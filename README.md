@@ -2,12 +2,12 @@
 
 ![tic_tac_logo](images/Tic_tac_toe.png)
 
-<font size="1">Image modified from https://en.wikipedia.org/wiki/File:Tic_tac_toe.svg
+<sub>Image modified from https://en.wikipedia.org/wiki/File:Tic_tac_toe.svg</sub>
 
-Game design inspired by Riya Tendulkar code:
+<sub>Game design inspired by Riya Tendulkar code:
 https://levelup.gitconnected.com/how-to-code-tic-tac-toe-in-python-using-tkinter-e7f9ce510bfb
 https://gist.github.com/riya1620/72c2b668ef29da061c44d97a82318572
-</font>
+</sub>
 
 ## A Tic Tak Toe Game in tkinter
 
