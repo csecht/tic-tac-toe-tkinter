@@ -27,6 +27,7 @@ except (ImportError, ModuleNotFoundError) as error:
           '\nOn Linux, you may also need: $ sudo apt-get install python3-tk\n'
           f'See also: https://tkdocs.com/tutorial/install.html \n{error}')
 
+MY_OS = sys.platform[:3]
 
 def quit_game(quit_now=True):
     """
@@ -52,6 +53,7 @@ class TicTacToeGUI(tk.Tk):
         self.player2 = 'PLAYER 2'
         self.p1_mark = 'X'
         self.p2_mark = 'O'
+        self.mark_font = 'TkFixedFont 30 bold'
         self.p1_points = 0
         self.p2_points = 0
         self.p1_score = tk.IntVar()
@@ -164,7 +166,10 @@ class TicTacToeGUI(tk.Tk):
         _row = 2
         _col = 0
         for lbl in self.play_labels:
-            lbl.grid(column=_col, row=_row)
+            if MY_OS == 'dar':
+                lbl.grid(column=_col, row=_row, pady=6, padx=6)
+            else:
+                lbl.grid(column=_col, row=_row)
             _col += 1
             if _col > 2:
                 _col = 0
@@ -186,8 +191,13 @@ class TicTacToeGUI(tk.Tk):
                                     padx=(0, 0), pady=(30, 0), sticky=tk.W)
         # Auto-turn counting labels are gridded in auto_start().
 
-        self.play_pc_ckb.grid(row=5, column=0,
-                              pady=5, sticky=tk.EW)
+        if MY_OS == 'dar':
+            self.play_pc_ckb.grid(row=5, column=0,
+                                  padx=25, pady=5, sticky=tk.W)
+        else:
+            self.play_pc_ckb.grid(row=5, column=0,
+                                  pady=5, sticky=tk.EW)
+
         self.pc_vs_pc_lbl.grid(row=5, column=1,
                                padx=(20, 0), pady=5, sticky=tk.W)
         self.auto_start_btn.grid(row=5, column=1,
@@ -205,9 +215,13 @@ class TicTacToeGUI(tk.Tk):
         for i, lbl in enumerate(self.play_labels):
             lbl.config(text=' ', height=3, width=6,
                        bg=self.not_won_bg, fg=self.mark_fg,
-                       font='TkFixedFont 30 bold',
-                       highlightthickness=6,
+                       font=self.mark_font,
                        )
+            if MY_OS == 'dar':
+                lbl.config(borderwidth=12)
+            else:
+                lbl.config(highlightthickness=6)
+
             lbl.bind('<Button-1>', lambda event, lbl_idx=i: self.player_turn(
                 self.play_labels[lbl_idx]))
             lbl.bind('<Enter>', lambda event, l=lbl: self.on_enter(l))
