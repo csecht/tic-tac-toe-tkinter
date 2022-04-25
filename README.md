@@ -43,4 +43,4 @@ PC Player 2 (O) just won:
 ![pc-win](images/auto_play.png)
 
 ### Known Issues
-* The play buttons do not format well in MacOS; they function, but look bad.
+Waiting for feedback...
