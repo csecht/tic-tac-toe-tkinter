@@ -29,6 +29,7 @@ except (ImportError, ModuleNotFoundError) as error:
 
 MY_OS = sys.platform[:3]
 
+
 def quit_game(quit_now=True):
     """
     Manage app window Quit button. Ask for confirmation if a game has
@@ -166,9 +167,9 @@ class TicTacToeGUI(tk.Tk):
         _row = 2
         _col = 0
         for lbl in self.play_labels:
-            if MY_OS == 'dar':
+            if MY_OS in 'win, dar':
                 lbl.grid(column=_col, row=_row, pady=6, padx=6)
-            else:
+            else:  # Linux (lin)
                 lbl.grid(column=_col, row=_row)
             _col += 1
             if _col > 2:
@@ -528,7 +529,7 @@ class TicTacToeGUI(tk.Tk):
         result_window = tk.Toplevel(self, borderwidth=4, relief='raised')
         result_window.title('Game Report')
         result_window.geometry(
-            f'225x125+{app.winfo_x() + 420}+{app.winfo_y() - 37}')
+            f'250x125+{app.winfo_x() + 420}+{app.winfo_y() - 37}')
         result_window.config(bg='Yellow3')
 
         def enable_app_quit():
