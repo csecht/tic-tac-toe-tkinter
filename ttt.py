@@ -54,7 +54,6 @@ class TicTacToeGUI(tk.Tk):
         self.player2 = 'PLAYER 2'
         self.p1_mark = 'X'
         self.p2_mark = 'O'
-        self.mark_font = 'TkFixedFont 30 bold'
         self.p1_points = 0
         self.p2_points = 0
         self.p1_score = tk.IntVar()
@@ -68,15 +67,6 @@ class TicTacToeGUI(tk.Tk):
         self.auto_after = 600  # ms, pause between turns for auto and PC modes.
         self.autoplay_marks = ''
         self.auto_turns = tk.IntVar()
-
-        # Foreground and background colors.
-        self.score_fg = 'DodgerBlue4'
-        self.mark_fg = 'yellow2'
-        self.disabled_fg = 'grey65'
-        self.active_fg = 'black'
-        self.won_bg = 'blue'
-        self.not_won_bg = 'black'
-        self.mouseover_bg = 'grey15'
 
         # Player's turn widgets.
         self.whose_turn = tk.StringVar()
@@ -98,6 +88,27 @@ class TicTacToeGUI(tk.Tk):
         self.auto_stop_btn = tk.Radiobutton()
         self.quit_button = tk.Button()
 
+        # Foreground and background colors.
+        self.color = {'score_fg': 'DodgerBlue4',
+                      'result_bg': 'yellow3',
+                      'disabled': 'grey65',
+                      'active_fg': 'black',
+                      'mark_fg': 'yellow2',
+                      'sq_won': 'blue',
+                      'sq_not_won': 'black',
+                      'sq_mouseover': 'grey15',
+                      }
+
+        # Fonts for labels.
+        self.fonts = {
+            'head11': ('TkHeadingFont', 11, 'italic bold'),
+            'head12bold': ('TkHeadingFont', 12, 'bold'),
+            'head10bold': ('TkHeaderFont', 10, 'bold'),
+            'condensed9': ('TkTooltipFont', 9),
+            'fixed30bold': ('TkFixedFont', 30, 'bold'),
+            'head14boldital': ('TkHeadingFont', 14, 'bold italic'),
+        }
+
         self.configure_widgets()
         self.grid_widgets()
 
@@ -105,37 +116,37 @@ class TicTacToeGUI(tk.Tk):
         """Initial configurations for app window widgets."""
         # Player's turn widgets.
         self.whose_turn_lbl.config(textvariable=self.whose_turn, height=4,
-                                   font=('TkHeadingFont', 11, 'italic bold'))
+                                   font=self.fonts['head11'])
         self.whose_turn.set(f'Turn: {self.player1}, {self.p1_mark}')
         self.auto_turns_header.config(text='Turns remaining',
-                                      font=('TkTooltipFont', 9))
+                                      font=self.fonts['condensed9'])
         self.auto_turns_lbl.config(textvariable=self.auto_turns,
-                                   font=('TkTooltipFont', 9),)
+                                   font=self.fonts['condensed9'])
 
         # Players' scores widgets.
         # ︴symbol from https://coolsymbol.com/line-symbols.html
         self.score_header.config(
-            text='Scores ︴', font=('TkHeadingFont', 12, 'bold'),
-            fg=self.score_fg)
+            text='Scores ︴', font=self.fonts['head12bold'],
+            fg=self.color['score_fg'])
         self.player1_header.config(
-            text='Player 1:', font=('TkHeaderFont', 10, 'bold'),
-            fg=self.score_fg)
+            text='Player 1:', font=self.fonts['head10bold'],
+            fg=self.color['score_fg'])
         self.player2_header.config(
-            text='Player 2:', font=('TkHeaderFont', 10, 'bold'),
-            fg=self.score_fg)
+            text='Player 2:', font=self.fonts['head10bold'],
+            fg=self.color['score_fg'])
         self.player1_score_lbl.config(
-            textvariable=self.p1_score, font=('TkHeaderFont', 12, 'bold'),
-            fg=self.score_fg)
+            textvariable=self.p1_score, font=self.fonts['head12bold'],
+            fg=self.color['score_fg'])
         self.player2_score_lbl.config(
-            textvariable=self.p2_score, font=('TkHeaderFont', 12, 'bold'),
-            fg=self.score_fg)
+            textvariable=self.p2_score, font=self.fonts['head12bold'],
+            fg=self.color['score_fg'])
 
         self.play_pc_ckb.config(text='Play computer',
                                 variable=self.play_pc,
                                 borderwidth=0,
-                                font=('TkDefaultFont', 10, 'bold'))
+                                font=self.fonts['head10bold'])
         self.pc_vs_pc_lbl.config(text='PC vs. PC',
-                                 font=('TkDefaultFont', 10, 'bold'))
+                                 font=self.fonts['head10bold'])
 
         self.auto_start_btn.config(text='Start', value=1,
                                    variable=self.play_auto,
@@ -215,8 +226,8 @@ class TicTacToeGUI(tk.Tk):
         """
         for i, lbl in enumerate(self.play_labels):
             lbl.config(text=' ', height=3, width=6,
-                       bg=self.not_won_bg, fg=self.mark_fg,
-                       font=self.mark_font,
+                       bg=self.color['sq_not_won'], fg=self.color['mark_fg'],
+                       font=self.fonts['fixed30bold'],
                        )
             if MY_OS == 'dar':
                 lbl.config(borderwidth=12)
@@ -230,34 +241,33 @@ class TicTacToeGUI(tk.Tk):
 
     def on_enter(self, label: tk):
         """
-        Indicate mouseover_bg cells with a color() change
-        (if different from default bg).
+        Indicate mouseover quares with a color change.
 
-        :param label: The active tkinter widget.
+        :param label: The tk.Label object.
         """
-        if label['bg'] == self.not_won_bg:
-            label['bg'] = self.mouseover_bg
-        elif label['bg'] == self.won_bg:
-            label['bg'] = self.won_bg
+        if label['bg'] == self.color['sq_not_won']:
+            label['bg'] = self.color['sq_mouseover']
+        elif label['bg'] == self.color['sq_won']:
+            label['bg'] = self.color['sq_won']
 
     def on_leave(self, label: tk):
         """
-        On mouse leave, cell returns to entry color.
+        On mouse leave, square returns to entry color.
 
-        :param label: The active tkinter widget.
+        :param label: The tk.Label object.
         """
-        if label['bg'] == self.mouseover_bg:
-            label['bg'] = self.not_won_bg
-        elif label['bg'] == self.not_won_bg:
-            label['bg'] = self.not_won_bg
-        elif label['bg'] == self.won_bg:
-            label['bg'] = self.won_bg
+        if label['bg'] == self.color['sq_mouseover']:
+            label['bg'] = self.color['sq_not_won']
+        elif label['bg'] == self.color['sq_not_won']:
+            label['bg'] = self.color['sq_not_won']
+        elif label['bg'] == self.color['sq_won']:
+            label['bg'] = self.color['sq_won']
 
     def player_turn(self, played_lbl: tk) -> None:
         """
         Check whether square (label) selected by players, *played_btn*,
-        is available to play either 'X' or 'O'.
-        Assign player's mark to text value of the selected button.
+        is available to play.
+        Assign player's mark to text value of the selected label.
         In Player v Player, the player's mark alternates each turn, so
         on even turns, Player2 plays first with 'X'.
         Reply to played label with computer's turn if option selected.
@@ -267,7 +277,7 @@ class TicTacToeGUI(tk.Tk):
         """
         # Need to disable auto_play() mode until current game is over.
         self.auto_start_btn.config(state='disabled')
-        self.pc_vs_pc_lbl.config(fg=self.disabled_fg)
+        self.pc_vs_pc_lbl.config(fg=self.color['disabled_fg'])
 
         # Note: X (human) always plays first.
         if played_lbl['text'] == ' ':
@@ -309,9 +319,9 @@ class TicTacToeGUI(tk.Tk):
     def pc_turn(self):
         """
         Computer plays Player2. Play the center square if open, otherwise
-        block any two Xs in a row; if none, then randomly play first
-        available square. Algorithm favors blocking over winning to
-        counter X's advantage of playing first.
+        block any two Player1 marks in a row; if none, then randomly
+        play first available square. Algorithm favors PC blocking over
+        winning to counter Player1's advantage of always playing first.
         """
         # Delay play for a better feel.
         #   With this, need app.update_idletasks() after Player 1 plays.
@@ -417,8 +427,8 @@ class TicTacToeGUI(tk.Tk):
                         self.display_result(f'{mark} WINS!')
 
                     else:  # Player v Player mode
-                        # Player2 is playing 'X' on even game numbers, so
-                        #   award an 'X' win (p1_mark) to P2
+                        # Player2 is playing p1_mark on even game numbers, so
+                        #   award p1_mark win to P2.
                         if self.num_game % 2 == 0:
                             if mark == self.p1_mark:
                                 self.p2_points += 1
@@ -429,7 +439,7 @@ class TicTacToeGUI(tk.Tk):
 
                         self.flash_win(combo)
                         # After a PvP game, switch player label of whose_turn
-                        #    to play 'X'.
+                        #    to play the other mark (p1_mark always plays first).
                         self.player1, self.player2 = self.player2, self.player1
                         self.block_player_action()
                         self.display_result(f'{mark} WINS!')
@@ -456,22 +466,22 @@ class TicTacToeGUI(tk.Tk):
         """
         _x, _y, _z = combo
 
-        app.after(10, lambda: self.play_labels[_x].config(bg=self.won_bg))
-        app.after(100, lambda: self.play_labels[_y].config(bg=self.won_bg))
-        app.after(200, lambda: self.play_labels[_z].config(bg=self.won_bg))
-        app.after(300, lambda: self.play_labels[_z].config(bg=self.not_won_bg))
-        app.after(400, lambda: self.play_labels[_y].config(bg=self.not_won_bg))
-        app.after(500, lambda: self.play_labels[_x].config(bg=self.not_won_bg))
-        app.after(600, lambda: self.play_labels[_x].config(bg=self.won_bg))
-        app.after(600, lambda: self.play_labels[_y].config(bg=self.won_bg))
-        app.after(600, lambda: self.play_labels[_z].config(bg=self.won_bg))
+        app.after(10, lambda: self.play_labels[_x].config(bg=self.color['sq_won']))
+        app.after(100, lambda: self.play_labels[_y].config(bg=self.color['sq_won']))
+        app.after(200, lambda: self.play_labels[_z].config(bg=self.color['sq_won']))
+        app.after(300, lambda: self.play_labels[_z].config(bg=self.color['sq_not_won']))
+        app.after(400, lambda: self.play_labels[_y].config(bg=self.color['sq_not_won']))
+        app.after(500, lambda: self.play_labels[_x].config(bg=self.color['sq_not_won']))
+        app.after(600, lambda: self.play_labels[_x].config(bg=self.color['sq_won']))
+        app.after(600, lambda: self.play_labels[_y].config(bg=self.color['sq_won']))
+        app.after(600, lambda: self.play_labels[_z].config(bg=self.color['sq_won']))
 
     def show_tie(self):
         """
         Make game board blue on tie.
         """
         for lbl in self.play_labels:
-            lbl.config(bg=self.won_bg)
+            lbl.config(bg=self.color['sq_won'])
             app.update_idletasks()
 
     def flash_tie(self):
@@ -480,19 +490,19 @@ class TicTacToeGUI(tk.Tk):
         """
         def flash_blue():
             for lbl in self.play_labels:
-                lbl.config(bg=self.won_bg)
+                lbl.config(bg=self.color['blue'])
                 app.update_idletasks()
 
         def tie_blue():
             for lbl in self.play_labels:
                 lbl.config(text=' ')
-            self.play_labels[4].config(text='TIE', bg=self.won_bg)
-            self.play_labels[4].config(text='TIE', bg=self.won_bg)
-            self.play_labels[4].config(text='TIE', bg=self.won_bg)
+            self.play_labels[4].config(text='TIE', bg=self.color['sq_won'])
+            self.play_labels[4].config(text='TIE', bg=self.color['sq_won'])
+            self.play_labels[4].config(text='TIE', bg=self.color['sq_won'])
 
         def tie_black():
             for lbl in self.play_labels:
-                lbl.config(bg=self.not_won_bg)
+                lbl.config(bg=self.color['sq_not_won'])
                 app.update_idletasks()
 
         app.after(10, flash_blue)
@@ -530,7 +540,7 @@ class TicTacToeGUI(tk.Tk):
         result_window.title('Game Report')
         result_window.geometry(
             f'250x125+{app.winfo_x() + 420}+{app.winfo_y() - 37}')
-        result_window.config(bg='Yellow3')
+        result_window.config(bg=self.color['result_bg'])
 
         def enable_app_quit():
             """
@@ -548,7 +558,7 @@ class TicTacToeGUI(tk.Tk):
             self.play_pc_ckb.config(state='normal')
             self.quit_button.config(state='normal', command=quit_game)
             self.auto_start_btn.config(state='normal')
-            self.pc_vs_pc_lbl.config(fg=self.active_fg)
+            self.pc_vs_pc_lbl.config(fg=self.color['active_fg'])
 
             self.auto_turns_header.grid_remove()
             self.auto_turns_lbl.grid_remove()
@@ -557,8 +567,8 @@ class TicTacToeGUI(tk.Tk):
             result_window.destroy()
 
         result_lbl = tk.Label(result_window, text=win_msg,
-                              font=('TkHeadingFont', 14, 'bold italic'),
-                              bg='Yellow3')
+                              font=self.fonts['head14boldital'],
+                              bg=self.color['result_bg'])
 
         again = tk.Button(result_window, text='New Game', command=new_game)
         not_again = tk.Button(result_window, text='Quit', command=quit_game)
@@ -600,7 +610,7 @@ class TicTacToeGUI(tk.Tk):
         if self.after_id:
             app.after_cancel(self.after_id)
             self.after_id = None
-        self.pc_vs_pc_lbl.config(fg=self.active_fg)
+        self.pc_vs_pc_lbl.config(fg=self.color['disabled_fg'])
 
         self.block_player_action()
 
@@ -658,9 +668,9 @@ class TicTacToeGUI(tk.Tk):
                 self.play_labels[4]['text'] = mark
             else:
                 while current_turn == self.turn_number():
-                    move = random.randrange(0, 9)
-                    if self.play_labels[move]['text'] == ' ':
-                        self.play_labels[move]['text'] = mark
+                    lbl_idx = random.randrange(0, 9)
+                    if self.play_labels[lbl_idx]['text'] == ' ':
+                        self.play_labels[lbl_idx]['text'] = mark
 
             if self.turn_number() >= 5:
                 self.check_winner()
@@ -684,15 +694,15 @@ class TicTacToeGUI(tk.Tk):
         _x, _y, _z = combo
 
         def winner_show():
-            self.play_labels[_x].config(text=mark, bg=self.won_bg)
-            self.play_labels[_y].config(text=mark, bg=self.won_bg)
-            self.play_labels[_z].config(text=mark, bg=self.won_bg)
+            self.play_labels[_x].config(text=mark, bg=self.color['sq_won'])
+            self.play_labels[_y].config(text=mark, bg=self.color['sq_won'])
+            self.play_labels[_z].config(text=mark, bg=self.color['sq_won'])
             app.update_idletasks()
 
         def winner_erase():
-            self.play_labels[_x].config(text=' ', bg=self.not_won_bg)
-            self.play_labels[_y].config(text=' ', bg=self.not_won_bg)
-            self.play_labels[_z].config(text=' ', bg=self.not_won_bg)
+            self.play_labels[_x].config(text=' ', bg=self.color['sq_not_won'])
+            self.play_labels[_y].config(text=' ', bg=self.color['sq_not_won'])
+            self.play_labels[_z].config(text=' ', bg=self.color['sq_not_won'])
 
         app.after(10, winner_show)
         app.after(400, winner_erase)
