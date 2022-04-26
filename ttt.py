@@ -91,7 +91,7 @@ class TicTacToeGUI(tk.Tk):
         # Foreground and background colors.
         self.color = {'score_fg': 'DodgerBlue4',
                       'result_bg': 'yellow3',
-                      'disabled': 'grey65',
+                      'disabled_fg': 'grey65',
                       'active_fg': 'black',
                       'mark_fg': 'yellow2',
                       'sq_won': 'blue',
