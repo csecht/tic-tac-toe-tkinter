@@ -65,8 +65,8 @@ class TicTacToeGUI(tk.Tk):
         self.after_id = None
         self.winner_found = False
         self.auto_after = 600  # ms, pause between turns for auto and PC modes.
-        self.autoplay_marks = ''
-        self.auto_turns = tk.IntVar()
+        self.all_autoplay_marks = ''
+        self.auto_turns_remaining = tk.IntVar()
 
         # Player's turn widgets.
         self.whose_turn = tk.StringVar()
@@ -100,7 +100,7 @@ class TicTacToeGUI(tk.Tk):
                       }
 
         # Fonts for labels.
-        self.fonts = {
+        self.font = {
             'head11': ('TkHeadingFont', 11, 'italic bold'),
             'head12bold': ('TkHeadingFont', 12, 'bold'),
             'head10bold': ('TkHeaderFont', 10, 'bold'),
@@ -116,37 +116,37 @@ class TicTacToeGUI(tk.Tk):
         """Initial configurations for app window widgets."""
         # Player's turn widgets.
         self.whose_turn_lbl.config(textvariable=self.whose_turn, height=4,
-                                   font=self.fonts['head11'])
+                                   font=self.font['head11'])
         self.whose_turn.set(f'Turn: {self.player1}, {self.p1_mark}')
         self.auto_turns_header.config(text='Turns remaining',
-                                      font=self.fonts['condensed9'])
-        self.auto_turns_lbl.config(textvariable=self.auto_turns,
-                                   font=self.fonts['condensed9'])
+                                      font=self.font['condensed9'])
+        self.auto_turns_lbl.config(textvariable=self.auto_turns_remaining,
+                                   font=self.font['condensed9'])
 
         # Players' scores widgets.
         # ︴symbol from https://coolsymbol.com/line-symbols.html
         self.score_header.config(
-            text='Scores ︴', font=self.fonts['head12bold'],
+            text='Scores ︴', font=self.font['head12bold'],
             fg=self.color['score_fg'])
         self.player1_header.config(
-            text='Player 1:', font=self.fonts['head10bold'],
+            text='Player 1:', font=self.font['head10bold'],
             fg=self.color['score_fg'])
         self.player2_header.config(
-            text='Player 2:', font=self.fonts['head10bold'],
+            text='Player 2:', font=self.font['head10bold'],
             fg=self.color['score_fg'])
         self.player1_score_lbl.config(
-            textvariable=self.p1_score, font=self.fonts['head12bold'],
+            textvariable=self.p1_score, font=self.font['head12bold'],
             fg=self.color['score_fg'])
         self.player2_score_lbl.config(
-            textvariable=self.p2_score, font=self.fonts['head12bold'],
+            textvariable=self.p2_score, font=self.font['head12bold'],
             fg=self.color['score_fg'])
 
         self.play_pc_ckb.config(text='Play computer',
                                 variable=self.play_pc,
                                 borderwidth=0,
-                                font=self.fonts['head10bold'])
+                                font=self.font['head10bold'])
         self.pc_vs_pc_lbl.config(text='PC vs. PC',
-                                 font=self.fonts['head10bold'])
+                                 font=self.font['head10bold'])
 
         self.auto_start_btn.config(text='Start', value=1,
                                    variable=self.play_auto,
@@ -227,7 +227,7 @@ class TicTacToeGUI(tk.Tk):
         for i, lbl in enumerate(self.play_labels):
             lbl.config(text=' ', height=3, width=6,
                        bg=self.color['sq_not_won'], fg=self.color['mark_fg'],
-                       font=self.fonts['fixed30bold'],
+                       font=self.font['fixed30bold'],
                        )
             if MY_OS == 'dar':
                 lbl.config(borderwidth=12)
@@ -567,7 +567,7 @@ class TicTacToeGUI(tk.Tk):
             result_window.destroy()
 
         result_lbl = tk.Label(result_window, text=win_msg,
-                              font=self.fonts['head14boldital'],
+                              font=self.font['head14boldital'],
                               bg=self.color['result_bg'])
 
         again = tk.Button(result_window, text='New Game', command=new_game)
@@ -629,24 +629,25 @@ class TicTacToeGUI(tk.Tk):
 
         self.activate_board()
 
-        mark = self.autoplay_marks[0]
+        mark = self.all_autoplay_marks[0]
         if mark == self.p2_mark:
-            self.autoplay_marks = self.autoplay_marks.lstrip(mark)
+            self.all_autoplay_marks = self.all_autoplay_marks.lstrip(mark)
 
     def auto_limit(self) -> None:
         """
         Provide for about 1840 alternating X & O auto_play flags; about
         240 games. Start with 2000 flags because games need to start
         with 'X', so leading 'O' may be striped from marks string at the
-        start of new games.
+        start of new games (or whatever corresponding player characters
+        are used).
         """
         # Need to limit auto_play() turns. String of 2000 text marks
         #   is shortened one character each turn. Actual number of
-        #   turns will be ~9% less b/c new games always start with 'X'
-        #   by stripping any leading 'O'.
-        k_x = self.p1_mark * 1000
-        k_o = self.p2_mark * 1000
-        self.autoplay_marks = ''.join(map(lambda x, o: x + o, k_x, k_o))
+        #   turns will be ~9% less b/c new games always start with p1_mark
+        #   by stripping any leading p2_mark.
+        all_x = self.p1_mark * 1000
+        all_o = self.p2_mark * 1000
+        self.all_autoplay_marks = ''.join(map(lambda x, o: x + o, all_x, all_o))
 
     def auto_play(self) -> None:
         """
@@ -657,12 +658,12 @@ class TicTacToeGUI(tk.Tk):
         O' in the center square at first opportunity; this reduces X's
         first play advantage to ~1.2x.
         """
-        self.auto_turns.set(len(self.autoplay_marks))
+        self.auto_turns_remaining.set(len(self.all_autoplay_marks))
         current_turn = self.turn_number()
 
-        if len(self.autoplay_marks) >= 1:
-            mark = self.autoplay_marks[0]
-            self.autoplay_marks = self.autoplay_marks.lstrip(mark)
+        if len(self.all_autoplay_marks) >= 1:
+            mark = self.all_autoplay_marks[0]
+            self.all_autoplay_marks = self.all_autoplay_marks.lstrip(mark)
 
             if mark == self.p2_mark and self.play_labels[4]['text'] == ' ':
                 self.play_labels[4]['text'] = mark
