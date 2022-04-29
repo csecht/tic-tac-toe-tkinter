@@ -297,8 +297,14 @@ class TicTacToeGUI(tk.Tk):
                     # Need update to see the pc_turn() play delayed by app.after.
                     app.update_idletasks()
 
+                    if self.turn_number() >= 5:
+                        self.check_winner()
+
                     if self.turn_number() < 9 and not self.winner_found:
                         self.pc_turn()
+
+                        if self.turn_number() >= 5:
+                            self.check_winner()
 
             elif self.mode_selection.get() == 'pvp':
                 if self.turn_number() % 2 == 0:
@@ -308,9 +314,8 @@ class TicTacToeGUI(tk.Tk):
                     played_lbl['text'] = self.p2_mark
                     self.whose_turn.set(f'Turn:\n{self.player1} plays {self.p1_mark}')
 
-            if self.turn_number() >= 5:
-                self.check_winner()
-
+                if self.turn_number() >= 5:
+                    self.check_winner()
         else:
             messagebox.showerror('Oops!', 'This square was already played!')
 
