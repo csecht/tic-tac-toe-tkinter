@@ -326,8 +326,6 @@ class TicTacToeGUI(tk.Tk):
         advantage of always playing first.
         """
 
-        # self.auto_go_stop_mode.config(state=tk.DISABLED)
-
         # Delay play for a better feel.
         #   With this, need app.update_idletasks() after Player 1 plays.
         app.after(self.play_after)
@@ -576,7 +574,6 @@ class TicTacToeGUI(tk.Tk):
                               font=self.font['head14boldital'],
                               bg=self.color['result_bg'])
 
-        # self.num_game += 1
         self.block_all_player_action()
         self.whose_turn.set('Turn:\npending...')
 
@@ -589,7 +586,6 @@ class TicTacToeGUI(tk.Tk):
         if self.mode_selection.get() in 'random, competitive':
             self.pc_rando_mode.deselect()
             self.pc_compet_mode.deselect()
-            # self.auto_go_stop_rbtn.config(state=tk.DISABLED)
             self.pvp_mode.select()
 
         def enable_app_quit():
@@ -606,7 +602,6 @@ class TicTacToeGUI(tk.Tk):
             self.reset_board()
             self.whose_turn.set(f'Turn:\n{self.player1} plays {self.p1_mark}')
             self.quit_button.config(state=tk.NORMAL, command=quit_game)
-            # Need to reset from 'Stop autoplay'.
             self.auto_go_stop.set('Start autoplay')
             self.auto_go_stop_rbtn.config(state=tk.NORMAL)
 
