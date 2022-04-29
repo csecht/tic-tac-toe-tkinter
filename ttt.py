@@ -619,6 +619,11 @@ class TicTacToeGUI(tk.Tk):
         not_again.pack()
 
     def auto_ctrl(self):
+        """
+        Check that an autoplay mode is selected before calling
+        auto_start() when the auto_go_stop_rbtn Radiobutton is clicked.
+        Called from the command function of auto_go_stop_rbtn.
+        """
         if 'Start' in self.auto_go_stop.get():
             if self.mode_selection.get() in 'random, competitive':
                 self.auto_go_stop.set('Stop autoplay')
