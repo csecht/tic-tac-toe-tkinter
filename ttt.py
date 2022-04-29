@@ -135,7 +135,7 @@ class TicTacToeGUI(tk.Tk):
         # Players' scores widgets.
         # ︴symbol from https://coolsymbol.com/line-symbols.html
         self.score_header.config(
-            text='Scores ︴', font=self.font['head12bold'],
+            text='Score ︴', font=self.font['head12bold'],
             fg=self.color['score_fg'])
         self.player1_header.config(
             text='Player 1:', font=self.font['head10bold'],
@@ -163,7 +163,7 @@ class TicTacToeGUI(tk.Tk):
                                   variable=self.mode_selection,
                                   value='random',
                                   command=self.block_mode_switch)
-        self.pc_compet_mode.config(text='Autoplay, competitive',
+        self.pc_compet_mode.config(text='Autoplay, strategy',
                                    variable=self.mode_selection,
                                    value='competitive',
                                    command=self.block_mode_switch)
@@ -205,8 +205,13 @@ class TicTacToeGUI(tk.Tk):
         self.whose_turn_lbl.grid(row=0, column=0, rowspan=2,
                                  padx=(12, 0), sticky=tk.W)
 
-        self.score_header.grid(row=0, column=1, rowspan=2,
-                               padx=(20, 0), sticky=tk.W)
+        if MY_OS == 'dar':
+            self.score_header.grid(row=0, column=1, rowspan=2,
+                                   padx=(50, 0), sticky=tk.W)
+        else:
+            self.score_header.grid(row=0, column=1, rowspan=2,
+                                   padx=(20, 0), sticky=tk.W)
+
         self.player1_header.grid(row=0, column=1, rowspan=2,
                                  padx=(0, 8), pady=(0, 30), sticky=tk.E)
         self.player2_header.grid(row=0, column=1, rowspan=2,
@@ -217,16 +222,10 @@ class TicTacToeGUI(tk.Tk):
         self.player2_score_lbl.grid(row=0, column=2, rowspan=2,
                                     padx=(0, 0), pady=(30, 0), sticky=tk.W)
         # Auto-turn counting labels are gridded in auto_start().
-        if MY_OS == 'dar':
-            self.pvp_mode.grid(column=0, row=5, padx=(10, 0), pady=(5, 5), sticky=tk.W)
-            self.pvpc_mode.grid(column=1, row=5, padx=(10, 0), pady=(5, 5), sticky=tk.W)
-            self.pc_rando_mode.grid(column=0, row=7, padx=(10, 0), pady=(8, 0), sticky=tk.W)
-            self.pc_compet_mode.grid(column=0, row=8, padx=(10, 0), pady=(0, 0), sticky=tk.W)
-        else:
-            self.pvp_mode.grid(column=0, row=5, padx=(10, 0), pady=(5, 5), sticky=tk.W)
-            self.pvpc_mode.grid(column=1, row=5, padx=(10, 0), pady=(5, 5), sticky=tk.W)
-            self.pc_rando_mode.grid(column=0, row=7, padx=(10, 0), pady=(8, 0), sticky=tk.W)
-            self.pc_compet_mode.grid(column=0, row=8, padx=(10, 0), pady=(0, 0), sticky=tk.W)
+        self.pvp_mode.grid(column=0, row=5, padx=(10, 0), pady=(5, 5), sticky=tk.W)
+        self.pvpc_mode.grid(column=1, row=5, padx=(10, 0), pady=(5, 5), sticky=tk.W)
+        self.pc_rando_mode.grid(column=0, row=7, padx=(10, 0), pady=(8, 0), sticky=tk.W)
+        self.pc_compet_mode.grid(column=0, row=8, padx=(10, 0), pady=(0, 0), sticky=tk.W)
 
         self.auto_go_stop_rbtn.grid(row=7, column=1, rowspan=2,
                                     padx=(0, 0), pady=(0, 10), sticky=tk.EW)
@@ -388,26 +387,6 @@ class TicTacToeGUI(tk.Tk):
 
         return turn
 
-    def block_mode_switch(self) -> None:
-        """
-        Cancel/ignore an errant/mistimed play mode selection.
-        Called from command of play mode Radiobuttons.
-        Block any mode change if in the middle of a game.
-        """
-
-        if self.turn_number() > 0:
-            if self.mode_selection.get() == 'pvp':
-                self.mode_selection.set('pvpc')
-            elif self.mode_selection.get() == 'pvpc':
-                self.mode_selection.set('pvp')
-            elif self.mode_selection.get() in 'random, competitive':
-                # Set to default because don't know prior mode.
-                self.pvp_mode.select()
-
-            messagebox.showinfo(title='Mode unavailable',
-                                detail='Finish this game,\n'
-                                       'then change the play mode.')
-
     def check_winner(self) -> None:
         """
         Check each player's played mark (play_labels's text value) and
@@ -531,6 +510,26 @@ class TicTacToeGUI(tk.Tk):
         app.after(10, flash_blue)
         app.after(300, tie_blue)
         app.after(500, tie_black)
+
+    def block_mode_switch(self) -> None:
+        """
+        Cancel/ignore an errant/mistimed play mode selection.
+        Called from command of play mode Radiobuttons.
+        Block any mode change if in the middle of a game.
+        """
+
+        if self.turn_number() > 0:
+            if self.mode_selection.get() == 'pvp':
+                self.mode_selection.set('pvpc')
+            elif self.mode_selection.get() == 'pvpc':
+                self.mode_selection.set('pvp')
+            elif self.mode_selection.get() in 'random, competitive':
+                # Set to default because don't know prior mode.
+                self.pvp_mode.select()
+
+            messagebox.showinfo(title='Mode unavailable',
+                                detail='Finish this game,\n'
+                                       'then change the play mode.')
 
     def block_playaction(self) -> None:
         """
