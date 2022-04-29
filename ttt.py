@@ -81,8 +81,8 @@ class TicTacToeGUI(tk.Tk):
         self.mode_selection = tk.StringVar()
         self.pvp_mode = tk.Radiobutton()
         self.pvpc_mode = tk.Radiobutton()
-        self.pc_rando_mode = tk.Radiobutton()
-        self.pc_compet_mode = tk.Radiobutton()
+        self.pc_random_mode = tk.Radiobutton()
+        self.pc_strategy_mode = tk.Radiobutton()
         self.autoplay_on = tk.BooleanVar()
         self.auto_go_stop_rbtn = tk.Radiobutton()
         self.auto_go_stop = tk.StringVar(value='Start autoplay')
@@ -159,14 +159,14 @@ class TicTacToeGUI(tk.Tk):
                               variable=self.mode_selection,
                               value='pvpc',
                               command=self.block_mode_switch)
-        self.pc_rando_mode.config(text='Autoplay, random',
-                                  variable=self.mode_selection,
-                                  value='random',
-                                  command=self.block_mode_switch)
-        self.pc_compet_mode.config(text='Autoplay, strategy',
+        self.pc_random_mode.config(text='Autoplay, random',
                                    variable=self.mode_selection,
-                                   value='competitive',
+                                   value='random',
                                    command=self.block_mode_switch)
+        self.pc_strategy_mode.config(text='Autoplay, strategy',
+                                     variable=self.mode_selection,
+                                     value='strategy',
+                                     command=self.block_mode_switch)
 
         self.auto_go_stop_rbtn.config(textvariable=self.auto_go_stop,
                                       variable=self.autoplay_on,
@@ -210,7 +210,7 @@ class TicTacToeGUI(tk.Tk):
                                    padx=(50, 0), sticky=tk.W)
         else:
             self.score_header.grid(row=0, column=1, rowspan=2,
-                                   padx=(20, 0), sticky=tk.W)
+                                   padx=(35, 0), sticky=tk.W)
 
         self.player1_header.grid(row=0, column=1, rowspan=2,
                                  padx=(0, 8), pady=(0, 30), sticky=tk.E)
@@ -224,8 +224,8 @@ class TicTacToeGUI(tk.Tk):
         # Auto-turn counting labels are gridded in auto_start().
         self.pvp_mode.grid(column=0, row=5, padx=(10, 0), pady=(5, 5), sticky=tk.W)
         self.pvpc_mode.grid(column=1, row=5, padx=(10, 0), pady=(5, 5), sticky=tk.W)
-        self.pc_rando_mode.grid(column=0, row=7, padx=(10, 0), pady=(8, 0), sticky=tk.W)
-        self.pc_compet_mode.grid(column=0, row=8, padx=(10, 0), pady=(0, 0), sticky=tk.W)
+        self.pc_random_mode.grid(column=0, row=7, padx=(10, 0), pady=(8, 0), sticky=tk.W)
+        self.pc_strategy_mode.grid(column=0, row=8, padx=(10, 0), pady=(0, 0), sticky=tk.W)
 
         self.auto_go_stop_rbtn.grid(row=7, column=1, rowspan=2,
                                     padx=(0, 0), pady=(0, 10), sticky=tk.EW)
@@ -423,7 +423,7 @@ class TicTacToeGUI(tk.Tk):
                 if lbl_x_txt == lbl_y_txt == lbl_z_txt == mark:
                     self.winner_found = True
 
-                    if self.mode_selection.get() in 'random, competitive':
+                    if self.mode_selection.get() in 'random, strategy':
                         award_points(mark)
                         self.auto_flash(combo, mark)
                     elif self.mode_selection.get() == 'pvpc':
@@ -458,7 +458,7 @@ class TicTacToeGUI(tk.Tk):
             self.p2_points += 0.5
             self.num_game += 1
 
-            if self.mode_selection.get() in 'random, competitive':
+            if self.mode_selection.get() in 'random, strategy':
                 self.auto_flash((4, 4, 4), 'TIE')
             else:
                 self.show_tie()
@@ -528,7 +528,7 @@ class TicTacToeGUI(tk.Tk):
                 self.mode_selection.set('pvpc')
             elif self.mode_selection.get() == 'pvpc':
                 self.mode_selection.set('pvp')
-            elif self.mode_selection.get() in 'random, competitive':
+            elif self.mode_selection.get() in 'random, strategy':
                 # Set to default because don't know prior mode.
                 self.pvp_mode.select()
 
@@ -587,9 +587,9 @@ class TicTacToeGUI(tk.Tk):
 
         # Need to unset autoplay mode to allow play action in Player modes:
         #   set to default PvP mode.
-        if self.mode_selection.get() in 'random, competitive':
-            self.pc_rando_mode.deselect()
-            self.pc_compet_mode.deselect()
+        if self.mode_selection.get() in 'random, strategy':
+            self.pc_random_mode.deselect()
+            self.pc_strategy_mode.deselect()
             self.pvp_mode.select()
 
         def enable_app_quit():
@@ -629,7 +629,7 @@ class TicTacToeGUI(tk.Tk):
         Called from the command function of auto_go_stop_rbtn.
         """
         if 'Start' in self.auto_go_stop.get():
-            if self.mode_selection.get() in 'random, competitive':
+            if self.mode_selection.get() in 'random, strategy':
                 self.auto_go_stop.set('Stop autoplay')
                 self.autoplay_on.set(True)
                 self.auto_start()
@@ -665,8 +665,8 @@ class TicTacToeGUI(tk.Tk):
         #   calls are controlled by after_id.
         if self.mode_selection.get() == 'random':
             self.autoplay_random()
-        elif self.mode_selection.get() == 'competitive':
-            self.autoplay_competitive()
+        elif self.mode_selection.get() == 'strategy':
+            self.autoplay_strategy()
 
     def auto_stop(self) -> None:
         """
@@ -733,7 +733,7 @@ class TicTacToeGUI(tk.Tk):
         else:
             self.auto_stop()
 
-    def autoplay_competitive(self):
+    def autoplay_strategy(self):
         """
         Automatically play computer vs. computer for 1000 turns
         (~120 games) or until stopped by user. Each turn is played on a
@@ -790,7 +790,7 @@ class TicTacToeGUI(tk.Tk):
 
             # Need a pause so user can see what plays were made and also
             #   allow auto_stop() to break the call cycle.
-            self.after_id = app.after(self.auto_after, self.autoplay_competitive)
+            self.after_id = app.after(self.auto_after, self.autoplay_strategy)
         else:
             self.auto_stop()
 
