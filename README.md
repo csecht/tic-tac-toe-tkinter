@@ -25,22 +25,23 @@ Start of a game in Player vs. Player mode, waiting for Player 1's first move:
 
 ![game-board](images/game_window.png)
 
-Player 1 won after 5 turns:
+Player 1 won first game:
 
 ![player1-win](images/player_v_player.png)
 
-Player vs Player, tie game awards a half point to each player:
+Player 2 tied the second game; a half point was awarded to each player:
 
 ![tie-game](images/tie_game.png)
 
-Player vs. PC mode, PC won second game:
+In Autoplay mode (computer vs computer), 1000 turns are played. Scores are updated in realtime through the series of about 120 to 140 games.
 
-![pc-win](images/player_v_pc.png)
+Popup windows announce user selection errors:
 
-Autoplay mode. Continuous PC v PC play for ~240 games (starting with 2000 total turns),
-PC Player 2 (O) just won:
+![mode_error](images/autoplay_mode_err.png)
 
-![pc-win](images/auto_play.png)
+and asks for confirmation:
+
+![confirm](images/confirm_quit.png)
 
 ### Known Issues
 Waiting for feedback...
