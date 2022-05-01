@@ -183,7 +183,7 @@ class TicTacToeGUI(tk.Tk):
                                      borderwidth=2,
                                      indicatoron=False,
                                      )
-        # Set startup for center preference through control_center_pref().
+        # Set startup for center preference through pc_pref_control().
         self.center_pref_rbtn.invoke()
 
         self.auto_go_stop_rbtn.config(textvariable=self.auto_go_stop,
@@ -389,16 +389,17 @@ class TicTacToeGUI(tk.Tk):
         """
 
         # Delay play for a better feel.
-        #   With this, need app.update_idletasks() after Player 1 plays.
+        #   With delay, need app.update_idletasks() after Player 1 plays.
         app.after(self.play_after)
 
         # Initial idea for algorithm:
-        # https://www.simplifiedpython.net/python-tic-tac-toe-using-artificial-intelligence/
-        winning_combos = (
+        # Need to reorder list so Human doesn't detect a pattern of where PC will play.
+        winning_combos = [
             (0, 1, 2), (3, 4, 5), (6, 7, 8),  # rows
             (0, 3, 6), (1, 4, 7), (2, 5, 8),  # columns
             (0, 4, 8), (2, 4, 6),  # diagonals
-        )
+        ]
+        random.shuffle(winning_combos)
 
         pc_turn = self.turn_number()
 
