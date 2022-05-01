@@ -94,7 +94,7 @@ class TicTacToeGUI(tk.Tk):
         # Additional autoplay widgets.
         self.after_id = None
         self.play_after = 600  # ms, pause between turns in play PC mode.
-        self.auto_after = 250  # ms, pause autoplay turns and game turnovers.
+        self.auto_after = 300  # ms, pause autoplay turns and game turnovers.
         self.all_autoplay_marks = ''
         self.auto_turns_remaining = tk.IntVar()
 
@@ -273,7 +273,7 @@ class TicTacToeGUI(tk.Tk):
             else:
                 lbl.config(highlightthickness=6)
 
-            lbl.bind('<Button-1>', lambda event, lbl_idx=i: self.player_turn(
+            lbl.bind('<Button-1>', lambda event, lbl_idx=i: self.human_turn(
                 self.board_labels[lbl_idx]))
             lbl.bind('<Enter>', lambda event, l=lbl: self.on_enter(l))
             lbl.bind('<Leave>', lambda event, l=lbl: self.on_leave(l))
@@ -334,7 +334,7 @@ class TicTacToeGUI(tk.Tk):
             self.autoplay_on.set(False)
             self.auto_stop()
 
-    def player_turn(self, played_lbl: tk) -> None:
+    def human_turn(self, played_lbl: tk) -> None:
         """
         Check whether square (*played_lbl*) selected by players is
         available to play.
@@ -382,7 +382,7 @@ class TicTacToeGUI(tk.Tk):
 
     def pc_turn(self):
         """
-        Computer plays Player2 when called from player_turn().
+        Computer plays Player2 when called from human_turn().
         Preference of play: center, block P1 win, go for win, corner,
         random. Strategy favors PC blocking over winning to counter
         Player1's advantage of always playing first.
@@ -403,6 +403,9 @@ class TicTacToeGUI(tk.Tk):
         pc_turn = self.turn_number()
 
         while pc_turn == self.turn_number():
+            corner_idx = random.choice((0, 2, 6, 8))
+            random_idx = random.randrange(0, 9)
+
             if self.board_labels[4]['text'] == ' ' and self.center_pref_on.get():
                 self.board_labels[4]['text'] = self.p2_mark
 
@@ -431,11 +434,9 @@ class TicTacToeGUI(tk.Tk):
 
                 # If no block or win combo, then play a corner, if not, go random.
                 if pc_turn == self.turn_number():
-                    corner_idx = random.choice((0, 2, 6, 8))
                     if self.board_labels[corner_idx]['text'] == ' ':
                         self.board_labels[corner_idx]['text'] = self.p2_mark
                 if pc_turn == self.turn_number():
-                    random_idx = random.randrange(0, 9)
                     if self.board_labels[random_idx]['text'] == ' ':
                         self.board_labels[random_idx]['text'] = self.p2_mark
 
@@ -537,14 +538,8 @@ class TicTacToeGUI(tk.Tk):
         _x, _y, _z = combo
 
         app.after(10, lambda: self.board_labels[_x].config(bg=self.color['sq_won']))
-        app.after(150, lambda: self.board_labels[_y].config(bg=self.color['sq_won']))
-        app.after(300, lambda: self.board_labels[_z].config(bg=self.color['sq_won']))
-        # app.after(300, lambda: self.board_labels[_z].config(bg=self.color['sq_not_won']))
-        # app.after(400, lambda: self.board_labels[_y].config(bg=self.color['sq_not_won']))
-        # app.after(500, lambda: self.board_labels[_x].config(bg=self.color['sq_not_won']))
-        # app.after(600, lambda: self.board_labels[_x].config(bg=self.color['sq_won']))
-        # app.after(600, lambda: self.board_labels[_y].config(bg=self.color['sq_won']))
-        # app.after(600, lambda: self.board_labels[_z].config(bg=self.color['sq_won']))
+        app.after(200, lambda: self.board_labels[_y].config(bg=self.color['sq_won']))
+        app.after(400, lambda: self.board_labels[_z].config(bg=self.color['sq_won']))
 
     def show_tie(self):
         """
@@ -825,9 +820,9 @@ class TicTacToeGUI(tk.Tk):
         center square only on a tie (using combo = (4, 4, 4)), then
         calls auto_setup() for the next auto_play() game.
 
-        :param combo: The tuple index values for a square on the board.
-        :param mark: The player mark, usually 'X' or 'O', but can be any
-                     string.
+        :param combo: The tuple index values for the winning squares on
+                      the board.
+        :param mark: The winning player's mark, usually 'X' or 'O'.
         """
         _x, _y, _z = combo
 
@@ -842,8 +837,8 @@ class TicTacToeGUI(tk.Tk):
             self.board_labels[_y].config(text=' ', bg=self.color['sq_not_won'])
             self.board_labels[_z].config(text=' ', bg=self.color['sq_not_won'])
 
-        app.after(10, winner_show)
-        app.after(200, winner_erase)
+        app.after(1, winner_show)
+        app.after(300, winner_erase)
         self.auto_setup()
 
 
