@@ -356,13 +356,13 @@ class TicTacToeGUI(tk.Tk):
                     app.update_idletasks()
 
                     if self.turn_number() >= 5:
-                        self.check_winner()
+                        self.check_winner(self.p1_mark)
 
                     if self.turn_number() < 9 and not self.winner_found:
                         self.pc_turn()
 
                         if self.turn_number() >= 5:
-                            self.check_winner()
+                            self.check_winner(self.p2_mark)
 
             elif self.mode_selection.get() == 'pvp':
                 if self.turn_number() % 2 == 0:
@@ -373,7 +373,7 @@ class TicTacToeGUI(tk.Tk):
                     self.whose_turn.set(f'Turn:\n{self.player1} plays {self.p1_mark}')
 
                 if self.turn_number() >= 5:
-                    self.check_winner()
+                    self.check_winner(played_lbl.cget('text'))
 
         else:
             messagebox.showerror('Oops!', 'This square was already played!')
@@ -456,13 +456,15 @@ class TicTacToeGUI(tk.Tk):
 
         return turn
 
-    def check_winner(self) -> None:
+    def check_winner(self, mark: str) -> None:
         """
         Check each player's played mark (board_labels's text value) and
         evaluate whether played marks match a positional win in the
         board matrix (based on board_labels index values).
-        In Player1 vs Player2 mode, which player goes first alternates
-        with each game.
+        In Player1 vs Player2 mode, alternate which player goes first
+        in repeating games.
+
+        :param mark: The played mark character to check for a win.
         """
         winning_combos = (
             (0, 1, 2), (3, 4, 5), (6, 7, 8),  # rows
@@ -476,44 +478,43 @@ class TicTacToeGUI(tk.Tk):
             else:
                 self.p2_points += 1
 
-        for mark in (self.p1_mark, self.p2_mark):
-            # Loop breaks when a winner is found b/c of calls to other functions.
-            for combo in winning_combos:
-                _x, _y, _z = combo
-                lbl_x_txt = self.board_labels[_x]['text']
-                lbl_y_txt = self.board_labels[_y]['text']
-                lbl_z_txt = self.board_labels[_z]['text']
+        # Loop breaks when a winner is found b/c of calls to other functions.
+        for combo in winning_combos:
+            _x, _y, _z = combo
+            lbl_x_txt = self.board_labels[_x]['text']
+            lbl_y_txt = self.board_labels[_y]['text']
+            lbl_z_txt = self.board_labels[_z]['text']
 
-                if lbl_x_txt == lbl_y_txt == lbl_z_txt == mark:
-                    self.winner_found = True
+            if lbl_x_txt == lbl_y_txt == lbl_z_txt == mark:
+                self.winner_found = True
 
-                    if self.mode_selection.get() in 'random, strategy':
-                        award_points(mark)
-                        self.auto_flash(combo, mark)
-                    elif self.mode_selection.get() == 'pvpc':
-                        award_points(mark)
-                        self.show_win(combo)
-                        self.display_result(f'{mark} WINS!')
+                if self.mode_selection.get() in 'random, strategy':
+                    award_points(mark)
+                    self.auto_flash(combo, mark)
+                elif self.mode_selection.get() == 'pvpc':
+                    award_points(mark)
+                    self.show_win(combo)
+                    self.display_result(f'{mark} WINS!')
 
-                    elif self.mode_selection.get() == 'pvp':
-                        # Player2 is playing p1_mark on even game numbers, so
-                        #   award p1_mark win to P2.
-                        if self.num_game % 2 == 0:
-                            if mark == self.p1_mark:
-                                self.p2_points += 1
-                            else:
-                                self.p1_points += 1
+                elif self.mode_selection.get() == 'pvp':
+                    # Player2 is playing p1_mark on even game numbers, so
+                    #   award p1_mark win to P2.
+                    if self.num_game % 2 == 0:
+                        if mark == self.p1_mark:
+                            self.p2_points += 1
                         else:
-                            award_points(mark)
+                            self.p1_points += 1
+                    else:
+                        award_points(mark)
 
-                        # After a PvP game, switch player label of whose_turn
-                        #    to play the other mark (p1_mark always plays first).
-                        self.player1, self.player2 = self.player2, self.player1
+                    # After a PvP game, switch player label of whose_turn
+                    #    to play the other mark (p1_mark always plays first).
+                    self.player1, self.player2 = self.player2, self.player1
 
-                        self.show_win(combo)
-                        self.display_result(f'{mark} WINS!')
+                    self.show_win(combo)
+                    self.display_result(f'{mark} WINS!')
 
-                    self.num_game += 1
+                self.num_game += 1
 
         if self.turn_number() == 9 and not self.winner_found:
             self.winner_found = True
@@ -738,7 +739,7 @@ class TicTacToeGUI(tk.Tk):
                         self.board_labels[lbl_idx]['text'] = mark
 
             if self.turn_number() >= 5:
-                self.check_winner()
+                self.check_winner(mark)
 
             # Need to move to next mark for next turn.
             self.all_autoplay_marks = self.all_autoplay_marks.lstrip(mark)
@@ -803,7 +804,7 @@ class TicTacToeGUI(tk.Tk):
                             self.board_labels[lbl_idx]['text'] = mark
 
             if self.turn_number() >= 5:
-                self.check_winner()
+                self.check_winner(mark)
 
             # Need to move to next mark for next turn.
             self.all_autoplay_marks = self.all_autoplay_marks.lstrip(mark)
