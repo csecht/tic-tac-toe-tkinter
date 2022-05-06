@@ -15,7 +15,7 @@ Copyright: (c) 2022 Craig S. Echt under MIT License, included in the
    package (LICENSE text file); if not see https://mit-license.org/
 URL: https://github.com/csecht/tic-tac-toe-tkinter
 Development Status :: 1 - Alpha
-Version: 0.0.2
+Version: 0.0.3
 
 Inspired by Riya Tendulkar code:
 https://levelup.gitconnected.com/how-to-code-tic-tac-toe-in-python-using-tkinter-e7f9ce510bfb
@@ -121,13 +121,14 @@ class TicTacToeGUI(tk.Tk):
         self.pc_pref_radiobtn = tk.Radiobutton()
         self.quit_button = tk.Button()
 
-        # Additional autoplay widgets.
+        # Additional widgets.
         self.after_id = None
         self.play_after = 600  # ms, pause between turns in play PC mode.
         self.auto_after = 300  # ms, for autoplay turns and game turnovers.
         self.all_autoplay_marks = ''
         self.auto_turns_remaining = tk.IntVar()
         self.curr_automode = ''
+        self.curr_pmode = ''
 
         # Foreground and background colors.
         self.color = {'score_fg': 'DodgerBlue4',
@@ -142,6 +143,8 @@ class TicTacToeGUI(tk.Tk):
                       'radiobtn_bg': 'DodgerBlue1',
                       'radiobtn_fg': 'white',
                       }
+        if MY_OS == 'dar':
+            self.color['default_bg'] = 'white'
 
         # Label fonts.
         self.font = {
@@ -423,10 +426,18 @@ class TicTacToeGUI(tk.Tk):
                 self.whose_turn.set(self.curr_automode)
 
             else:
-                if mode == 'pvp':
-                    self.pvpc_mode.select()
-                elif mode == 'pvpc':
+                if self.curr_pmode == 'pvp':
                     self.pvp_mode.select()
+                    self.pc_pref_radiobtn.config(state=tk.DISABLED)
+                    self.pvpc_mode.deselect()
+                    self.auto_random_mode.deselect()
+                    self.auto_strategy_mode.deselect()
+                elif self.curr_pmode == 'pvpc':
+                    self.pvpc_mode.select()
+                    self.pc_pref_radiobtn.config(state=tk.NORMAL)
+                    self.pvp_mode.deselect()
+                    self.auto_random_mode.deselect()
+                    self.auto_strategy_mode.deselect()
 
                 detail = 'Finish the current game,\nthen change mode.'
 
@@ -449,7 +460,6 @@ class TicTacToeGUI(tk.Tk):
             if mode in 'auto-random, auto-strategy':
                 self.whose_turn.set('PC autoplay')
                 self.whose_turn_lbl.config(bg=self.color['default_bg'])
-
             else:
                 self.your_turn_player1()
 
@@ -487,6 +497,7 @@ class TicTacToeGUI(tk.Tk):
 
         if played_lbl['text'] == ' ':
             if self.mode_selection.get() == 'pvp':
+                self.curr_pmode = 'pvp'
                 if self.prev_game_num.get() % 2 == 0:
                     if self.turn_number() % 2 == 0:
                         play_p1()  # even prev_game, even turn
@@ -502,6 +513,7 @@ class TicTacToeGUI(tk.Tk):
                     self.check_winner(played_lbl.cget('text'))
 
             elif self.mode_selection.get() == 'pvpc':
+                self.curr_pmode = 'pvpc'
                 if (self.turn_number() % 2 == 0 and
                         self.prev_game_num.get() % 2 == 0):
                     play_p1vpc()  # even prev_game, even turn
