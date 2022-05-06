@@ -35,15 +35,7 @@ Player 2 tied the second game; a half point was awarded to each player:
 
 In Autoplay mode (computer vs computer), 1000 turns are played. Scores are updated in realtime through the series of about 120 to 140 games.
 
-In Autoplay or Player v PC game modes, there is an option to have computer play its first turn randomly or play the center square if available. The PC preference can be changed on-the-fly.
-
-Popup windows announce user selection errors:
-
-![mode_error](images/autoplay_mode_err.png)
-
-and asks for confirmation:
-
-![confirm](images/confirm_quit.png)
+In Player v PC game mode, you can choose to have computer play with different preferences.
 
 ### Known Issues
 Waiting for feedback...
