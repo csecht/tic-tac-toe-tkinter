@@ -33,6 +33,10 @@ Player 2 tied the second game; a half point was awarded to each player:
 
 ![tie-game](images/tie_game.png)
 
+Autoplay, strategy mode, in progress:
+
+![autoplay-game](images/autoplay.png)
+
 In Autoplay mode (computer vs computer), 1000 turns are played. Scores are updated in realtime through the series of about 120 to 140 games.
 
 In Player v PC game mode, you can choose to have computer play with different preferences.
