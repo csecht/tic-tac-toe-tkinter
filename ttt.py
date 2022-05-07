@@ -12,10 +12,10 @@ Play mode options:
 Requires tkinter (tk/tcl) and Python3.
 Developed in Python 3.8-3.9 with tkinter 8.6.
 Copyright: (c) 2022 Craig S. Echt under MIT License, included in the
-   package (LICENSE text file); if not see https://mit-license.org/
+   package (LICENSE text file); if not, see https://mit-license.org/
 URL: https://github.com/csecht/tic-tac-toe-tkinter
 Development Status :: 1 - Alpha
-Version: 0.0.3
+Version: 0.0.4
 
 Inspired by Riya Tendulkar code:
 https://levelup.gitconnected.com/how-to-code-tic-tac-toe-in-python-using-tkinter-e7f9ce510bfb
@@ -134,7 +134,7 @@ class TicTacToeGUI(tk.Tk):
         self.color = {'score_fg': 'DodgerBlue4',
                       'result_bg': 'yellow3',
                       'disabled_fg': 'grey65',
-                      'default_bg': 'grey85',
+                      'default_bg': '',
                       'active_fg': 'black',
                       'mark_fg': 'yellow2',
                       'sq_won': 'blue',
@@ -145,6 +145,11 @@ class TicTacToeGUI(tk.Tk):
                       }
         if MY_OS == 'dar':
             self.color['default_bg'] = 'white'
+        elif MY_OS == 'lin':
+            self.color['default_bg'] = 'grey85'
+        elif MY_OS == 'win':
+            self.color['default_bg'] = 'grey95'
+
 
         # Label fonts.
         self.font = {
@@ -206,11 +211,11 @@ class TicTacToeGUI(tk.Tk):
                               value='pvpc',
                               bg=self.color['result_bg'],
                               command=self.mode_control)
-        self.auto_random_mode.config(text='Autoplay, random',
+        self.auto_random_mode.config(text='Autoplay random',
                                      variable=self.mode_selection,
                                      value='auto-random',
                                      command=self.mode_control)
-        self.auto_strategy_mode.config(text='Autoplay, strategy',
+        self.auto_strategy_mode.config(text='Autoplay strategy',
                                        variable=self.mode_selection,
                                        value='auto-strategy',
                                        command=self.mode_control)
@@ -952,7 +957,8 @@ class TicTacToeGUI(tk.Tk):
         mode = self.mode_selection.get()
         self.setup_game_board()
         # Need to slice mode id to remove "auto-" prefix.
-        self.display_result(f'Autoplay {mode[5:]} stopped')
+        # self.display_result(f'Autoplay {mode[5:]} stopped')
+        self.display_result(f'{self.curr_automode}, stopped')
 
     def auto_setup(self) -> None:
         """
@@ -991,7 +997,7 @@ class TicTacToeGUI(tk.Tk):
 
         :return: None
         """
-        self.curr_automode = 'Autoplay, random'
+        self.curr_automode = 'Autoplay random'
         self.auto_turns_remaining.set(len(self.all_autoplay_marks))
         current_turn = self.turn_number()
 
@@ -1027,7 +1033,7 @@ class TicTacToeGUI(tk.Tk):
         :return: None
         """
 
-        self.curr_automode = 'Autoplay, strategy'
+        self.curr_automode = 'Autoplay strategy'
         # Tuples of winning list indices for the board_labels board squares.
         winning_combos = [
             (0, 1, 2), (3, 4, 5), (6, 7, 8),  # rows
