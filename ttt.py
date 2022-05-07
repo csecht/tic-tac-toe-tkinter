@@ -150,7 +150,6 @@ class TicTacToeGUI(tk.Tk):
         elif MY_OS == 'win':
             self.color['default_bg'] = 'grey95'
 
-
         # Label fonts.
         self.font = {
             'head11': ('TkHeadingFont', 11, 'italic bold'),
@@ -954,10 +953,7 @@ class TicTacToeGUI(tk.Tk):
             app.after_cancel(self.after_id)
             self.after_id = None
 
-        mode = self.mode_selection.get()
         self.setup_game_board()
-        # Need to slice mode id to remove "auto-" prefix.
-        # self.display_result(f'Autoplay {mode[5:]} stopped')
         self.display_result(f'{self.curr_automode}, stopped')
 
     def auto_setup(self) -> None:
@@ -1143,8 +1139,8 @@ if __name__ == '__main__':
 
     except KeyboardInterrupt:
         print("*** User quit the program ***\n")
-        sys.exit()
+        sys.exit(0)
 
     except Exception as unknown:
         print(f'\nAn unexpected error: {unknown}\n')
-        sys.exit()
+        sys.exit(1)
