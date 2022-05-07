@@ -1,5 +1,5 @@
 # Project: tic-tac-toe-tkinter
-
+## Last update introduced a bug in PvPC play. Please stand by....
 ![tic_tac_logo](images/Tic_tac_toe.png)
 
 <sub>Image modified from https://en.wikipedia.org/wiki/File:Tic_tac_toe.svg</sub>
