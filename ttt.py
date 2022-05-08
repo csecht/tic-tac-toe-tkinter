@@ -15,7 +15,7 @@ Copyright: (c) 2022 Craig S. Echt under MIT License, included in the
    package (LICENSE text file); if not, see https://mit-license.org/
 URL: https://github.com/csecht/tic-tac-toe-tkinter
 Development Status :: 1 - Alpha
-Version: 0.0.6
+Version: 0.0.7
 
 Inspired by Riya Tendulkar code:
 https://levelup.gitconnected.com/how-to-code-tic-tac-toe-in-python-using-tkinter-e7f9ce510bfb
@@ -222,12 +222,14 @@ class TicTacToeGUI(tk.Tk):
 
         self.choose_pc_pref.bind('<<ComboboxSelected>>',
                                  lambda _: self.reset_game_and_score())
-        all_prefs = ('PC plays randomly', 'PC prefers corners',
-                     'PC starts with center', 'PC plays strategically')
+        all_prefs = ('PC plays random', 'PC plays corners',
+                     'PC plays center', 'PC plays strategy')
         self.choose_pc_pref['values'] = all_prefs
         # Set random, 1st in tuple, as the default.
         self.choose_pc_pref.current(0)
         self.choose_pc_pref.config(width=19, state=tk.DISABLED)
+        if MY_OS == 'dar':
+            self.choose_pc_pref.config(width=13, state=tk.DISABLED)
 
         self.auto_random_mode.config(text='Autoplay random',
                                      variable=self.mode_selection,
@@ -561,11 +563,11 @@ class TicTacToeGUI(tk.Tk):
         while turn_number == self.turn_number():
 
             # Preference: all PC moves are random.
-            if self.choose_pc_pref.get() == 'PC plays randomly':
+            if self.choose_pc_pref.get() == 'PC plays random':
                 self.pc_plays_random(turn_number)
 
             # Preference: play the center when it is available.
-            elif self.choose_pc_pref.get() == 'PC starts with center':
+            elif self.choose_pc_pref.get() == 'PC plays center':
                 if self.board_labels[4]['text'] == ' ':
                     self.board_labels[4]['text'] = self.p2_mark
 
@@ -606,7 +608,7 @@ class TicTacToeGUI(tk.Tk):
                         break
 
             # Prefer corners, as optioned.
-            if self.choose_pc_pref.get() == 'PC prefers corners':
+            if self.choose_pc_pref.get() == 'PC plays corners':
                 for _c in corners:
                     c_txt = self.board_labels[_c]['text']
                     if turn_number == self.turn_number() and c_txt == ' ':
@@ -744,7 +746,11 @@ class TicTacToeGUI(tk.Tk):
         result_window = tk.Toplevel(self, borderwidth=4, relief='raised')
         result_window.title('Game Report')
         result_window.geometry(
-            f'310x125+{app.winfo_x() + 420}+{app.winfo_y() - 37}')
+            f'310x125+{app.winfo_x() + 420}+{app.winfo_y() - 260}')
+        if MY_OS == 'dar':
+            result_window.geometry(
+                f'230x100+{app.winfo_x() + 420}+{app.winfo_y() + 300}')
+
         result_window.config(bg=self.color['result_bg'])
 
         result_lbl = tk.Label(result_window, text=win_msg,
