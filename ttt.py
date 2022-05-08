@@ -15,7 +15,7 @@ Copyright: (c) 2022 Craig S. Echt under MIT License, included in the
    package (LICENSE text file); if not, see https://mit-license.org/
 URL: https://github.com/csecht/tic-tac-toe-tkinter
 Development Status :: 1 - Alpha
-Version: 0.0.5
+Version: 0.0.6
 
 Inspired by Riya Tendulkar code:
 https://levelup.gitconnected.com/how-to-code-tic-tac-toe-in-python-using-tkinter-e7f9ce510bfb
@@ -56,7 +56,7 @@ def quit_game(quit_now=True):
         print("*** User quit the program ***\n")
         app.destroy()
     else:
-        msg = messagebox.askquestion(
+        msg = messagebox.askyesno(
             'Confirm', 'Current game is in play.\nQuit now?')
         if msg:
             print("*** User quit the program ***\n")
@@ -104,6 +104,9 @@ class TicTacToeGUI(tk.Tk):
         self.player2_header = tk.Label()
         self.player1_score_lbl = tk.Label()
         self.player2_score_lbl = tk.Label()
+        self.ties_header = tk.Label()
+        self.ties_num = tk.IntVar(value=0)
+        self.ties_lbl = tk.Label()
 
         # Play action widgets.
         #   Set up the 9 game-play squares here.
@@ -198,6 +201,13 @@ class TicTacToeGUI(tk.Tk):
             textvariable=self.p2_score, font=self.font['head12bold'],
             fg=self.color['score_fg'])
 
+        self.ties_header.config(
+            text='Ties:', font=self.font['head10bold'],
+            fg=self.color['score_fg'])
+        self.ties_lbl.config(
+            textvariable=self.ties_num, font=self.font['head10bold'],
+            fg=self.color['score_fg'])
+
         # Play mode control widgets:
         self.pvp_mode.config(text='Player v Player',
                              variable=self.mode_selection,
@@ -248,7 +258,11 @@ class TicTacToeGUI(tk.Tk):
 
         :return: None
         """
-        self.whose_turn.set(f'{self.player1} plays {self.p1_mark}')
+        if self.mode_selection.get() == 'pvpc' and self.turn_number() == 1:
+            self.whose_turn.set(f'PC played {self.p2_mark}\n'
+                                f'Your turn {self.player1}')
+        else:
+            self.whose_turn.set(f'{self.player1} plays {self.p1_mark}')
         self.whose_turn_lbl.config(bg=self.color['result_bg'])
 
     def grid_widgets(self) -> None:
@@ -282,21 +296,26 @@ class TicTacToeGUI(tk.Tk):
 
         if MY_OS == 'dar':
             self.score_header.grid(
-                row=0, column=1, rowspan=2, padx=(40, 0), sticky=tk.W)
+                row=0, column=1, rowspan=2, padx=(40, 0), pady=(0, 20), sticky=tk.W)
         else:
             self.score_header.grid(
-                row=0, column=1, rowspan=2, padx=(25, 0), sticky=tk.W)
+                row=0, column=1, rowspan=2, padx=(25, 0), pady=(0, 20), sticky=tk.W)
 
         self.player1_header.grid(
-            row=0, column=1, rowspan=2, padx=(0, 8), pady=(0, 30), sticky=tk.E)
+            row=0, column=1, rowspan=2, padx=(0, 8), pady=(0, 50), sticky=tk.E)
         self.player2_header.grid(
-            row=0, column=1, rowspan=2, padx=(0, 8), pady=(30, 0), sticky=tk.E)
+            row=0, column=1, rowspan=2, padx=(0, 8), pady=(30, 20), sticky=tk.E)
 
         self.player1_score_lbl.grid(
-            row=0, column=2, rowspan=2, padx=0, pady=(0, 30), sticky=tk.W)
+            row=0, column=2, rowspan=2, padx=0, pady=(0, 50), sticky=tk.W)
         self.player2_score_lbl.grid(
-            row=0, column=2, rowspan=2, padx=0, pady=(30, 0), sticky=tk.W)
+            row=0, column=2, rowspan=2, padx=0, pady=(30, 20), sticky=tk.W)
         # Auto-turn counting labels are gridded in auto_start().
+
+        self.ties_header.grid(
+            row=0, column=1, rowspan=2, padx=(0, 8), pady=(70, 0), sticky=tk.E)
+        self.ties_lbl.grid(
+            row=0, column=2, rowspan=2, padx=0, pady=(70, 0), sticky=tk.W)
 
         self.pvp_mode.grid(
             row=5, column=0, padx=(10, 0), pady=5, sticky=tk.W)
@@ -522,7 +541,8 @@ class TicTacToeGUI(tk.Tk):
 
         turn_number = self.turn_number()
 
-        # Delay play for a better feel, but not when PC starts a game.
+        # Delay play for a better feel, but not when PC starts a game b/c
+        #   that just delays closing the Result toplevel for a new game.
         if turn_number > 0:
             app.after(self.play_after)
 
@@ -677,6 +697,8 @@ class TicTacToeGUI(tk.Tk):
 
             self.p1_points += 0.5
             self.p2_points += 0.5
+
+            self.ties_num.set(self.ties_num.get() + 1)
 
             if self.mode_selection.get() in 'auto-random, auto-strategy':
                 self.auto_flash((4, 4, 4), 'TIE')
