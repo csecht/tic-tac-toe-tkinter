@@ -200,7 +200,6 @@ class TicTacToeGUI(tk.Tk):
         self.player2_score_lbl.config(
             textvariable=self.p2_score, font=self.font['head12bold'],
             fg=self.color['score_fg'])
-
         self.ties_header.config(
             text='Ties:', font=self.font['head10bold'],
             fg=self.color['score_fg'])
@@ -227,9 +226,10 @@ class TicTacToeGUI(tk.Tk):
         self.choose_pc_pref['values'] = all_prefs
         # Set random, 1st in tuple, as the default.
         self.choose_pc_pref.current(0)
-        self.choose_pc_pref.config(width=19, state=tk.DISABLED)
+        # Combobox is enabled as readonly when pvpc_mode is selected.
+        self.choose_pc_pref.config(width=16, state=tk.DISABLED)
         if MY_OS == 'dar':
-            self.choose_pc_pref.config(width=13, state=tk.DISABLED)
+            self.choose_pc_pref.config(width=13)
 
         self.auto_random_mode.config(text='Autoplay random',
                                      variable=self.mode_selection,
@@ -746,7 +746,7 @@ class TicTacToeGUI(tk.Tk):
         result_window = tk.Toplevel(self, borderwidth=4, relief='raised')
         result_window.title('Game Report')
         result_window.geometry(
-            f'310x125+{app.winfo_x() + 420}+{app.winfo_y() - 260}')
+            f'310x125+{app.winfo_x() + 500}+{app.winfo_y() + 260}')
         if MY_OS == 'dar':
             result_window.geometry(
                 f'230x100+{app.winfo_x() + 420}+{app.winfo_y() + 300}')
