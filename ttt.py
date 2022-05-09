@@ -857,6 +857,7 @@ class TicTacToeGUI(tk.Tk):
         self.p2_score.set(0)
         self.p1_points = 0
         self.p2_points = 0
+        self.ties_num.set(0)
         self.your_turn_player1()
         self.setup_game_board()
 
