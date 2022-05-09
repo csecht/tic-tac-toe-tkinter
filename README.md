@@ -21,25 +21,33 @@ From within the tic-tac-toe-tk-main folder, execute `ttt.py` from a Terminal or 
 - Windows: `python3 ttt.py` or `python ttt.py` or `py ttt.py`, depending on your system environment.
 
 ### Play action
+There are four play modes:
+- Player vs Player
+- Player vs PC (computer)
+- Autoplay, random (computer plays itself randomly)
+- Autoplay, strategy (computer itself with rules)
+
+In Player v PC game mode, you can choose among computer play options:
+- PC plays random
+- PC plays corners
+- PC plays center
+- PC plays strategy.
+
+In Autoplay mode (computer vs computer), 1000 turns are played. Scores are updated in realtime through the series of about 120 to 140 games.
+
+### Screenshots
+
 Start of a game in Player vs. Player mode, waiting for Player 1's first move:
 
 ![game-board](images/game_window.png)
 
-Player 1 won first game:
-
-![player1-win](images/player_v_player.png)
-
-Player 2 tied the second game; a half point was awarded to each player:
+Player 1 tied the second game; a half point was awarded to each player:
 
 ![tie-game](images/tie_game.png)
 
 Autoplay, strategy mode, in progress:
 
 ![autoplay-game](images/autoplay.png)
-
-In Autoplay mode (computer vs computer), 1000 turns are played. Scores are updated in realtime through the series of about 120 to 140 games.
-
-In Player v PC game mode, you can choose to have computer play with different preferences.
 
 ### Known Issues
 Waiting for feedback...
