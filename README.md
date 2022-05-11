@@ -33,19 +33,15 @@ In Player v PC game mode, you can choose among computer play options:
 - PC plays center
 - PC plays strategy.
 
-In Autoplay mode (computer vs computer), 1000 turns are played. Scores are updated in realtime through the series of about 120 to 140 games.
+In Autoplay mode, PC plays itself. You can choose to have Player 1 (X) start every game or have both Players alternate game starts. 1000 turns are played at about 3 turns per second. Scores are updated in realtime through the series of about 110 to 130 games. Studying autoplay results in different play modes can be instructive for improving your game strategies!
 
 ### Screenshots
 
-Start of a game in Player vs. Player mode, waiting for Player 1's first move:
+PC wins first game in Player vs. PC mode:
 
-![game-board](images/game_window.png)
+![p_v_pc](images/play_pc.png)
 
-Player 1 tied the second game; a half point was awarded to each player:
-
-![tie-game](images/tie_game.png)
-
-Autoplay, strategy mode, in progress:
+Autoplay random mode with alternating starting players, in progress:
 
 ![autoplay-game](images/autoplay.png)
 
