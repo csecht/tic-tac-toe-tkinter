@@ -782,6 +782,7 @@ class TicTacToeGUI(tk.Tk):
         elif MY_OS == 'lin':
             result_window.geometry(
                 f'+{app.winfo_x() + 500}+{app.winfo_y() + 260}')
+            result_window.minsize(200, 115)
 
         result_window.config(bg=self.color['result_bg'])
 
