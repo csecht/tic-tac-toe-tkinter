@@ -158,7 +158,7 @@ class TicTacToeGUI(tk.Tk):
 
         # Label fonts.
         self.font = {
-            'head11': ('TkHeadingFont', 11, 'italic bold'),
+            'heading': ('TkHeadingFont', 11, 'italic bold'),
             'head12bold': ('TkHeadingFont', 12, 'bold'),
             'head10bold': ('TkHeaderFont', 10, 'bold'),
             'head10': ('TkHeaderFont', 10),
@@ -175,6 +175,8 @@ class TicTacToeGUI(tk.Tk):
 
         if MY_OS == 'dar':
             self.font['condensed'] = ('TkTooltipFont', 12)
+            self.font['heading'] = ('TkHeadingFont', 13, 'italic bold')
+            self.font['head10bold'] = ('TkHeadingFont', 12, 'bold')
 
         # Player's turn widgets.
         self.prev_game_num_header.config(text='Games played',
@@ -182,7 +184,7 @@ class TicTacToeGUI(tk.Tk):
         self.prev_game_num_lbl.config(textvariable=self.prev_game_num,
                                       font=self.font['condensed'])
         self.whose_turn_lbl.config(textvariable=self.whose_turn, height=4,
-                                   font=self.font['head11'])
+                                   font=self.font['heading'])
         self.your_turn_player1()
 
         self.auto_turns_header.config(text='Turns remaining',
@@ -339,8 +341,12 @@ class TicTacToeGUI(tk.Tk):
             row=5, column=0, padx=(10, 0), pady=5, sticky=tk.W)
         self.pvpc_mode.grid(
             row=5, column=1, columnspan=2, padx=(0, 0), pady=5, sticky=tk.W)
-        self.choose_pc_pref.grid(
-            row=5, column=1, columnspan=2, padx=(0, 110), pady=0, sticky=tk.E)
+        if MY_OS == 'dar':
+            self.choose_pc_pref.grid(
+                row=5, column=1, columnspan=2, padx=(0, 70), pady=0, sticky=tk.E)
+        else:
+            self.choose_pc_pref.grid(
+                row=5, column=1, columnspan=2, padx=(0, 110), pady=0, sticky=tk.E)
 
         self.separator.grid(
             row=7, column=0, columnspan=3, padx=10, sticky=tk.EW)
