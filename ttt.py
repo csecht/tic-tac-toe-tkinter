@@ -15,7 +15,7 @@ Copyright: (c) 2022 Craig S. Echt under MIT License, included in the
    package (LICENSE text file); if not, see https://mit-license.org/
 URL: https://github.com/csecht/tic-tac-toe-tkinter
 Development Status :: 1 - Alpha
-Version: 0.0.8
+Version: 0.0.9
 
 Inspired by Riya Tendulkar code:
 https://levelup.gitconnected.com/how-to-code-tic-tac-toe-in-python-using-tkinter-e7f9ce510bfb
@@ -874,6 +874,8 @@ class TicTacToeGUI(tk.Tk):
                 self.auto_turns_remaining.get() > 0):
             self.reset_game_and_score()
             self.curr_automode = ''
+            self.auto_turns_remaining.set(0)
+            self.all_autoplay_marks = ''
 
     def reset_game_and_score(self) -> None:
         """
