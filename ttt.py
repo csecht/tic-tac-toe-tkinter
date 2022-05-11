@@ -822,7 +822,7 @@ class TicTacToeGUI(tk.Tk):
         again = tk.Button(result_window, text='New Game', command=restart_game)
         not_again = tk.Button(result_window, text='Quit', command=quit_game)
 
-        result_lbl.pack(pady=3)
+        result_lbl.pack(pady=3, padx=3)
         again.pack(pady=(5, 0))
         not_again.pack(pady=(0, 5))
 
