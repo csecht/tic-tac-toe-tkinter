@@ -263,7 +263,7 @@ class TicTacToeGUI(tk.Tk):
         self.auto_go_stop_radiobtn.config(state=tk.DISABLED)
 
         self.who_autostarts.config(text='Player 1 starts',
-                                   font=self.font['condensed'], width=12,
+                                   font=self.font['condensed'],
                                    border=2,
                                    relief='solid',
                                    overrelief='raised',
@@ -773,11 +773,15 @@ class TicTacToeGUI(tk.Tk):
 
         result_window = tk.Toplevel(self, borderwidth=4, relief='raised')
         result_window.title('Game Report')
-        result_window.geometry(
-            f'310x125+{app.winfo_x() + 500}+{app.winfo_y() + 260}')
         if MY_OS == 'dar':
             result_window.geometry(
-                f'230x100+{app.winfo_x() + 420}+{app.winfo_y() + 300}')
+                f'+{app.winfo_x() + 420}+{app.winfo_y() + 300}')
+        elif MY_OS == 'win':
+            result_window.geometry(
+                f'+{app.winfo_x() + 480}+{app.winfo_y() + 310}')
+        elif MY_OS == 'lin':
+            result_window.geometry(
+                f'+{app.winfo_x() + 500}+{app.winfo_y() + 260}')
 
         result_window.config(bg=self.color['result_bg'])
 
@@ -818,8 +822,8 @@ class TicTacToeGUI(tk.Tk):
         not_again = tk.Button(result_window, text='Quit', command=quit_game)
 
         result_lbl.pack(pady=3)
-        again.pack(pady=5)
-        not_again.pack()
+        again.pack(pady=(5, 0))
+        not_again.pack(pady=(0, 5))
 
     def block_all_player_action(self) -> None:
         """
