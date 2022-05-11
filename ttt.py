@@ -773,11 +773,12 @@ class TicTacToeGUI(tk.Tk):
         result_window.title('Game Report')
         if MY_OS == 'dar':
             result_window.geometry(
-                f'+{app.winfo_x() + 420}+{app.winfo_y() + 290}')
+                f'+{app.winfo_x() + 420}+{app.winfo_y() + 300}')
             result_window.minsize(180, 90)
         elif MY_OS == 'win':
             result_window.geometry(
                 f'+{app.winfo_x() + 480}+{app.winfo_y() + 310}')
+            result_window.minsize(200, 115)
         elif MY_OS == 'lin':
             result_window.geometry(
                 f'+{app.winfo_x() + 500}+{app.winfo_y() + 260}')
@@ -823,7 +824,7 @@ class TicTacToeGUI(tk.Tk):
 
         result_lbl.pack(pady=3, padx=3)
         again.pack(pady=(5, 0))
-        not_again.pack(pady=(5, 5))
+        not_again.pack(pady=(0, 5))
 
     def block_all_player_action(self) -> None:
         """
