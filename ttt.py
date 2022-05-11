@@ -491,7 +491,7 @@ class TicTacToeGUI(tk.Tk):
         available to play.
         Assign player's mark to text value of the selected label.
         In Player v Player, player's alternate who plays first in
-        consecutive games and players' marks also alternate.
+        consecutive games.
         In Player v PC mode, Player 1 (human) always has the first turn.
         Evaluate played squares for a win after 5th turn.
 
@@ -684,8 +684,6 @@ class TicTacToeGUI(tk.Tk):
         Check each player's played mark (board_labels's text value) and
         evaluate whether played marks match a positional win in the
         board matrix (based on board_labels index values).
-        In Player1 vs Player2 mode, alternate which player goes first
-        in repeating games.
 
         :param mark: The played mark character to check for a win.
         :return: None
@@ -839,8 +837,8 @@ class TicTacToeGUI(tk.Tk):
 
     def new_game(self) -> None:
         """
-        Set up the next game. Players alternate
-        who goes first for each consecutive game in the same mode.
+        Set up the next game.
+        Called from display_result().
 
         return: None
         """
