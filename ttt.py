@@ -65,15 +65,14 @@ def quit_game(quit_now=True):
 
 class TicTacToeGUI(tk.Tk):
     """
-    Display the tkinter GUI playing board and control buttons.
+    Display the tkinter GUI playing board and its control buttons.
     Methods: configure_widgets, your_turn_player1, grid_widgets,
-    setup_game_board, unbind_game_board, on_enter, on_leave,
-    pc_pref_control, mode_control, human_turn, pc_turn,
-    pc_plays_random, turn_number, check_winner, flash_win, flash_tie,
-    display_result, block_all_player_action, new_game,
-    reset_game_and_score, auto_command, auto_start, auto_stop,
-    auto_setup, auto_turn_limit, autoplay_random, autoplay_strategy,
-    auto_flash.
+        setup_game_board, unbind_game_board, on_enter, on_leave,
+        mode_control, human_turn, pc_turn, pc_plays_random, turn_number,
+        check_winner, flash_win, flash_tie, display_result,
+        block_all_player_action, new_game, reset_game_and_score,
+        auto_command, auto_start, auto_stop, auto_setup, auto_turn_limit,
+        autoplay_random, autoplay_strategy, auto_flash.
     """
 
     def __init__(self):
@@ -288,12 +287,12 @@ class TicTacToeGUI(tk.Tk):
         self.whose_turn_lbl.config(bg=self.color['result_bg'])
 
     def grid_widgets(self) -> None:
-        """Position app window widgets. Configure play mode buttons."""
+        """Position app window widgets."""
 
-        # Position play action buttons in 3 x 3 grid. Note that while
+        # Position play action Labels in 3 x 3 grid. Note that while
         #   nothing is gridded in row index 1, the top row uses rowspan=2
-        #   to center widgets vertically; hence, board_label buttons
-        #   begin on row index 2.
+        #   to center widgets vertically; hence, board_labels begin on
+        #   row index 2.
         _row = 2
         _col = 0
         for lbl in self.board_labels:
@@ -764,7 +763,7 @@ class TicTacToeGUI(tk.Tk):
         """
         Create pop-up window to announce winner and tie with PvP and PvPC,
         or with canceled autoplay.
-        Provide option buttons to play again or quit app.
+        Provide option Buttons to play again or quit app.
         Tally players' wins across re-plays and new games.
 
         :param win_msg: The result string to display in result window.
@@ -879,8 +878,9 @@ class TicTacToeGUI(tk.Tk):
     def reset_game_and_score(self) -> None:
         """
         Sets game number and player points to zero.
-        Called from pc_pref_control() and mode_control() when
-        user changes between PvP and PvPC or changes PvPC play mode.
+        Called from mode_control() when user changes between PvP and
+        PvPC or changes PvPC play mode, and from auto_start(),
+        new_game(), and Combobox selection bind.
 
         :return: None
         """
