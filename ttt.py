@@ -777,8 +777,8 @@ class TicTacToeGUI(tk.Tk):
             result_window.minsize(180, 90)
         elif MY_OS == 'win':
             result_window.geometry(
-                f'+{app.winfo_x() + 480}+{app.winfo_y() + 310}')
-            result_window.minsize(200, 115)
+                f'+{app.winfo_x()}+{app.winfo_y()}')
+            result_window.minsize(250, 105)
         elif MY_OS == 'lin':
             result_window.geometry(
                 f'+{app.winfo_x() + 500}+{app.winfo_y() + 260}')
@@ -805,15 +805,14 @@ class TicTacToeGUI(tk.Tk):
             self.auto_strategy_mode.deselect()
             self.pvp_mode.select()
 
-        def enable_app_quit():
-            """
-            Need to enable app window Quit button if user closes
-            Toplevel with the system's close window button.
-            """
-            self.quit_button.config(state=tk.NORMAL, command=quit_game)
-            result_window.destroy()
+        def no_exit_on_x():
+            messagebox.showinfo(
+                parent=result_window,
+                title='Click a button',
+                detail='Use either "New Game" or "Quit"'
+                       ' to close Report window.')
 
-        result_window.protocol('WM_DELETE_WINDOW', enable_app_quit)
+        result_window.protocol('WM_DELETE_WINDOW', no_exit_on_x)
 
         def restart_game():
             self.new_game()
