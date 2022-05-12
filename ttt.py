@@ -265,12 +265,13 @@ class TicTacToeGUI(tk.Tk):
 
         self.who_autostarts.config(text='Player 1 starts',
                                    font=self.font['condensed'],
+                                   relief='solid', overrelief='raised',
                                    border=2,
-                                   relief='solid',
-                                   overrelief='raised',
                                    command=self.set_who_autostarts)
 
-        self.quit_button.config(text='Quit', command=quit_game)
+        self.quit_button.config(text='Quit',
+                                relief='ridge', overrelief='raised', border=3,
+                                command=quit_game)
         self.setup_game_board()
 
     def your_turn_player1(self) -> None:
@@ -816,16 +817,18 @@ class TicTacToeGUI(tk.Tk):
             self.new_game()
             result_window.destroy()
 
-        again = tk.Button(result_window,
-                          text=f'New Game (\u23CE)',  # Return symbol.
+        again = tk.Button(result_window, text=f'New Game (\u23CE)',  # Return symbol.
+                          relief='groove', overrelief='raised', border=3,
                           command=restart_game)
-        not_again = tk.Button(result_window, text='Quit', command=quit_game)
+        not_again = tk.Button(result_window, text='Quit',
+                              relief='groove', overrelief='raised', border=3,
+                              command=quit_game)
         result_window.bind('<Return>', lambda _: restart_game())
         result_window.bind('<KP_Enter>', lambda _: restart_game())
 
         result_lbl.pack(pady=3, padx=3)
-        again.pack(pady=(5, 0))
-        not_again.pack(pady=(0, 5))
+        again.pack(pady=(3, 0))
+        not_again.pack(pady=3)
 
     def block_all_player_action(self) -> None:
         """
