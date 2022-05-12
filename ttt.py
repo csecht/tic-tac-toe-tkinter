@@ -815,8 +815,12 @@ class TicTacToeGUI(tk.Tk):
             self.new_game()
             result_window.destroy()
 
-        again = tk.Button(result_window, text='New Game', command=restart_game)
+        again = tk.Button(result_window,
+                          text=f'New Game (\u23CE)',  # Return symbol.
+                          command=restart_game)
         not_again = tk.Button(result_window, text='Quit', command=quit_game)
+        result_window.bind('<Return>', lambda _: restart_game())
+        result_window.bind('<KP_Enter>', lambda _: restart_game())
 
         result_lbl.pack(pady=3, padx=3)
         again.pack(pady=(5, 0))
