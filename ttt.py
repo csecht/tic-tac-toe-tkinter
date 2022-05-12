@@ -771,20 +771,16 @@ class TicTacToeGUI(tk.Tk):
 
         result_window = tk.Toplevel(self, borderwidth=4, relief='raised')
         result_window.title('Game Report')
+        result_window.config(bg=self.color['result_bg'])
+
         if MY_OS == 'dar':
-            result_window.geometry(
-                f'+{app.winfo_x() + 420}+{app.winfo_y() + 300}')
             result_window.minsize(180, 90)
         elif MY_OS == 'win':
             result_window.geometry(
                 f'+{app.winfo_x()}+{app.winfo_y()}')
             result_window.minsize(250, 105)
         elif MY_OS == 'lin':
-            result_window.geometry(
-                f'+{app.winfo_x() + 500}+{app.winfo_y() + 260}')
             result_window.minsize(200, 115)
-
-        result_window.config(bg=self.color['result_bg'])
 
         result_lbl = tk.Label(result_window, text=win_msg,
                               font=self.font['head14boldital'],
@@ -1085,10 +1081,10 @@ class TicTacToeGUI(tk.Tk):
                             if x_txt == y_txt == self.p1_mark and z_txt == ' ':
                                 self.board_labels[_z]['text'] = mark
                                 break
-                            elif y_txt == z_txt == self.p1_mark and x_txt == ' ':
+                            if y_txt == z_txt == self.p1_mark and x_txt == ' ':
                                 self.board_labels[_x]['text'] = mark
                                 break
-                            elif x_txt == z_txt == self.p1_mark and y_txt == ' ':
+                            if x_txt == z_txt == self.p1_mark and y_txt == ' ':
                                 self.board_labels[_y]['text'] = mark
                                 break
 
