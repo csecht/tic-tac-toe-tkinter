@@ -41,7 +41,7 @@ except (ImportError, ModuleNotFoundError) as error:
     print(f'This program requires tkinter, which is included with \n'
           'Python 3.7+ distributions.\n'
           'Install the most recent version or re-install Python and include Tk/Tcl.\n'
-          '\nOn Linux, you may also need: $ sudo apt-get install python3-tk\n'
+          '\nLinux users may need this: $ sudo apt-get install python3-tk\n'
           f'See also: https://tkdocs.com/tutorial/install.html \n{error}')
 
 MY_OS = sys.platform[:3]
@@ -235,10 +235,12 @@ class TicTacToeGUI(tk.Tk):
         self.choose_pc_pref['values'] = all_prefs
         # Set random, 1st in tuple, as the default.
         self.choose_pc_pref.current(0)
-        # Combobox is enabled as readonly when pvpc_mode is selected.
-        self.choose_pc_pref.config(width=16, state=tk.DISABLED)
+        # choose_pc_pref is enabled as readonly when pvpc_mode is selected.
+        self.choose_pc_pref.config(state=tk.DISABLED)
         if MY_OS == 'dar':
             self.choose_pc_pref.config(width=13)
+        else:
+            self.choose_pc_pref.config(width=16)
 
         self.separator.configure(orient='horizontal')
 
@@ -290,29 +292,29 @@ class TicTacToeGUI(tk.Tk):
 
         # Position play action buttons in 3 x 3 grid. Note that while
         #   nothing is gridded in row index 1, the top row uses rowspan=2
-        #   to center widgets vertically; hence, play buttons begin on
-        #   row index 2.
+        #   to center widgets vertically; hence, board_label buttons
+        #   begin on row index 2.
         _row = 2
         _col = 0
         for lbl in self.board_labels:
             if MY_OS in 'win, dar':
-                lbl.grid(column=_col, row=_row, pady=6, padx=6)
+                lbl.grid(row=_row, column=_col, padx=6, pady=6)
             else:  # Linux (lin)
-                lbl.grid(column=_col, row=_row)
+                lbl.grid(row=_row, column=_col)
             _col += 1
             if _col > 2:
                 _col = 0
                 _row += 1
 
         # Squeeze everything in with pretty spanning, padding, and stickies.
-        #  Sorted by row, then column.
+        #  Grid statements are sorted by row, then column.
         self.rowconfigure(0, minsize=100)
         self.prev_game_num_header.grid(
             row=0, column=2, rowspan=2, padx=(0, 15), pady=(5, 0), sticky=tk.NE)
         self.prev_game_num_lbl.grid(
             row=0, column=2, rowspan=2, padx=(0, 15), pady=(24, 0), sticky=tk.NE)
         self.whose_turn_lbl.grid(  # padx matches that of board_labels.
-            row=0, column=0, padx=(6, 6), pady=(5, 0), sticky=tk.NSEW)
+            row=0, column=0, padx=6, pady=(5, 0), sticky=tk.NSEW)
 
         if MY_OS == 'dar':
             self.score_header.grid(
