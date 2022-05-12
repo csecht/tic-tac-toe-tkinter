@@ -15,7 +15,7 @@ Copyright: (c) 2022 Craig S. Echt under MIT License, included in the
    package (LICENSE text file); if not, see https://mit-license.org/
 URL: https://github.com/csecht/tic-tac-toe-tkinter
 Development Status :: 1 - Alpha
-Version: 0.0.9
+Version: 0.0.10
 
 Inspired by Riya Tendulkar code:
 https://levelup.gitconnected.com/how-to-code-tic-tac-toe-in-python-using-tkinter-e7f9ce510bfb
@@ -110,7 +110,6 @@ class TicTacToeGUI(tk.Tk):
         self.ties_lbl = tk.Label()
 
         # Play action widgets.
-        #   Set up the 9 game-play squares here.
         self.board_labels = [tk.Label() for _ in range(9)]
         self.mode_selection = tk.StringVar()
         self.pvp_mode = tk.Radiobutton()
@@ -773,12 +772,11 @@ class TicTacToeGUI(tk.Tk):
         result_window = tk.Toplevel(self, borderwidth=4, relief='raised')
         result_window.title('Game Report')
         result_window.config(bg=self.color['result_bg'])
+        result_window.geometry(f'+{app.winfo_x()}+{app.winfo_y()}')
 
         if MY_OS == 'dar':
             result_window.minsize(180, 90)
         elif MY_OS == 'win':
-            result_window.geometry(
-                f'+{app.winfo_x()}+{app.winfo_y()}')
             result_window.minsize(250, 105)
         elif MY_OS == 'lin':
             result_window.minsize(200, 115)
@@ -1170,7 +1168,6 @@ def parse_args() -> None:
     args = parser.parse_args()
     if args.about:
         print(__doc__)
-        print()
         sys.exit(0)
 
 
