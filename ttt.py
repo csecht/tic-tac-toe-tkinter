@@ -115,14 +115,13 @@ class TicTacToeGUI(tk.Tk):
         self.mode_selection = tk.StringVar()
         self.pvp_mode = tk.Radiobutton()
         self.pvpc_mode = tk.Radiobutton()
+        self.choose_pc_pref = ttk.Combobox()
         self.auto_random_mode = tk.Radiobutton()
         self.auto_strategy_mode = tk.Radiobutton()
         self.autoplay_on = tk.BooleanVar()
         self.auto_go_stop_radiobtn = tk.Radiobutton()
         self.auto_go_stop_txt = tk.StringVar()
         self.who_autostarts = tk.Button()
-
-        self.choose_pc_pref = ttk.Combobox()
 
         self.quit_button = tk.Button()
 
@@ -132,7 +131,7 @@ class TicTacToeGUI(tk.Tk):
         self.play_after = 600  # ms, pause between turns in play PC mode.
         self.auto_after = 300  # ms, for autoplay turns and game turnovers.
         self.all_autoplay_marks = ''  # Used to dole out PC marks in proper order.
-        self.curr_automode = ''  # Used to display of whose_turn.
+        self.curr_automode = ''  # Used to display whose_turn.
         self.curr_pmode = ''  # Used to evaluate conditions.
 
         # Foreground and background colors.
@@ -146,7 +145,7 @@ class TicTacToeGUI(tk.Tk):
                       'sq_not_won': 'black',
                       'sq_mouseover': 'grey15',
                       'radiobtn_bg': 'DodgerBlue1',
-                      'radiobtn_fg': 'white',
+                      # 'radiobtn_fg': 'white',
                       }
         if MY_OS == 'dar':
             self.color['default_bg'] = 'white'
@@ -157,13 +156,13 @@ class TicTacToeGUI(tk.Tk):
 
         # Label fonts.
         self.font = {
+            'head10': ('TkHeadingFont', 10),
             'heading': ('TkHeadingFont', 11, 'italic bold'),
+            'head10bold': ('TkHeadingFont', 10, 'bold'),
             'head12bold': ('TkHeadingFont', 12, 'bold'),
-            'head10bold': ('TkHeaderFont', 10, 'bold'),
-            'head10': ('TkHeaderFont', 10),
+            'head14ibold': ('TkHeadingFont', 14, 'italic bold'),
             'condensed': ('TkTooltipFont', 9),
             'fixed30bold': ('TkFixedFont', 30, 'bold'),
-            'head14boldital': ('TkHeadingFont', 14, 'bold italic'),
         }
 
         self.configure_widgets()
@@ -172,6 +171,7 @@ class TicTacToeGUI(tk.Tk):
     def configure_widgets(self) -> None:
         """Initial configurations for app window widgets."""
 
+        # Need MacBook-specific font sizes; has not been checked on iMacs.
         if MY_OS == 'dar':
             self.font['condensed'] = ('TkTooltipFont', 12)
             self.font['heading'] = ('TkHeadingFont', 13, 'italic bold')
@@ -270,7 +270,8 @@ class TicTacToeGUI(tk.Tk):
                                    command=self.set_who_autostarts)
 
         self.quit_button.config(text='Quit',
-                                relief='ridge', overrelief='raised', border=3,
+                                relief='ridge', overrelief='raised',
+                                border=3,
                                 command=quit_game)
         self.setup_game_board()
 
@@ -786,7 +787,7 @@ class TicTacToeGUI(tk.Tk):
             result_window.minsize(200, 115)
 
         result_lbl = tk.Label(result_window, text=win_msg,
-                              font=self.font['head14boldital'],
+                              font=self.font['head14ibold'],
                               bg=self.color['result_bg'])
 
         self.block_all_player_action()
