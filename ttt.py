@@ -8,8 +8,9 @@ Play mode options:
   Player v Player,
   Player v PC (with PC preference options),
   Autoplay, about 120 games of the PC playing itself in either random or
-    strategic mode options.
-Requires tkinter (tk/tcl) and Python3.
+    strategic mode options and an optinon for either one Player always
+    goes first or Players alternate the first turn.
+Requires tkinter (tk/tcl) and Python3.6+.
 Developed in Python 3.8-3.9 with tkinter 8.6.
 Copyright: (c) 2022 Craig S. Echt under MIT License, included in the
    package (LICENSE text file); if not, see https://mit-license.org/
@@ -425,8 +426,8 @@ class TicTacToeGUI(tk.Tk):
         """
         Cancel/ignore an errant/mistimed play mode selection.
         Block any mode change if in the middle of a game or autoplay.
-        Disable and enable Radiobuttons as the mode requires.
-        Called from kw command of the play mode Radiobuttons.
+        Disable and enable Radiobuttons as each mode requires.
+        Called as callback from the play mode Radiobuttons.
 
         :return: None
         """
@@ -487,10 +488,10 @@ class TicTacToeGUI(tk.Tk):
 
     def human_turn(self, played_lbl: tk) -> None:
         """
-        Check whether square (*played_lbl*) selected by players is
-        available to play.
-        Assign player's mark to text value of the selected label.
-        In Player v Player, player's alternate who plays first in
+        Check whether *played_lbl* (game square Label) selected by
+        players has been already played. If not, assign player's mark
+        to text value of the selected label.
+        In Player v Player mode, player's alternate who plays first in
         consecutive games.
         In Player v PC mode, Player 1 (human) always has the first turn.
         Evaluate played squares for a win after 5th turn.
@@ -760,10 +761,11 @@ class TicTacToeGUI(tk.Tk):
 
     def display_result(self, win_msg: str) -> None:
         """
-        Create pop-up window to announce winner and tie with PvP and PvPC,
-        or with canceled autoplay.
-        Provide option Buttons to play again or quit app.
-        Tally players' wins across re-plays and new games.
+        Create pop-up Game Report window to announce winner and tie with
+        PvP and PvPC, or with canceled autoplay.
+        Provide option Buttons to play again or quit app. Play again
+        option also can be invoked with Return or Enter.
+        Tally players' wins for games within a single play mode.
 
         :param win_msg: The result string to display in result window.
         :return: None
@@ -772,6 +774,7 @@ class TicTacToeGUI(tk.Tk):
         result_window = tk.Toplevel(self, borderwidth=4, relief='raised')
         result_window.title('Game Report')
         result_window.config(bg=self.color['result_bg'])
+        # Need to position toplevel in top-left corner of app window.
         result_window.geometry(f'+{app.winfo_x()}+{app.winfo_y()}')
 
         if MY_OS == 'dar':
@@ -826,8 +829,8 @@ class TicTacToeGUI(tk.Tk):
 
     def block_all_player_action(self) -> None:
         """
-        Prevent user action in app window while display_result() window
-        is open. Called from display_result().
+        Prevent user action in app window while Game Report window is
+        open. Called from display_result().
 
         :return: None
         """
