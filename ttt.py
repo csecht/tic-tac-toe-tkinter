@@ -16,7 +16,7 @@ Copyright: (c) 2022 Craig S. Echt under MIT License, included in the
    package (LICENSE text file); if not, see https://mit-license.org/
 URL: https://github.com/csecht/tic-tac-toe-tkinter
 Development Status :: 1 - Alpha
-Version: 0.0.10
+Version: 0.0.11
 
 Inspired by Riya Tendulkar code:
 https://levelup.gitconnected.com/how-to-code-tic-tac-toe-in-python-using-tkinter-e7f9ce510bfb
@@ -70,7 +70,7 @@ class TicTacToeGUI(tk.Tk):
     Methods: configure_widgets, your_turn_player1, grid_widgets,
         setup_game_board, unbind_game_board, on_enter, on_leave,
         mode_control, human_turn, pc_turn, pc_plays_random, turn_number,
-        check_winner, flash_win, flash_tie, display_result,
+        check_winner, flash_win, flash_tie, window_geometry, display_report,
         block_all_player_action, new_game, reset_game_and_score,
         auto_command, auto_start, auto_stop, auto_setup, auto_turn_limit,
         autoplay_random, autoplay_strategy, auto_flash.
@@ -133,6 +133,9 @@ class TicTacToeGUI(tk.Tk):
         self.all_autoplay_marks = ''  # Used to dole out PC marks in proper order.
         self.curr_automode = ''  # Used to display whose_turn.
         self.curr_pmode = ''  # Used to evaluate conditions.
+        self.report_geometry = ''
+        self.report_calls = 0
+        self.titlebar_offset = 0
 
         # Foreground and background colors.
         self.color = {'score_fg': 'DodgerBlue4',
@@ -270,7 +273,7 @@ class TicTacToeGUI(tk.Tk):
                                    command=self.set_who_autostarts)
 
         self.quit_button.config(text='Quit',
-                                relief='ridge', overrelief='raised',
+                                relief='groove', overrelief='raised',
                                 border=3,
                                 command=quit_game)
         self.setup_game_board()
@@ -720,7 +723,7 @@ class TicTacToeGUI(tk.Tk):
                 else:  # Mode selection is pvp or pvpc.
                     award_points(mark)
                     self.flash_win(combo)
-                    self.display_result(f'{mark} WINS!')
+                    self.display_report(f'{mark} WINS!')
 
         if self.turn_number() == 9 and not self.winner_found:
             self.winner_found = True
@@ -735,7 +738,7 @@ class TicTacToeGUI(tk.Tk):
                 self.auto_flash((4, 4, 4), 'TIE')
             else:
                 self.flash_tie()
-                self.display_result('IT IS A TIE!')
+                self.display_report('IT IS A TIE!')
 
     def flash_win(self, combo) -> None:
         """
@@ -761,7 +764,33 @@ class TicTacToeGUI(tk.Tk):
             lbl.config(bg=self.color['sq_won'])
             app.update_idletasks()
 
-    def display_result(self, win_msg: str) -> None:
+    def window_geometry(self, toplevel: tk) -> None:
+        """
+        Set the xy geometry of a *toplevel* window in top-left corner of
+        app widget, unless it is moved; then put at the new position
+        determined by report_geometry.
+        Calculate the height of the system's window title bar to use as
+        a y-offset for the *toplevel* xy geometry.
+
+        :param toplevel: The tkinter toplevel object to position.
+        :return: None
+        """
+        if self.report_geometry:
+            toplevel.geometry(self.report_geometry)
+        else:  # Set the initial xy position.
+            toplevel.geometry(f'+{app.winfo_x()}+{app.winfo_y()}')
+
+        # Need to position the geometry of the Report window by applying
+        #   a y offset for the height of the system's window title bar.
+        #   This is needed because tkinter widget geometry does not
+        #   include the system's title bar.
+        # Title bar height is determined once from the initial placement
+        #   of the Report window relative to the app window.
+        if self.report_calls == 1:
+            app.update_idletasks()
+            self.titlebar_offset = toplevel.winfo_y() - app.winfo_y()
+
+    def display_report(self, win_msg: str) -> None:
         """
         Create pop-up Game Report window to announce winner and tie with
         PvP and PvPC, or with canceled autoplay.
@@ -772,21 +801,21 @@ class TicTacToeGUI(tk.Tk):
         :param win_msg: The result string to display in result window.
         :return: None
         """
+        report_window = tk.Toplevel(self, borderwidth=4, relief='raised')
+        report_window.title('Game Report')
+        report_window.config(bg=self.color['result_bg'])
 
-        result_window = tk.Toplevel(self, borderwidth=4, relief='raised')
-        result_window.title('Game Report')
-        result_window.config(bg=self.color['result_bg'])
-        # Need to position toplevel in top-left corner of app window.
-        result_window.geometry(f'+{app.winfo_x()}+{app.winfo_y()}')
+        self.report_calls += 1
+        self.window_geometry(report_window)
 
         if MY_OS == 'dar':
-            result_window.minsize(180, 90)
+            report_window.minsize(180, 90)
         elif MY_OS == 'win':
-            result_window.minsize(250, 105)
+            report_window.minsize(250, 105)
         elif MY_OS == 'lin':
-            result_window.minsize(200, 115)
+            report_window.minsize(200, 115)
 
-        result_lbl = tk.Label(result_window, text=win_msg,
+        result_lbl = tk.Label(report_window, text=win_msg,
                               font=self.font['head14ibold'],
                               bg=self.color['result_bg'])
 
@@ -798,34 +827,37 @@ class TicTacToeGUI(tk.Tk):
         self.p1_score.set(self.p1_points)
         self.p2_score.set(self.p2_points)
 
-        # Need to unset autoplay mode to allow play action in Player modes:
-        #   set to default PvP mode.
-        if self.mode_selection.get() in 'auto-random, auto-strategy':
-            self.auto_random_mode.deselect()
-            self.auto_strategy_mode.deselect()
-            self.pvp_mode.select()
-
         def no_exit_on_x():
             messagebox.showinfo(
-                parent=result_window,
+                parent=report_window,
                 title='Click a button',
                 detail='Use either "New Game" or "Quit"'
                        ' to close Report window.')
 
-        result_window.protocol('WM_DELETE_WINDOW', no_exit_on_x)
+        report_window.protocol('WM_DELETE_WINDOW', no_exit_on_x)
 
         def restart_game():
-            self.new_game()
-            result_window.destroy()
+            """
+            Record current xy geometry of Report window, reset game
+            board, close window.
 
-        again = tk.Button(result_window, text=f'New Game (\u23CE)',  # Return symbol.
+            :return: None
+            """
+            self.report_geometry = (
+                f'+{report_window.winfo_x()}'
+                f'+{report_window.winfo_y() - self.titlebar_offset}'
+            )
+            self.new_game()
+            report_window.destroy()
+
+        again = tk.Button(report_window, text='New Game (\u23CE)',  # Return symbol.
                           relief='groove', overrelief='raised', border=3,
                           command=restart_game)
-        not_again = tk.Button(result_window, text='Quit',
+        not_again = tk.Button(report_window, text='Quit',
                               relief='groove', overrelief='raised', border=3,
                               command=quit_game)
-        result_window.bind('<Return>', lambda _: restart_game())
-        result_window.bind('<KP_Enter>', lambda _: restart_game())
+        report_window.bind('<Return>', lambda _: restart_game())
+        report_window.bind('<KP_Enter>', lambda _: restart_game())
 
         result_lbl.pack(pady=3, padx=3)
         again.pack(pady=(3, 0))
@@ -834,7 +866,7 @@ class TicTacToeGUI(tk.Tk):
     def block_all_player_action(self) -> None:
         """
         Prevent user action in app window while Game Report window is
-        open. Called from display_result().
+        open. Called from display_report().
 
         :return: None
         """
@@ -844,8 +876,7 @@ class TicTacToeGUI(tk.Tk):
 
     def new_game(self) -> None:
         """
-        Set up the next game.
-        Called from display_result().
+        Set up the next game. Called from display_report().
 
         return: None
         """
@@ -967,7 +998,7 @@ class TicTacToeGUI(tk.Tk):
         self.who_autostarts.config(state=tk.NORMAL)
 
         self.setup_game_board()
-        self.display_result(f'{self.curr_automode}, stopped')
+        self.display_report(f'{self.curr_automode}, stopped')
 
     def auto_setup(self) -> None:
         """
