@@ -67,6 +67,7 @@ def quit_game(quit_now=True):
 class TicTacToeGUI(tk.Tk):
     """
     Display the tkinter GUI playing board and its control buttons.
+    Provide multi-mode play action, with scoring.
     Methods: configure_widgets, your_turn_player1, grid_widgets,
         setup_game_board, unbind_game_board, on_enter, on_leave,
         mode_control, human_turn, pc_turn, pc_plays_random, turn_number,
@@ -98,7 +99,7 @@ class TicTacToeGUI(tk.Tk):
         self.auto_turns_header = tk.Label()
         self.auto_turns_lbl = tk.Label()
         self.auto_turns_remaining = tk.IntVar()
-        # auto_turns_remaining is set to len of autoplay_mark string
+        # auto_turns_remaining is set to length of autoplay_marks string.
 
         # Players' scores widgets.
         self.score_header = tk.Label()
@@ -172,7 +173,7 @@ class TicTacToeGUI(tk.Tk):
         self.grid_widgets()
 
     def configure_widgets(self) -> None:
-        """Initial configurations for app window widgets."""
+        """Initial configurations of app window widgets."""
 
         # Need MacBook-specific font sizes; has not been checked on iMacs.
         if MY_OS == 'dar':
@@ -278,19 +279,6 @@ class TicTacToeGUI(tk.Tk):
                                 command=quit_game)
         self.setup_game_board()
 
-    def your_turn_player1(self) -> None:
-        """
-        Displays that it is Player 1's turn to play.
-
-        :return: None
-        """
-        if self.mode_selection.get() == 'pvpc' and self.turn_number() == 1:
-            self.whose_turn.set(f'PC played {self.p2_mark}\n'
-                                f'Your turn {self.player1}')
-        else:
-            self.whose_turn.set(f'{self.player1} plays {self.p1_mark}')
-        self.whose_turn_lbl.config(bg=self.color['result_bg'])
-
     def grid_widgets(self) -> None:
         """Position app window widgets."""
 
@@ -373,6 +361,7 @@ class TicTacToeGUI(tk.Tk):
     def setup_game_board(self) -> None:
         """
         Configure and activate play action for the game board squares.
+
         :return: None
         """
         for i, lbl in enumerate(self.board_labels):
@@ -392,7 +381,7 @@ class TicTacToeGUI(tk.Tk):
 
     def unbind_game_board(self) -> None:
         """
-        When autoplay is active, prevent user action on game squares.
+        Prevent user action on game board squares.
 
         :return: None
         """
@@ -403,7 +392,7 @@ class TicTacToeGUI(tk.Tk):
 
     def on_enter(self, label: tk) -> None:
         """
-        Indicate mouseover squares with a color change.
+        On mouseover, indicate game board square with a color change.
 
         :param label: The tk.Label object.
         :return: None
@@ -415,7 +404,7 @@ class TicTacToeGUI(tk.Tk):
 
     def on_leave(self, label: tk):
         """
-        On mouse leave, square returns to entry color.
+        On mouse leave, game board square returns to entered color.
 
         :param label: The tk.Label object.
         :return: None
@@ -429,10 +418,10 @@ class TicTacToeGUI(tk.Tk):
 
     def mode_control(self) -> None:
         """
-        Cancel/ignore an errant/mistimed play mode selection.
         Block any mode change if in the middle of a game or autoplay.
         Disable and enable Radiobuttons as each mode requires.
-        Called as callback from the play mode Radiobuttons.
+        Cancel/ignore an errant or mistimed play mode selection.
+        Is callback from the play mode Radiobuttons.
 
         :return: None
         """
@@ -491,15 +480,28 @@ class TicTacToeGUI(tk.Tk):
             else:
                 self.your_turn_player1()
 
+    def your_turn_player1(self) -> None:
+        """
+        Display when it is Player 1's turn to play.
+
+        :return: None
+        """
+        if self.mode_selection.get() == 'pvpc' and self.turn_number() == 1:
+            self.whose_turn.set(f'PC played {self.p2_mark}\n'
+                                f'Your turn {self.player1}')
+        else:
+            self.whose_turn.set(f'{self.player1} plays {self.p1_mark}')
+        self.whose_turn_lbl.config(bg=self.color['result_bg'])
+
     def human_turn(self, played_lbl: tk) -> None:
         """
-        Check whether *played_lbl* (game square Label) selected by
-        players has been already played. If not, assign player's mark
-        to text value of the selected label.
+        Check whether *played_lbl* (game board square Label) selected by
+        player was already played. If not, assign player's mark to the
+        text value of the selected label.
         In Player v Player mode, player's alternate who plays first in
         consecutive games.
         In Player v PC mode, Player 1 (human) always has the first turn.
-        Evaluate played squares for a win after 5th turn.
+        Evaluate played squares for a win after the 5th turn.
 
         :param played_lbl: The tk.Label object that was clicked.
         :return: None
@@ -564,10 +566,10 @@ class TicTacToeGUI(tk.Tk):
 
     def pc_turn(self) -> None:
         """
-        Computer plays Player2.
-        Preference of PC play: selected pref option > play for a win >
+        Computer plays as Player2.
+        Precedence of PC play: selected pref option > play for a win >
         block P1 win > play to corner, if preferred > play random.
-        Called from human_turn() or new_game().
+        Called from human_turn() and new_game().
 
         :return: None
         """
@@ -660,7 +662,7 @@ class TicTacToeGUI(tk.Tk):
         app.update_idletasks()
 
     def pc_plays_random(self, turn_number: int, mark: str) -> None:
-        """ All PC plays are random positions.
+        """ All PC plays are to random positions.
 
         :param mark: The player's mark string to play.
         :param turn_number: The current turn number, from turn_number().
@@ -756,7 +758,7 @@ class TicTacToeGUI(tk.Tk):
         app.after(400, lambda: self.board_labels[_z].config(bg=self.color['sq_won']))
 
     def flash_tie(self) -> None:
-        """Make entire game board blue on tie.
+        """Make entire game board blue on a tied game.
 
         :return: None
         """
@@ -767,8 +769,8 @@ class TicTacToeGUI(tk.Tk):
     def window_geometry(self, toplevel: tk) -> None:
         """
         Set the xy geometry of a *toplevel* window in top-left corner of
-        app widget, unless it is moved; then put at the new position
-        determined by report_geometry.
+        app widget. If it is moved, then put at the new geometry
+        determined by the report_geometry variable.
         Calculate the height of the system's window title bar to use as
         a y-offset for the *toplevel* xy geometry.
 
@@ -784,19 +786,19 @@ class TicTacToeGUI(tk.Tk):
         #   a y offset for the height of the system's window title bar.
         #   This is needed because tkinter widget geometry does not
         #   include the system's title bar.
-        # Title bar height is determined once from the initial placement
-        #   of the Report window relative to the app window.
+        # Title bar height is determined only once from the initial
+        #   placement of the Report window at top-left of the app window.
         if self.report_calls == 1:
             app.update_idletasks()
             self.titlebar_offset = toplevel.winfo_y() - app.winfo_y()
 
     def display_report(self, win_msg: str) -> None:
         """
-        Create pop-up Game Report window to announce winner and tie with
-        PvP and PvPC, or with canceled autoplay.
-        Provide option Buttons to play again or quit app. Play again
-        option also can be invoked with Return or Enter.
-        Tally players' wins for games within a single play mode.
+        Pop-up a Game Report window to announce winner or tie with
+        PvP and PvPC modes, or with a canceled autoplay.
+        Provide option Buttons to play again or quit app.
+        Play again option can be invoked with Return or Enter.
+        Display tally of players' wins within a single play mode.
 
         :param win_msg: The result string to display in result window.
         :return: None
@@ -839,7 +841,7 @@ class TicTacToeGUI(tk.Tk):
         def restart_game():
             """
             Record current xy geometry of Report window, reset game
-            board, close window.
+            board, then close window. Called from keybind and Button cmd.
 
             :return: None
             """
@@ -917,10 +919,10 @@ class TicTacToeGUI(tk.Tk):
 
     def reset_game_and_score(self) -> None:
         """
-        Sets game number and player points to zero.
+        Set game number and player points to zero.
         Called from mode_control() when user changes between PvP and
         PvPC or changes PvPC play mode, and from auto_start(),
-        new_game(), and Combobox selection bind.
+        new_game(), and Combobox selection binding.
 
         :return: None
         """
@@ -937,7 +939,7 @@ class TicTacToeGUI(tk.Tk):
         """
         Check that an autoplay mode is selected before calling
         auto_start() when the auto_go_stop_radiobtn Radiobutton invoked.
-        Called from the kw command of the auto_go_stop_radiobtn.
+        Called as the auto_go_stop_radiobtn command.
 
         :return: None
         """
@@ -1190,8 +1192,8 @@ class TicTacToeGUI(tk.Tk):
         app.after(1, winner_show)
         app.after(300, winner_erase)
 
-        # Need to allow idle time for auto_setup to complete given auto_after time;
-        #   important for getting all_autoplay_marks in proper register.
+        # Need to allow idle time for auto_setup to complete given auto_after
+        #   time; keeps all_autoplay_marks in correct register.
         app.after_idle(self.auto_setup)
 
 
