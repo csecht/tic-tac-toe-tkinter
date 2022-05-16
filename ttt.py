@@ -277,6 +277,8 @@ class TicTacToeGUI(tk.Tk):
                                 relief='groove', overrelief='raised',
                                 border=3,
                                 command=quit_game)
+
+        # Configure game board play squares:
         self.setup_game_board()
 
     def grid_widgets(self) -> None:
@@ -517,6 +519,7 @@ class TicTacToeGUI(tk.Tk):
 
         def play_p2():
             played_lbl['text'] = self.p2_mark
+            # played_lbl.config(fg=self.color['default_bg'])
             self.your_turn_player1()
 
         def play_p1vpc():
@@ -809,6 +812,10 @@ class TicTacToeGUI(tk.Tk):
 
         self.report_calls += 1
         self.window_geometry(report_window)
+
+        # Need prevent focus shifting to app window which would cover up
+        #  the Report window.
+        report_window.attributes('-topmost', True)
 
         if MY_OS == 'dar':
             report_window.minsize(180, 90)
