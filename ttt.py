@@ -16,7 +16,7 @@ Copyright: (c) 2022 Craig S. Echt under MIT License, included in the
    package (LICENSE text file); if not, see https://mit-license.org/
 URL: https://github.com/csecht/tic-tac-toe-tkinter
 Development Status :: 1 - Alpha
-Version: 0.0.12
+Version: 0.0.13
 
 Inspired by Riya Tendulkar code:
 https://levelup.gitconnected.com/how-to-code-tic-tac-toe-in-python-using-tkinter-e7f9ce510bfb
@@ -759,10 +759,12 @@ class TicTacToeGUI(tk.Tk):
                 if self.mode_selection.get() in 'auto-random, auto-strategy':
                     award_points(mark)
                     self.auto_flash(combo, mark)
+                    break
                 else:  # Mode selection is pvp or pvpc.
                     award_points(mark)
                     self.flash_win(combo)
                     self.display_report(f'{mark} WINS!')
+                    break
 
         if self.turn_number() == 9 and not self.winner_found:
             self.winner_found = True
@@ -999,7 +1001,7 @@ class TicTacToeGUI(tk.Tk):
         else:
             self.auto_go_stop_txt.set('Start autoplay')
             self.autoplay_on.set(False)
-            self.auto_stop()
+            self.auto_stop('canceled')
 
     def auto_start(self) -> None:
         """
@@ -1031,11 +1033,12 @@ class TicTacToeGUI(tk.Tk):
         elif self.mode_selection.get() == 'auto-strategy':
             self.autoplay_strategy()
 
-    def auto_stop(self) -> None:
+    def auto_stop(self, stop_msg: str) -> None:
         """
         Stop autoplay method and call Results popup window.
         Disable player game actions (resets when Results window closes).
 
+        :param stop_msg: Information on source of auto_stop call.
         :return: None
         """
         if self.after_id:
@@ -1045,7 +1048,7 @@ class TicTacToeGUI(tk.Tk):
         self.who_autostarts.config(state=tk.NORMAL)
 
         self.setup_game_board()
-        self.display_report(f'{self.curr_automode}, stopped')
+        self.display_report(f'{self.curr_automode}, {stop_msg}')
 
     def auto_setup(self) -> None:
         """
@@ -1128,7 +1131,7 @@ class TicTacToeGUI(tk.Tk):
             #   auto_stop() to break the call cycle.
             self.after_id = app.after(self.auto_after, self.autoplay_random)
         else:
-            self.auto_stop()
+            self.auto_stop('ended')
 
     def autoplay_strategy(self) -> None:
         """
@@ -1209,7 +1212,7 @@ class TicTacToeGUI(tk.Tk):
             #   allow auto_stop() to break the call cycle.
             self.after_id = app.after(self.auto_after, self.autoplay_strategy)
         else:
-            self.auto_stop()
+            self.auto_stop('ended')
 
     def auto_flash(self, combo: tuple, mark: str) -> None:
         """
