@@ -37,11 +37,11 @@ In Autoplay mode, PC plays itself. You can choose to have Player 1 (X) start eve
 
 ### Screenshots
 
-Player 1 wins 1st game in Player v Player mode. Ready for Player 1 to start 2nd game with a click (or with Return/Enter):
+Player 1 wins 1st game in Player v Player mode. Ready for Player 1 to start 2nd game with a click (or with Return/Enter). The result window can be repositioned from its default location.
 
 ![pvp-game](images/player1_wins.png)
 
-Autoplay random mode with alternating starting players, in progress:
+Autoplay random mode with alternating starting players, in progress, with 555 turns remaining:
 
 ![autoplay-game](images/autoplay.png)
 
