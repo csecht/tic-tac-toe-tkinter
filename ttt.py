@@ -16,7 +16,7 @@ Copyright: (c) 2022 Craig S. Echt under MIT License, included in the
    package (LICENSE text file); if not, see https://mit-license.org/
 URL: https://github.com/csecht/tic-tac-toe-tkinter
 Development Status :: 1 - Alpha
-Version: 0.0.11
+Version: 0.0.12
 
 Inspired by Riya Tendulkar code:
 https://levelup.gitconnected.com/how-to-code-tic-tac-toe-in-python-using-tkinter-e7f9ce510bfb
@@ -122,9 +122,9 @@ class TicTacToeGUI(tk.Tk):
         self.autoplay_on = tk.BooleanVar()
         self.auto_go_stop_radiobtn = tk.Radiobutton()
         self.auto_go_stop_txt = tk.StringVar()
-        self.who_autostarts = tk.Button()
+        self.who_autostarts = ttk.Button()
 
-        self.quit_button = tk.Button()
+        self.quit_button = ttk.Button()
 
         # Additional widgets.
         self.separator = ttk.Separator()
@@ -160,26 +160,28 @@ class TicTacToeGUI(tk.Tk):
 
         # Label fonts.
         self.font = {
-            'head10': ('TkHeadingFont', 10),
-            'heading': ('TkHeadingFont', 11, 'italic bold'),
-            'head10bold': ('TkHeadingFont', 10, 'bold'),
-            'head12bold': ('TkHeadingFont', 12, 'bold'),
-            'head14ibold': ('TkHeadingFont', 14, 'italic bold'),
-            'condensed': ('TkTooltipFont', 9),
-            'fixed30bold': ('TkFixedFont', 30, 'bold'),
+            'sm_button': ('TkHeadingFont', 8),
+            'who': ('TkHeadingFont', 8, 'italic bold'),
+            'button': ('TkHeadingFont', 8, 'bold'),
+            'scores': ('TkHeadingFont', 9),
+            'report': ('TkHeadingFont', 10, 'italic bold'),
+            'condensed': ('TkTooltipFont', 8),
+            'marks': ('TkFixedFont', 50),
         }
-
         self.configure_widgets()
         self.grid_widgets()
 
     def configure_widgets(self) -> None:
         """Initial configurations of app window widgets."""
+        ttk.Style().theme_use('alt')
 
         # Need MacBook-specific font sizes; has not been checked on iMacs.
         if MY_OS == 'dar':
-            self.font['condensed'] = ('TkTooltipFont', 12)
-            self.font['heading'] = ('TkHeadingFont', 13, 'italic bold')
-            self.font['head10bold'] = ('TkHeadingFont', 12, 'bold')
+            self.font['sm_button'] = ('TkHeadingFont', 10)
+            self.font['who'] = ('TkHeadingFont', 11, 'italic bold')
+            self.font['button'] = ('TkHeadingFont', 10, 'bold')
+            self.font['scores'] = ('TkHeadingFont', 12)
+            self.font['condensed'] = ('TkTooltipFont', 10)
 
         # Player's turn widgets.
         self.prev_game_num_header.config(text='Games played',
@@ -187,10 +189,10 @@ class TicTacToeGUI(tk.Tk):
         self.prev_game_num_lbl.config(textvariable=self.prev_game_num,
                                       font=self.font['condensed'])
         self.whose_turn_lbl.config(textvariable=self.whose_turn, height=4,
-                                   font=self.font['heading'])
+                                   font=self.font['who'])
         self.your_turn_player1()
 
-        self.auto_turns_header.config(text='Turns remaining',
+        self.auto_turns_header.config(text='Turns to go',
                                       font=self.font['condensed'])
         self.auto_turns_lbl.config(textvariable=self.auto_turns_remaining,
                                    font=self.font['condensed'])
@@ -198,37 +200,39 @@ class TicTacToeGUI(tk.Tk):
         # Players' scores widgets:
         # ︴symbol from https://coolsymbol.com/line-symbols.html
         self.score_header.config(
-            text='Score ︴', font=self.font['head12bold'],
+            text='Score ︴', font=self.font['scores'],
             fg=self.color['score_fg'])
         self.player1_header.config(
-            text='Player 1:', font=self.font['head12bold'],
+            text='Player 1:', font=self.font['scores'],
             fg=self.color['score_fg'])
         self.player2_header.config(
-            text='Player 2:', font=self.font['head12bold'],
+            text='Player 2:', font=self.font['scores'],
             fg=self.color['score_fg'])
         self.player1_score_lbl.config(
-            textvariable=self.p1_score, font=self.font['head12bold'],
+            textvariable=self.p1_score, font=self.font['scores'],
             fg=self.color['score_fg'])
         self.player2_score_lbl.config(
-            textvariable=self.p2_score, font=self.font['head12bold'],
+            textvariable=self.p2_score, font=self.font['scores'],
             fg=self.color['score_fg'])
         self.ties_header.config(
-            text='Ties:', font=self.font['head10bold'],
+            text='Ties:', font=self.font['scores'],
             fg=self.color['score_fg'])
         self.ties_lbl.config(
-            textvariable=self.ties_num, font=self.font['head10bold'],
+            textvariable=self.ties_num, font=self.font['scores'],
             fg=self.color['score_fg'])
 
         # Play mode control widgets:
         self.pvp_mode.config(text='Player v Player',
+                             font=self.font['condensed'],
                              variable=self.mode_selection,
                              value='pvp',
                              command=self.mode_control)
         self.pvp_mode.select()
+
         self.pvpc_mode.config(text='Player v PC',
+                              font=self.font['condensed'],
                               variable=self.mode_selection,
                               value='pvpc',
-                              # bg=self.color['result_bg'],
                               command=self.mode_control)
 
         self.choose_pc_pref.bind('<<ComboboxSelected>>',
@@ -239,19 +243,22 @@ class TicTacToeGUI(tk.Tk):
         # Set random, 1st in tuple, as the default.
         self.choose_pc_pref.current(0)
         # choose_pc_pref is enabled as readonly when pvpc_mode is selected.
-        self.choose_pc_pref.config(state=tk.DISABLED)
+        self.choose_pc_pref.config(font=self.font['condensed'],
+                                   state=tk.DISABLED)
         if MY_OS == 'dar':
             self.choose_pc_pref.config(width=13)
         else:
-            self.choose_pc_pref.config(width=16)
+            self.choose_pc_pref.config(width=14)
 
         self.separator.configure(orient='horizontal')
 
         self.auto_random_mode.config(text='Autoplay random',
+                                     font=self.font['condensed'],
                                      variable=self.mode_selection,
                                      value='auto-random',
                                      command=self.mode_control)
         self.auto_strategy_mode.config(text='Autoplay strategy',
+                                       font=self.font['condensed'],
                                        variable=self.mode_selection,
                                        value='auto-strategy',
                                        command=self.mode_control)
@@ -259,7 +266,7 @@ class TicTacToeGUI(tk.Tk):
                                           variable=self.autoplay_on,
                                           fg=self.color['mark_fg'],
                                           bg=self.color['radiobtn_bg'],
-                                          font=self.font['head10bold'],
+                                          font=self.font['button'],
                                           command=self.auto_command,
                                           borderwidth=2,
                                           indicatoron=False,
@@ -267,15 +274,25 @@ class TicTacToeGUI(tk.Tk):
         self.auto_go_stop_txt.set('Start autoplay')
         self.auto_go_stop_radiobtn.config(state=tk.DISABLED)
 
-        self.who_autostarts.config(text='Player 1 starts',
-                                   font=self.font['condensed'],
-                                   relief='solid', overrelief='raised',
-                                   border=2,
-                                   command=self.set_who_autostarts)
+        # ttk.Buttons are used b/c tk.Buttons cannot be configured in macOS.
+        style = ttk.Style()
+        style.map('My.TButton',
+                  foreground=[('pressed', self.color['disabled_fg']),
+                              ('active', self.color['mark_fg']),
+                              ('disabled', self.color['disabled_fg'])
+                              ],
+                  background=[('pressed', self.color['default_bg']),
+                              ('active', self.color['radiobtn_bg'])],
+                  )
+        style.configure('My.TButton', font=self.font['sm_button'])
+        self.who_autostarts.configure(style="My.TButton",
+                                      text='Player 1 starts', width=14,
+                                      state=tk.DISABLED,
+                                      takefocus=False,
+                                      command=self.set_who_autostarts)
 
-        self.quit_button.config(text='Quit',
-                                relief='groove', overrelief='raised',
-                                border=3,
+        self.quit_button.config(style="My.TButton",
+                                text='Quit', width=4,
                                 command=quit_game)
 
         # Configure game board play squares:
@@ -292,9 +309,9 @@ class TicTacToeGUI(tk.Tk):
         _col = 0
         for lbl in self.board_labels:
             if MY_OS in 'win, dar':
-                lbl.grid(row=_row, column=_col, padx=6, pady=6)
+                lbl.grid(row=_row, column=_col, pady=6, padx=6, ipady=6, ipadx=10)
             else:  # Linux (lin)
-                lbl.grid(row=_row, column=_col)
+                lbl.grid(row=_row, column=_col, pady=1, padx=1, ipady=6, ipadx=10)
             _col += 1
             if _col > 2:
                 _col = 0
@@ -302,63 +319,77 @@ class TicTacToeGUI(tk.Tk):
 
         # Squeeze everything in with pretty spanning, padding, and stickies.
         #  Grid statements are sorted by row, then column.
-        self.rowconfigure(0, minsize=100)
+        self.rowconfigure(0, minsize=80)
         self.prev_game_num_header.grid(
-            row=0, column=2, rowspan=2, padx=(0, 15), pady=(5, 0), sticky=tk.NE)
+            row=0, column=2, rowspan=2, padx=(0, 8), pady=(5, 0), sticky=tk.NE)
         self.prev_game_num_lbl.grid(
-            row=0, column=2, rowspan=2, padx=(0, 15), pady=(24, 0), sticky=tk.NE)
+            row=0, column=2, rowspan=2, padx=(0, 8), pady=(24, 0), sticky=tk.NE)
         self.whose_turn_lbl.grid(  # padx matches that of board_labels.
-            row=0, column=0, padx=6, pady=(5, 0), sticky=tk.NSEW)
+            row=0, column=0, padx=0, pady=(5, 0))
 
+        # There is duplication in the elif statements to allow easy editing and
+        #  cut/paste options for platform-specific needs.
         if MY_OS == 'dar':
             self.score_header.grid(
-                row=0, column=1, rowspan=2, padx=(40, 0), pady=(0, 20), sticky=tk.W)
-        else:
+                row=0, column=1, rowspan=2, padx=(10, 0), pady=(0, 10), sticky=tk.W)
+            self.player1_header.grid(
+                row=0, column=1, rowspan=2, padx=(0, 0), pady=(0, 40), sticky=tk.E)
+            self.player2_header.grid(
+                row=0, column=1, rowspan=2, padx=(0, 0), pady=(20, 10), sticky=tk.E)
+        elif MY_OS == 'lin':
             self.score_header.grid(
-                row=0, column=1, rowspan=2, padx=(25, 0), pady=(0, 20), sticky=tk.W)
-
-        self.player1_header.grid(
-            row=0, column=1, rowspan=2, padx=(0, 8), pady=(0, 50), sticky=tk.E)
-        self.player2_header.grid(
-            row=0, column=1, rowspan=2, padx=(0, 8), pady=(30, 20), sticky=tk.E)
+                row=0, column=1, rowspan=2, padx=(10, 0), pady=(0, 10), sticky=tk.W)
+            self.player1_header.grid(
+                row=0, column=1, rowspan=2, padx=(0, 8), pady=(0, 40), sticky=tk.E)
+            self.player2_header.grid(
+                row=0, column=1, rowspan=2, padx=(0, 8), pady=(20, 10), sticky=tk.E)
+        elif MY_OS == 'win':
+            self.score_header.grid(
+                row=0, column=1, rowspan=2, padx=(25, 0), pady=(0, 10), sticky=tk.W)
+            self.player1_header.grid(
+                row=0, column=1, rowspan=2, padx=(0, 8), pady=(0, 40), sticky=tk.E)
+            self.player2_header.grid(
+                row=0, column=1, rowspan=2, padx=(0, 8), pady=(20, 10), sticky=tk.E)
 
         self.player1_score_lbl.grid(
-            row=0, column=2, rowspan=2, padx=0, pady=(0, 50), sticky=tk.W)
+            row=0, column=2, rowspan=2, padx=0, pady=(0, 40), sticky=tk.W)
         self.player2_score_lbl.grid(
-            row=0, column=2, rowspan=2, padx=0, pady=(30, 20), sticky=tk.W)
+            row=0, column=2, rowspan=2, padx=0, pady=(20, 10), sticky=tk.W)
         # Auto-turn counting labels are gridded in auto_start().
 
         self.ties_header.grid(
-            row=0, column=1, rowspan=2, padx=(0, 8), pady=(70, 0), sticky=tk.E)
+            row=0, column=1, rowspan=2, padx=(0, 8), pady=(55, 0), sticky=tk.E)
         self.ties_lbl.grid(
-            row=0, column=2, rowspan=2, padx=0, pady=(70, 0), sticky=tk.W)
+            row=0, column=2, rowspan=2, padx=0, pady=(55, 0), sticky=tk.W)
 
         self.pvp_mode.grid(
             row=5, column=0, padx=(10, 0), pady=5, sticky=tk.W)
-        self.pvpc_mode.grid(
-            row=5, column=1, columnspan=2, padx=(0, 0), pady=5, sticky=tk.W)
         if MY_OS == 'dar':
+            self.pvpc_mode.grid(
+                row=5, column=1, columnspan=2, padx=(20, 0), pady=5, sticky=tk.W)
             self.choose_pc_pref.grid(
-                row=5, column=1, columnspan=2, padx=(0, 70), pady=0, sticky=tk.E)
+                row=5, column=1, columnspan=2, padx=(0, 25), pady=0, sticky=tk.E)
         else:
+            self.pvpc_mode.grid(
+                row=5, column=1, columnspan=2, padx=(0, 0), pady=5, sticky=tk.W)
             self.choose_pc_pref.grid(
-                row=5, column=1, columnspan=2, padx=(0, 110), pady=0, sticky=tk.E)
+                row=5, column=1, columnspan=2, padx=(0, 35), pady=0, sticky=tk.E)
 
         self.separator.grid(
             row=7, column=0, columnspan=3, padx=10, sticky=tk.EW)
 
         self.auto_random_mode.grid(
-            row=8, column=0, padx=(10, 0), pady=(4, 0), sticky=tk.W)
+            row=8, column=0, padx=0, pady=(4, 0), sticky=tk.W)
         self.auto_go_stop_radiobtn.grid(
             row=8, column=1, rowspan=2, padx=0, pady=(12, 0), sticky=tk.EW)
 
         self.auto_strategy_mode.grid(
-            row=9, column=0, padx=(10, 0), pady=0, sticky=tk.W)
+            row=9, column=0, padx=0, pady=0, sticky=tk.W)
 
         self.who_autostarts.grid(
-            row=10, column=0, padx=(25, 0), pady=(0, 5), sticky=tk.W)
+            row=10, column=0, padx=(15, 0), pady=5, sticky=tk.W)
         self.quit_button.grid(
-            row=10, column=2, padx=(0, 10), pady=(0, 5), sticky=tk.E)
+            row=10, column=2, padx=5, pady=(0, 5), sticky=tk.E)
 
     def setup_game_board(self) -> None:
         """
@@ -367,9 +398,10 @@ class TicTacToeGUI(tk.Tk):
         :return: None
         """
         for i, lbl in enumerate(self.board_labels):
-            lbl.config(text=' ', height=3, width=6,
+            lbl.config(text=' ', height=1, width=2,
                        bg=self.color['sq_not_won'], fg=self.color['mark_fg'],
-                       font=self.font['fixed30bold'],
+                       font=self.font['marks'],
+
                        )
             if MY_OS == 'dar':
                 lbl.config(borderwidth=12)
@@ -473,8 +505,10 @@ class TicTacToeGUI(tk.Tk):
 
             if mode in 'pvp, pvpc':
                 self.auto_go_stop_radiobtn.config(state=tk.DISABLED)
+                self.who_autostarts.configure(state=tk.DISABLED)
             else:
                 self.auto_go_stop_radiobtn.config(state=tk.NORMAL)
+                self.who_autostarts.configure(state=tk.NORMAL)
 
             if mode in 'auto-random, auto-strategy':
                 self.whose_turn.set('PC autoplay')
@@ -807,7 +841,7 @@ class TicTacToeGUI(tk.Tk):
         :return: None
         """
         report_window = tk.Toplevel(self, borderwidth=4, relief='raised')
-        report_window.title('Game Report')
+        report_window.title('TTT')
         report_window.config(bg=self.color['result_bg'])
 
         self.report_calls += 1
@@ -816,16 +850,17 @@ class TicTacToeGUI(tk.Tk):
         # Need prevent focus shifting to app window which would cover up
         #  the Report window.
         report_window.attributes('-topmost', True)
+        report_window.focus_force()
 
         if MY_OS == 'dar':
-            report_window.minsize(180, 90)
+            report_window.minsize(180, 80)
         elif MY_OS == 'win':
-            report_window.minsize(250, 105)
+            report_window.minsize(190, 100)
         elif MY_OS == 'lin':
-            report_window.minsize(200, 115)
+            report_window.minsize(150, 90)
 
-        result_lbl = tk.Label(report_window, text=win_msg,
-                              font=self.font['head14ibold'],
+        report_lbl = tk.Label(report_window, text=win_msg,
+                              font=self.font['report'],
                               bg=self.color['result_bg'])
 
         self.block_all_player_action()
@@ -860,16 +895,18 @@ class TicTacToeGUI(tk.Tk):
             report_window.destroy()
 
         again = tk.Button(report_window, text='New Game (\u23CE)',  # Return symbol.
+                          font=self.font['button'],
                           relief='groove', overrelief='raised', border=3,
                           command=restart_game)
         not_again = tk.Button(report_window, text='Quit',
+                              font=self.font['sm_button'],
                               relief='groove', overrelief='raised', border=3,
                               command=quit_game)
         report_window.bind('<Return>', lambda _: restart_game())
         report_window.bind('<KP_Enter>', lambda _: restart_game())
 
-        result_lbl.pack(pady=3, padx=3)
-        again.pack(pady=(3, 0))
+        report_lbl.pack(pady=3, padx=3)
+        again.pack(pady=(0, 0))
         not_again.pack(pady=3)
 
     def block_all_player_action(self) -> None:
@@ -977,9 +1014,10 @@ class TicTacToeGUI(tk.Tk):
         self.whose_turn_lbl.config(bg=self.color['default_bg'])
 
         self.auto_turns_header.grid(row=0, column=2, rowspan=2,
-                                    padx=(0, 15), pady=(0, 35), sticky=tk.SE)
+                                    padx=(0, 8), pady=(0, 20), sticky=tk.SE)
         self.auto_turns_lbl.grid(row=0, column=2, rowspan=2,
-                                 padx=(0, 15), pady=(0, 15), sticky=tk.SE)
+                                 padx=(0, 8), pady=(0, 0), sticky=tk.SE)
+
         self.auto_go_stop_radiobtn.config(state=tk.NORMAL)
         self.who_autostarts.config(state=tk.DISABLED)
 
