@@ -151,12 +151,6 @@ class TicTacToeGUI(tk.Tk):
                       'radiobtn_bg': 'DodgerBlue1',
                       # 'radiobtn_fg': 'white',
                       }
-        if MY_OS == 'dar':
-            self.color['default_bg'] = 'white'
-        elif MY_OS == 'lin':
-            self.color['default_bg'] = 'grey85'
-        elif MY_OS == 'win':
-            self.color['default_bg'] = 'grey95'
 
         # Label fonts.
         self.font = {
@@ -175,7 +169,14 @@ class TicTacToeGUI(tk.Tk):
         """Initial configurations of app window widgets."""
         ttk.Style().theme_use('alt')
 
-        # Need MacBook-specific font sizes; has not been checked on iMacs.
+        # Need to apply OS-specific adjustments.
+        if MY_OS == 'dar':
+            self.color['default_bg'] = 'white'
+        elif MY_OS == 'lin':
+            self.color['default_bg'] = 'grey85'
+        elif MY_OS == 'win':
+            self.color['default_bg'] = 'grey95'
+
         if MY_OS == 'dar':
             self.font['sm_button'] = ('TkHeadingFont', 10)
             self.font['who'] = ('TkHeadingFont', 11, 'italic bold')
@@ -245,6 +246,7 @@ class TicTacToeGUI(tk.Tk):
         # choose_pc_pref is enabled as readonly when pvpc_mode is selected.
         self.choose_pc_pref.config(font=self.font['condensed'],
                                    state=tk.DISABLED)
+        self.option_add("*TCombobox*Font", self.font['condensed'])
         if MY_OS == 'dar':
             self.choose_pc_pref.config(width=13)
         else:
