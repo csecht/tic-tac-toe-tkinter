@@ -266,14 +266,13 @@ class TicTacToeGUI(tk.Tk):
                                        value='auto-strategy',
                                        command=self.mode_control)
         self.auto_go_stop_radiobtn.config(textvariable=self.auto_go_stop_txt,
+                                          font=self.font['button'],
                                           variable=self.autoplay_on,
                                           fg=self.color['mark_fg'],
                                           bg=self.color['radiobtn_bg'],
-                                          font=self.font['button'],
-                                          command=self.auto_command,
                                           borderwidth=2,
                                           indicatoron=False,
-                                          )
+                                          command=self.auto_command)
         self.auto_go_stop_txt.set('Start autoplay')
         self.auto_go_stop_radiobtn.config(state=tk.DISABLED)
 
@@ -748,7 +747,7 @@ class TicTacToeGUI(tk.Tk):
             else:
                 self.p2_points += 1
 
-        # Loop breaks when a winner is found b/c of calls to other functions.
+        # Loop breaks when the first winning combo is found.
         for combo in winning_combos:
             _x, _y, _z = combo
             lbl_x_txt = self.board_labels[_x]['text']
@@ -763,11 +762,12 @@ class TicTacToeGUI(tk.Tk):
                     award_points(mark)
                     self.auto_flash(combo, mark)
                     break
-                else:  # Mode selection is pvp or pvpc.
-                    award_points(mark)
-                    self.flash_win(combo)
-                    self.display_report(f'{mark} WINS!')
-                    break
+
+                # Mode selection is pvp or pvpc.
+                award_points(mark)
+                self.flash_win(combo)
+                self.display_report(f'{mark} WINS!')
+                break
 
         if self.turn_number() == 9 and not self.winner_found:
             self.winner_found = True
