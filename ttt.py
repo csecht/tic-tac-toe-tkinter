@@ -236,21 +236,22 @@ class TicTacToeGUI(tk.Tk):
                               value='pvpc',
                               command=self.mode_control)
 
-        self.choose_pc_pref.bind('<<ComboboxSelected>>',
-                                 lambda _: self.reset_game_and_score())
-        all_prefs = ('PC plays random', 'PC plays corners',
-                     'PC plays center', 'PC plays strategy')
-        self.choose_pc_pref['values'] = all_prefs
-        # Set random, 1st in tuple, as the default.
-        self.choose_pc_pref.current(0)
         # choose_pc_pref is enabled as readonly when pvpc_mode is selected.
+        #   Set drop-down list font size to match displayed font size.
+        #   Set random, 1st in tuple, as the default.
         self.choose_pc_pref.config(font=self.font['condensed'],
+                                   width=14,
+                                   values=('PC plays random',
+                                           'PC plays corners',
+                                           'PC plays center',
+                                           'PC plays strategy'),
                                    state=tk.DISABLED)
         self.option_add("*TCombobox*Font", self.font['condensed'])
         if MY_OS == 'dar':
             self.choose_pc_pref.config(width=13)
-        else:
-            self.choose_pc_pref.config(width=14)
+        self.choose_pc_pref.current(0)
+        self.choose_pc_pref.bind('<<ComboboxSelected>>',
+                                 lambda _: self.reset_game_and_score())
 
         self.separator.configure(orient='horizontal')
 
