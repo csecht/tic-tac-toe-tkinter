@@ -41,7 +41,7 @@ Player 1 wins 1st game in Player v Player mode. Ready for Player 1 to start 2nd 
 
 ![pvp-game](images/player1_wins.png)
 
-Autoplay random mode with alternating starting players, in progress, with 555 turns remaining:
+Autoplay random mode with Player 1 starting all games, in progress, with 555 turns remaining:
 
 ![autoplay-game](images/autoplay.png)
 
