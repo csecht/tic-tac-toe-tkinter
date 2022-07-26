@@ -10,30 +10,19 @@ Play mode options:
   Autoplay, about 120 games of the PC playing itself in either random or
     strategic mode options and an optinon for either one Player always
     goes first or Players alternate the first turn.
+
 Requires tkinter (tk/tcl) and Python3.6+.
 Developed in Python 3.8-3.9 with tkinter 8.6.
-Copyright: (c) 2022 Craig S. Echt under MIT License, included in the
-   package (LICENSE text file); if not, see https://mit-license.org/
-URL: https://github.com/csecht/tic-tac-toe-tkinter
-Development Status :: 1 - Alpha
-Version: 0.0.13
 
 Inspired by Riya Tendulkar code:
 https://levelup.gitconnected.com/how-to-code-tic-tac-toe-in-python-using-tkinter-e7f9ce510bfb
 https://gist.github.com/riya1620/72c2b668ef29da061c44d97a82318572
 """
+# Copyright: (c) 2022 Craig S. Echt, under MIT License
 
 import argparse
 import random
 import sys
-
-# Check for minimum Python version required:
-if sys.version_info < (3, 6):
-    print(f'Sorry, but this program requires Python 3.6 or later.\n'
-          'Current Python version:'
-          f' {sys.version_info.major}.{sys.version_info.minor}\n'
-          'Python downloads are available from https://docs.python.org/')
-    sys.exit(0)
 
 try:
     import tkinter as tk
@@ -45,23 +34,8 @@ except (ImportError, ModuleNotFoundError) as error:
           '\nLinux users may need this: $ sudo apt-get install python3-tk\n'
           f'See also: https://tkdocs.com/tutorial/install.html \n{error}')
 
-MY_OS = sys.platform[:3]
-
-
-def quit_game(quit_now=True):
-    """
-    Manage app window Quit button. Ask for confirmation if a game has
-    not yet finished.
-    """
-    if quit_now:
-        print("*** User quit the program ***\n")
-        app.destroy()
-    else:
-        msg = messagebox.askyesno(
-            'Confirm', 'Current game is in play.\nQuit now?')
-        if msg:
-            print("*** User quit the program ***\n")
-            app.destroy()
+import ttt_utils
+from ttt_utils import utils, platform_check as chk
 
 
 class TicTacToeGUI(tk.Tk):
@@ -76,6 +50,131 @@ class TicTacToeGUI(tk.Tk):
         auto_command, auto_start, auto_stop, auto_setup, auto_turn_limit,
         autoplay_random, autoplay_strategy, auto_flash.
     """
+
+    __slots__ = (
+        # inherited attributes
+                'adderrorinfo',
+                'after_id',
+                'call',
+                'config',
+                'createcommand',
+                'createfilehandler',
+                'createtimerhandler',
+                'deletefilehandler',
+                'dooneevent',
+                'evalfile',
+                'exprboolean',
+                'exprdouble',
+                'exprlong',
+                'exprstring',
+                'getboolean',
+                'getdouble',
+                'getint',
+                'getvar',
+                'globalgetvar',
+                'globalsetvar',
+                'globalunsetvar',
+                'interpaddr',
+                'mainloop',
+                'master',
+                'quit',
+                'record',
+                'setvar',
+                'split',
+                'splitlist',
+                'unsetvar',
+                'wantobjects',
+                'willdispatch',
+                'anchor',
+                'bbox',
+                'children',
+                'columnconfigure',
+                'focus',
+                'lift',
+                'propagate',
+                'size',
+                'slaves',
+                'tk',
+                'waitvar',
+                'aspect',
+                'attributes',
+                'client',
+                'colormapwindows',
+                'command',
+                'deiconify',
+                'focusmodel',
+                'forget',
+                'frame',
+                'geometry',
+                'grid',
+                'group',
+                'iconbitmap',
+                'iconify',
+                'iconmask',
+                'iconphoto',
+                'iconposition',
+                'iconwindow',
+                'manage',
+                'maxsize',
+                'minsize',
+                'overrideredirect',
+                'positionfrom',
+                'sizefrom',
+                'state',
+                'transient',
+                'withdraw',
+
+                 # instance attributes
+                 'after_id',
+                 'all_autoplay_marks',
+                 'auto_after',
+                 'auto_go_stop_radiobtn',
+                 'auto_go_stop_txt',
+                 'auto_random_mode',
+                 'auto_strategy_mode',
+                 'auto_turns_header',
+                 'auto_turns_lbl',
+                 'auto_turns_remaining',
+                 'autoplay_on',
+                 'board_labels',
+                 'choose_pc_pref',
+                 'color',
+                 'curr_automode',
+                 'curr_pmode',
+                 'font',
+                 'mode_selection',
+                 'p1_mark',
+                 'p1_points',
+                 'p1_score',
+                 'p2_mark',
+                 'p2_points',
+                 'p2_score',
+                 'play_after',
+                 'player1',
+                 'player1_header',
+                 'player1_score_lbl',
+                 'player2',
+                 'player2_header',
+                 'player2_score_lbl',
+                 'prev_game_num',
+                 'prev_game_num_header',
+                 'prev_game_num_lbl',
+                 'pvp_mode',
+                 'pvpc_mode',
+                 'quit_button',
+                 'report_calls',
+                 'report_geometry',
+                 'score_header',
+                 'separator',
+                 'ties_header',
+                 'ties_lbl',
+                 'ties_num',
+                 'titlebar_offset',
+                 'who_autostarts',
+                 'whose_turn',
+                 'whose_turn_lbl',
+                 'winner_found',
+                 )
 
     def __init__(self):
         super().__init__()
@@ -170,14 +269,14 @@ class TicTacToeGUI(tk.Tk):
         ttk.Style().theme_use('alt')
 
         # Need to apply OS-specific adjustments.
-        if MY_OS == 'dar':
+        if chk.MY_OS == 'dar':
             self.color['default_bg'] = 'white'
-        elif MY_OS == 'lin':
+        elif chk.MY_OS == 'lin':
             self.color['default_bg'] = 'grey85'
-        elif MY_OS == 'win':
+        elif chk.MY_OS == 'win':
             self.color['default_bg'] = 'grey95'
 
-        if MY_OS == 'dar':
+        if chk.MY_OS == 'dar':
             self.font['sm_button'] = ('TkHeadingFont', 10)
             self.font['who'] = ('TkHeadingFont', 11, 'italic bold')
             self.font['button'] = ('TkHeadingFont', 10, 'bold')
@@ -247,7 +346,7 @@ class TicTacToeGUI(tk.Tk):
                                            'PC plays strategy'),
                                    state=tk.DISABLED)
         self.option_add("*TCombobox*Font", self.font['condensed'])
-        if MY_OS == 'dar':
+        if chk.MY_OS == 'dar':
             self.choose_pc_pref.config(width=13)
         self.choose_pc_pref.current(0)
         self.choose_pc_pref.bind('<<ComboboxSelected>>',
@@ -295,7 +394,7 @@ class TicTacToeGUI(tk.Tk):
 
         self.quit_button.config(style="My.TButton",
                                 text='Quit', width=4,
-                                command=quit_game)
+                                command=utils.quit_game)
 
         # Configure game board play squares:
         self.setup_game_board()
@@ -310,7 +409,7 @@ class TicTacToeGUI(tk.Tk):
         _row = 2
         _col = 0
         for lbl in self.board_labels:
-            if MY_OS in 'win, dar':
+            if chk.MY_OS in 'win, dar':
                 lbl.grid(row=_row, column=_col, pady=6, padx=6, ipady=6, ipadx=10)
             else:  # Linux (lin)
                 lbl.grid(row=_row, column=_col, pady=1, padx=1, ipady=6, ipadx=10)
@@ -331,21 +430,21 @@ class TicTacToeGUI(tk.Tk):
 
         # There is duplication in the elif statements to allow easy editing and
         #  cut/paste options for platform-specific needs.
-        if MY_OS == 'dar':
+        if chk.MY_OS == 'dar':
             self.score_header.grid(
                 row=0, column=1, rowspan=2, padx=(10, 0), pady=(0, 10), sticky=tk.W)
             self.player1_header.grid(
                 row=0, column=1, rowspan=2, padx=(0, 0), pady=(0, 40), sticky=tk.E)
             self.player2_header.grid(
                 row=0, column=1, rowspan=2, padx=(0, 0), pady=(20, 10), sticky=tk.E)
-        elif MY_OS == 'lin':
+        elif chk.MY_OS == 'lin':
             self.score_header.grid(
                 row=0, column=1, rowspan=2, padx=(10, 0), pady=(0, 10), sticky=tk.W)
             self.player1_header.grid(
                 row=0, column=1, rowspan=2, padx=(0, 8), pady=(0, 40), sticky=tk.E)
             self.player2_header.grid(
                 row=0, column=1, rowspan=2, padx=(0, 8), pady=(20, 10), sticky=tk.E)
-        elif MY_OS == 'win':
+        elif chk.MY_OS == 'win':
             self.score_header.grid(
                 row=0, column=1, rowspan=2, padx=(25, 0), pady=(0, 10), sticky=tk.W)
             self.player1_header.grid(
@@ -366,7 +465,7 @@ class TicTacToeGUI(tk.Tk):
 
         self.pvp_mode.grid(
             row=5, column=0, padx=(10, 0), pady=5, sticky=tk.W)
-        if MY_OS == 'dar':
+        if chk.MY_OS == 'dar':
             self.pvpc_mode.grid(
                 row=5, column=1, columnspan=2, padx=(20, 0), pady=5, sticky=tk.W)
             self.choose_pc_pref.grid(
@@ -405,7 +504,7 @@ class TicTacToeGUI(tk.Tk):
                        font=self.font['marks'],
 
                        )
-            if MY_OS == 'dar':
+            if chk.MY_OS == 'dar':
                 lbl.config(borderwidth=12)
             else:
                 lbl.config(highlightthickness=6)
@@ -601,7 +700,7 @@ class TicTacToeGUI(tk.Tk):
         else:
             messagebox.showerror('Oops!', 'This square was already played!')
 
-        self.quit_button.config(command=lambda: quit_game(False))
+        self.quit_button.config(command=lambda: utils.quit_game(False))
 
     def pc_turn(self) -> None:
         """
@@ -857,11 +956,11 @@ class TicTacToeGUI(tk.Tk):
         report_window.attributes('-topmost', True)
         report_window.focus_force()
 
-        if MY_OS == 'dar':
+        if chk.MY_OS == 'dar':
             report_window.minsize(180, 80)
-        elif MY_OS == 'win':
+        elif chk.MY_OS == 'win':
             report_window.minsize(190, 100)
-        elif MY_OS == 'lin':
+        elif chk.MY_OS == 'lin':
             report_window.minsize(150, 90)
 
         report_lbl = tk.Label(report_window, text=win_msg,
@@ -906,7 +1005,7 @@ class TicTacToeGUI(tk.Tk):
         not_again = tk.Button(report_window, text='Quit',
                               font=self.font['sm_button'],
                               relief='groove', overrelief='raised', border=3,
-                              command=quit_game)
+                              command=utils.quit_game)
         report_window.bind('<Return>', lambda _: restart_game())
         report_window.bind('<KP_Enter>', lambda _: restart_game())
 
@@ -931,7 +1030,7 @@ class TicTacToeGUI(tk.Tk):
 
         return: None
         """
-        self.quit_button.config(state=tk.NORMAL, command=quit_game)
+        self.quit_button.config(state=tk.NORMAL, command=utils.quit_game)
         self.auto_go_stop_txt.set('Start autoplay')
         self.auto_go_stop_radiobtn.config(state=tk.NORMAL)
 
@@ -1248,33 +1347,38 @@ class TicTacToeGUI(tk.Tk):
         app.after_idle(self.auto_setup)
 
 
-def parse_args() -> None:
+def manage_args() -> None:
     """Allow handling of common command line arguments.
     """
     parser = argparse.ArgumentParser()
     parser.add_argument('--about',
-                        help='Provides description, MIT license, version',
+                        help='Provides description, version, URL, license',
                         action='store_true',
                         default=False)
     args = parser.parse_args()
     if args.about:
         print(__doc__)
+        print(f'{"Author:".ljust(13)}', ttt_utils.__author__)
+        print(f'{"Version:".ljust(13)}', ttt_utils.__version__)
+        print(f'{"Status:".ljust(13)}', ttt_utils.__dev_status__)
+        print(f'{"URL:".ljust(13)}', ttt_utils.URL)
+        print(ttt_utils.__copyright__)
+        print(ttt_utils.LICENSE)
         sys.exit(0)
 
 
 if __name__ == '__main__':
-    parse_args()
+    manage_args()
+
+    print('tty.py now running...')
+    app = TicTacToeGUI()
+    app.title('TIC TAC TOE')
+    app.resizable(False, False)
+
     try:
-        print('tty.py now running...')
-        app = TicTacToeGUI()
-        app.title('TIC TAC TOE')
-        app.resizable(False, False)
         app.mainloop()
-
     except KeyboardInterrupt:
-        print("*** User quit the program ***\n")
-        sys.exit(0)
-
+        print("\n*** User quit the program ***\n")
     except Exception as unknown:
         print(f'\nAn unexpected error: {unknown}\n')
         sys.exit(1)
