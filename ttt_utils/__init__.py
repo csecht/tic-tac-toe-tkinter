@@ -6,14 +6,13 @@ from . import platform_check, vcheck
 
 # Development status standards: https://pypi.org/classifiers/
 __author__ = 'Craig S. Echt'
-__version__: str = '0.0.15'
+__version__: str = '0.0.16'
 __dev_status__ = 'Development Status :: 3 - Alpha'
 __copyright__ = 'Copyright (C) 2022 C.S. Echt, under MIT License'
 
 URL = 'https://github.com/csecht/tic-tac-toe-tkinter'
 
-LICENSE = """                           MIT License
-
+LICENSE = """                                MIT License
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"), to deal
     in the Software without restriction, including without limitation the rights
@@ -34,7 +33,8 @@ LICENSE = """                           MIT License
 
     You should have received a copy of the license
     along with this program distribution (the LICENCE.txt file). If not,
-    see https://mit-license.org/"""
+    see https://mit-license.org/
+    """
 
 platform_check.check_platform()
 vcheck.minversion('3.7')

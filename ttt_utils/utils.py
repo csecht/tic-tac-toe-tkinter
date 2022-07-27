@@ -1,6 +1,33 @@
+import argparse
 import sys
 import __main__
+
+import ttt_utils
+
 # Copyright (C) 2021 C. Echt under GNU General Public License'
+
+
+def manage_args() -> None:
+    """Allow handling of common command line arguments.
+    """
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--about',
+                        help='Provides description, version, URL, license',
+                        action='store_true',
+                        default=False)
+    args = parser.parse_args()
+    if args.about:
+        print('====================== ABOUT START ====================')
+        print(__main__.__doc__)
+        print(f'{"Author:".ljust(13)}', ttt_utils.__author__)
+        print(f'{"Version:".ljust(13)}', ttt_utils.__version__)
+        print(f'{"Status:".ljust(13)}', ttt_utils.__dev_status__)
+        print(f'{"URL:".ljust(13)}', ttt_utils.URL)
+        print(ttt_utils.__copyright__)
+        print(ttt_utils.LICENSE)
+        print('====================== ABOUT END ====================')
+
+        sys.exit(0)
 
 
 def quit_game(keybind=None) -> None:

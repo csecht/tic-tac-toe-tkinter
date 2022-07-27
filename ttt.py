@@ -34,7 +34,6 @@ except (ImportError, ModuleNotFoundError) as error:
           '\nLinux users may need this: $ sudo apt-get install python3-tk\n'
           f'See also: https://tkdocs.com/tutorial/install.html \n{error}')
 
-import ttt_utils
 from ttt_utils import utils, platform_check as chk
 
 
@@ -1405,28 +1404,8 @@ class TicTacToeGUI(tk.Tk):
         app.after_idle(self.auto_setup)
 
 
-def manage_args() -> None:
-    """Allow handling of common command line arguments.
-    """
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--about',
-                        help='Provides description, version, URL, license',
-                        action='store_true',
-                        default=False)
-    args = parser.parse_args()
-    if args.about:
-        print(__doc__)
-        print(f'{"Author:".ljust(13)}', ttt_utils.__author__)
-        print(f'{"Version:".ljust(13)}', ttt_utils.__version__)
-        print(f'{"Status:".ljust(13)}', ttt_utils.__dev_status__)
-        print(f'{"URL:".ljust(13)}', ttt_utils.URL)
-        print(ttt_utils.__copyright__)
-        print(ttt_utils.LICENSE)
-        sys.exit(0)
-
-
 if __name__ == '__main__':
-    manage_args()
+    utils.manage_args()
 
     print('tty.py now running...')
     app = TicTacToeGUI()
