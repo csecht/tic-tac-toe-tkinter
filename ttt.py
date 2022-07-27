@@ -735,6 +735,20 @@ class TicTacToeGUI(tk.Tk):
 
         self.quit_button.config(command=lambda: utils.quit_game(False))
 
+    def color_the_mark(self, _id: int) -> None:
+        """
+        In pvpc mode, when  played by the PC, provide an alternate to
+        the default fg color for the played square (Label text), which
+        is identified by the board_labels' index, *_id*.
+
+        :param _id: The board label's list index of the played square.
+        :return: None
+        """
+        # Note that the label fg in pvp mode is configured in
+        #    human_turn.h_plays_p2().
+        if not self.curr_automode:
+            self.board_labels[_id].config(fg=self.color['tk_white'])
+
     def pc_turn(self) -> None:
         """
         Computer plays as Player2.
@@ -777,8 +791,7 @@ class TicTacToeGUI(tk.Tk):
             elif self.choose_pc_pref.get() == 'PC plays center':
                 if self.board_labels[4]['text'] == ' ':
                     self.board_labels[4]['text'] = self.p2_mark
-                    self.board_labels[4].config(
-                        fg=self.color['tk_white'])
+                    self.color_the_mark(4)
 
             # Start here when playing 'strategically' or 'prefers corners'.
             # Play for win.
@@ -790,18 +803,15 @@ class TicTacToeGUI(tk.Tk):
                     z_txt = self.board_labels[_z]['text']
                     if x_txt == y_txt == self.p2_mark and z_txt == ' ':
                         self.board_labels[_z]['text'] = self.p2_mark
-                        self.board_labels[_z].config(
-                            fg=self.color['tk_white'])
+                        self.color_the_mark(_z)
                         break
                     if y_txt == z_txt == self.p2_mark and x_txt == ' ':
                         self.board_labels[_x]['text'] = self.p2_mark
-                        self.board_labels[_x].config(
-                            fg=self.color['tk_white'])
+                        self.color_the_mark(_x)
                         break
                     if x_txt == z_txt == self.p2_mark and y_txt == ' ':
                         self.board_labels[_y]['text'] = self.p2_mark
-                        self.board_labels[_y].config(
-                            fg=self.color['tk_white'])
+                        self.color_the_mark(_y)
                         break
 
             # Play to block
@@ -814,19 +824,16 @@ class TicTacToeGUI(tk.Tk):
 
                     if x_txt == y_txt == self.p1_mark and z_txt == ' ':
                         self.board_labels[_z]['text'] = self.p2_mark
-                        self.board_labels[_z].config(
-                            fg=self.color['tk_white'])
+                        self.color_the_mark(_z)
 
                         break
                     if y_txt == z_txt == self.p1_mark and x_txt == ' ':
                         self.board_labels[_x]['text'] = self.p2_mark
-                        self.board_labels[_x].config(
-                            fg=self.color['tk_white'])
+                        self.color_the_mark(_x)
                         break
                     if x_txt == z_txt == self.p1_mark and y_txt == ' ':
                         self.board_labels[_y]['text'] = self.p2_mark
-                        self.board_labels[_y].config(
-                            fg=self.color['tk_white'])
+                        self.color_the_mark(_y)
                         break
 
             # Prefer corners, as optioned.
@@ -835,8 +842,7 @@ class TicTacToeGUI(tk.Tk):
                     c_txt = self.board_labels[_c]['text']
                     if turn_number == self.turn_number() and c_txt == ' ':
                         self.board_labels[_c]['text'] = self.p2_mark
-                        self.board_labels[_c].config(
-                            fg=self.color['tk_white'])
+                        self.color_the_mark(_c)
                         break
 
             # If no block, win or preferred corner, then play random.
@@ -861,8 +867,7 @@ class TicTacToeGUI(tk.Tk):
             random_idx = random.randrange(0, 9)
             if self.board_labels[random_idx]['text'] == ' ':
                 self.board_labels[random_idx]['text'] = mark
-                self.board_labels[random_idx].config(
-                    fg=self.color['tk_white'])
+                self.color_the_mark(random_idx)
 
     def turn_number(self) -> int:
         """
