@@ -241,7 +241,7 @@ class TicTacToeGUI(tk.Tk):
         self.color = {'score_fg': 'DodgerBlue4',
                       'result_bg': 'yellow3',
                       'disabled_fg': 'grey65',
-                      'default_bg': '',
+                      'tk_white': '',  # defined in configure_widgets()
                       'active_fg': 'black',
                       'mark_fg': 'yellow2',
                       'sq_won': 'blue',
@@ -270,11 +270,11 @@ class TicTacToeGUI(tk.Tk):
 
         # Need to apply OS-specific adjustments.
         if chk.MY_OS == 'dar':
-            self.color['default_bg'] = 'white'
+            self.color['tk_white'] = 'white'
         elif chk.MY_OS == 'lin':
-            self.color['default_bg'] = 'grey85'
+            self.color['tk_white'] = 'grey85'
         elif chk.MY_OS == 'win':
-            self.color['default_bg'] = 'grey95'
+            self.color['tk_white'] = 'grey95'
 
         if chk.MY_OS == 'dar':
             self.font['sm_button'] = ('TkHeadingFont', 10)
@@ -396,7 +396,7 @@ class TicTacToeGUI(tk.Tk):
                               ('active', self.color['mark_fg']),
                               ('disabled', self.color['disabled_fg'])
                               ],
-                  background=[('pressed', self.color['default_bg']),
+                  background=[('pressed', self.color['tk_white']),
                               ('active', self.color['radiobtn_bg'])],
                   )
         style.configure('My.TButton', font=self.font['sm_button'])
@@ -646,7 +646,7 @@ class TicTacToeGUI(tk.Tk):
 
             if mode in 'auto-random, auto-strategy':
                 self.whose_turn.set('PC autoplay')
-                self.whose_turn_lbl.config(bg=self.color['default_bg'])
+                self.whose_turn_lbl.config(bg=self.color['tk_white'])
             else:
                 self.your_turn_player1()
 
@@ -682,19 +682,19 @@ class TicTacToeGUI(tk.Tk):
         # At app start, Previous game # = 0, then increments after a win/tie.
         #  At start of a new game, turn # = 0.
         #  On even PvPC games, pc will have already played 1st turn.
-        def play_p1():
+        def h_plays_p1():
             played_lbl['text'] = self.p1_mark
             self.whose_turn.set(f'{self.player2} plays {self.p2_mark}')
-            self.whose_turn_lbl.config(bg=self.color['default_bg'])
+            self.whose_turn_lbl.config(bg=self.color['tk_white'])
 
-        def play_p2():
+        def h_plays_p2():
             played_lbl['text'] = self.p2_mark
-            played_lbl.config(fg=self.color['default_bg'])
+            played_lbl.config(fg=self.color['tk_white'])
             self.your_turn_player1()
 
-        def play_p1vpc():
+        def h_plays_p1_v_pc():
             played_lbl['text'] = self.p1_mark
-            self.whose_turn_lbl.config(bg=self.color['default_bg'])
+            self.whose_turn_lbl.config(bg=self.color['tk_white'])
             self.whose_turn.set(f'PC plays {self.p2_mark}')
 
         if played_lbl['text'] == ' ':
@@ -702,14 +702,14 @@ class TicTacToeGUI(tk.Tk):
                 self.curr_pmode = 'pvp'
                 if self.prev_game_num.get() % 2 == 0:
                     if self.turn_number() % 2 == 0:
-                        play_p1()  # even prev_game, even turn
+                        h_plays_p1()  # even prev_game, even turn
                     else:
-                        play_p2()  # even prev_game, odd turn
+                        h_plays_p2()  # even prev_game, odd turn
                 else:
                     if self.turn_number() % 2 == 0:
-                        play_p2()  # odd prev_game, even turn
+                        h_plays_p2()  # odd prev_game, even turn
                     else:
-                        play_p1()  # odd prev_game, odd turn
+                        h_plays_p1()  # odd prev_game, odd turn
 
                 if self.turn_number() >= 5:
                     self.check_winner(played_lbl.cget('text'))
@@ -718,11 +718,11 @@ class TicTacToeGUI(tk.Tk):
                 self.curr_pmode = 'pvpc'
                 if (self.turn_number() % 2 == 0 and
                         self.prev_game_num.get() % 2 == 0):
-                    play_p1vpc()  # even prev_game, even turn
+                    h_plays_p1_v_pc()  # even prev_game, even turn
 
                 elif (self.turn_number() % 2 != 0 and
                       self.prev_game_num.get() % 2 != 0):
-                    play_p1vpc()  # odd prev_game, odd turn
+                    h_plays_p1_v_pc()  # odd prev_game, odd turn
 
                 # Need update for app.after delay to work in pc_turn().
                 app.update_idletasks()
@@ -743,6 +743,7 @@ class TicTacToeGUI(tk.Tk):
         Precedence of PC play: selected pref option > play for a win >
         block P1 win > play to corner, if preferred > play random.
         Called from human_turn() and new_game().
+        Color PC mark as 'tk_white', which is the system's 'white'.
 
         :return: None
         """
@@ -778,6 +779,8 @@ class TicTacToeGUI(tk.Tk):
             elif self.choose_pc_pref.get() == 'PC plays center':
                 if self.board_labels[4]['text'] == ' ':
                     self.board_labels[4]['text'] = self.p2_mark
+                    self.board_labels[4].config(
+                        fg=self.color['tk_white'])
 
             # Start here when playing 'strategically' or 'prefers corners'.
             # Play for win.
@@ -789,12 +792,18 @@ class TicTacToeGUI(tk.Tk):
                     z_txt = self.board_labels[_z]['text']
                     if x_txt == y_txt == self.p2_mark and z_txt == ' ':
                         self.board_labels[_z]['text'] = self.p2_mark
+                        self.board_labels[_z].config(
+                            fg=self.color['tk_white'])
                         break
                     if y_txt == z_txt == self.p2_mark and x_txt == ' ':
                         self.board_labels[_x]['text'] = self.p2_mark
+                        self.board_labels[_x].config(
+                            fg=self.color['tk_white'])
                         break
                     if x_txt == z_txt == self.p2_mark and y_txt == ' ':
                         self.board_labels[_y]['text'] = self.p2_mark
+                        self.board_labels[_y].config(
+                            fg=self.color['tk_white'])
                         break
 
             # Play to block
@@ -807,12 +816,19 @@ class TicTacToeGUI(tk.Tk):
 
                     if x_txt == y_txt == self.p1_mark and z_txt == ' ':
                         self.board_labels[_z]['text'] = self.p2_mark
+                        self.board_labels[_z].config(
+                            fg=self.color['tk_white'])
+
                         break
                     if y_txt == z_txt == self.p1_mark and x_txt == ' ':
                         self.board_labels[_x]['text'] = self.p2_mark
+                        self.board_labels[_x].config(
+                            fg=self.color['tk_white'])
                         break
                     if x_txt == z_txt == self.p1_mark and y_txt == ' ':
                         self.board_labels[_y]['text'] = self.p2_mark
+                        self.board_labels[_y].config(
+                            fg=self.color['tk_white'])
                         break
 
             # Prefer corners, as optioned.
@@ -821,6 +837,8 @@ class TicTacToeGUI(tk.Tk):
                     c_txt = self.board_labels[_c]['text']
                     if turn_number == self.turn_number() and c_txt == ' ':
                         self.board_labels[_c]['text'] = self.p2_mark
+                        self.board_labels[_c].config(
+                            fg=self.color['tk_white'])
                         break
 
             # If no block, win or preferred corner, then play random.
@@ -845,6 +863,8 @@ class TicTacToeGUI(tk.Tk):
             random_idx = random.randrange(0, 9)
             if self.board_labels[random_idx]['text'] == ' ':
                 self.board_labels[random_idx]['text'] = mark
+                self.board_labels[random_idx].config(
+                    fg=self.color['tk_white'])
 
     def turn_number(self) -> int:
         """
@@ -1004,7 +1024,7 @@ class TicTacToeGUI(tk.Tk):
 
         self.block_all_player_action()
         self.whose_turn.set('Game pending...')
-        self.whose_turn_lbl.config(bg=self.color['default_bg'])
+        self.whose_turn_lbl.config(bg=self.color['tk_white'])
 
         # Need to update players' cumulative wins in the app window.
         self.p1_score.set(self.p1_points)
@@ -1080,12 +1100,12 @@ class TicTacToeGUI(tk.Tk):
                 self.your_turn_player1()
             else:
                 self.whose_turn.set(f'{self.player2} plays {self.p2_mark}')
-                self.whose_turn_lbl.config(bg=self.color['default_bg'])
+                self.whose_turn_lbl.config(bg=self.color['tk_white'])
 
         elif self.mode_selection.get() == 'pvpc':
             if self.prev_game_num.get() % 2 != 0:
                 self.whose_turn.set(f'PC plays {self.p2_mark}')
-                self.whose_turn_lbl.config(bg=self.color['default_bg'])
+                self.whose_turn_lbl.config(bg=self.color['tk_white'])
 
                 self.pc_turn()
             else:
@@ -1150,7 +1170,7 @@ class TicTacToeGUI(tk.Tk):
         self.setup_game_board()
         self.reset_game_and_score()
         self.whose_turn.set('PC autoplay')
-        self.whose_turn_lbl.config(bg=self.color['default_bg'])
+        self.whose_turn_lbl.config(bg=self.color['tk_white'])
 
         self.auto_turns_header.grid(row=0, column=2, rowspan=2,
                                     padx=(0, 8), pady=(0, 20), sticky=tk.SE)
@@ -1412,6 +1432,9 @@ if __name__ == '__main__':
     app = TicTacToeGUI()
     app.title('TIC TAC TOE')
     app.resizable(False, False)
+
+    img = tk.PhotoImage(file='images/Tic_tac_toe.png')
+    app.wm_iconphoto(True, img)
 
     try:
         app.mainloop()
