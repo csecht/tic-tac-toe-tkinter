@@ -235,30 +235,20 @@ class TicTacToeGUI(tk.Tk):
         self.report_calls = 0
         self.titlebar_offset = 0
 
+        self.font = {}
+
         # Foreground and background colors.
         self.color = {'score_fg': 'DodgerBlue4',
                       'result_bg': 'yellow3',
                       'disabled_fg': 'grey65',
                       'tk_white': '',  # defined in configure_widgets()
-                      'active_fg': 'black',
                       'mark_fg': 'yellow2',
                       'sq_won': 'blue',
                       'sq_not_won': 'black',
                       'sq_mouseover': 'grey15',
                       'radiobtn_bg': 'DodgerBlue1',
-                      # 'radiobtn_fg': 'white',
                       }
 
-        # Label fonts.
-        self.font = {
-            'sm_button': ('TkHeadingFont', 8),
-            'who': ('TkHeadingFont', 8, 'italic bold'),
-            'button': ('TkHeadingFont', 8, 'bold'),
-            'scores': ('TkHeadingFont', 9),
-            'report': ('TkHeadingFont', 10, 'italic bold'),
-            'condensed': ('TkTooltipFont', 8),
-            'marks': ('TkFixedFont', 50),
-        }
         self.configure_widgets()
         self.grid_widgets()
 
@@ -266,34 +256,30 @@ class TicTacToeGUI(tk.Tk):
         """Initial configurations of app window widgets."""
         ttk.Style().theme_use('alt')
 
+        self.font['sm_button'] = ('TkHeadingFont', 8)
+        self.font['who'] = ('TkHeadingFont', 7, 'italic bold')
+        self.font['button'] = ('TkHeadingFont', 8, 'bold')
+        self.font['scores'] = ('TkHeadingFont', 9)
+        self.font['report'] = ('TkHeadingFont', 9, 'italic bold')
+        self.font['condensed'] = ('TkTooltipFont', 8)
+        self.font['mark'] = ('TkFixedFont', 50)
+
         # Need to apply OS-specific adjustments.
+        if chk.MY_OS == 'lin':
+            self.font['report'] = ('TkHeadingFont', 10, 'italic bold')
+        elif chk.MY_OS == 'dar':
+            self.font['sm_button'] = ('TkHeadingFont', 10)
+            self.font['who'] = ('TkHeadingFont', 11, 'italic bold')
+            self.font['button'] = ('TkHeadingFont', 10, 'bold')
+            self.font['scores'] = ('TkHeadingFont', 12)
+            self.font['condensed'] = ('TkTooltipFont', 10)
+
         if chk.MY_OS == 'dar':
             self.color['tk_white'] = 'white'
         elif chk.MY_OS == 'lin':
             self.color['tk_white'] = 'grey85'
         elif chk.MY_OS == 'win':
             self.color['tk_white'] = 'grey95'
-
-        if chk.MY_OS == 'dar':
-            self.font['sm_button'] = ('TkHeadingFont', 10)
-            self.font['who'] = ('TkHeadingFont', 11, 'italic bold')
-            self.font['button'] = ('TkHeadingFont', 10, 'bold')
-            self.font['scores'] = ('TkHeadingFont', 12)
-            self.font['condensed'] = ('TkTooltipFont', 10)
-        elif chk.MY_OS == 'win':
-            self.font['sm_button'] = ('TkHeadingFont', 8)
-            self.font['who'] = ('TkHeadingFont', 7, 'italic bold')
-            self.font['button'] = ('TkHeadingFont', 8, 'bold')
-            # self.font['scores'] = ('TkHeadingFont', 9)
-            self.font['report'] = ('TkHeadingFont', 9, 'italic bold')
-            # self.font['condensed'] = ('TkTooltipFont', 8)
-            #             'sm_button': ('TkHeadingFont', 8),
-            #             'who': ('TkHeadingFont', 8, 'italic bold'),
-            #             'button': ('TkHeadingFont', 8, 'bold'),
-            #             'scores': ('TkHeadingFont', 9),
-            #             'report': ('TkHeadingFont', 10, 'italic bold'),
-            #             'condensed': ('TkTooltipFont', 8),
-            #             'marks': ('TkFixedFont', 50),
 
         # Player's turn widgets.
         self.prev_game_num_header.config(text='Games played',
@@ -532,7 +518,7 @@ class TicTacToeGUI(tk.Tk):
         for i, lbl in enumerate(self.board_labels):
             lbl.config(text=' ', height=1, width=2,
                        bg=self.color['sq_not_won'], fg=self.color['mark_fg'],
-                       font=self.font['marks'],
+                       font=self.font['mark'],
 
                        )
             if chk.MY_OS == 'dar':
