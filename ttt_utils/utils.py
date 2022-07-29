@@ -1,8 +1,9 @@
+import __main__
 import argparse
 import sys
-import __main__
 
 import ttt_utils
+
 
 # Copyright (C) 2021 C. Echt under GNU General Public License'
 
