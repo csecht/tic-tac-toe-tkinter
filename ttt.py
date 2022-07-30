@@ -1270,6 +1270,10 @@ class TicTacToeGUI(tk.Tk):
 
 
 if __name__ == '__main__':
+
+    # ttt_utils.__init__ runs checks on supported platforms and
+    #   Python versions; exits if checks fail.
+
     utils.manage_args()
 
     print('tty.py now running...')
