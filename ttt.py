@@ -288,7 +288,7 @@ class TicTacToeGUI(tk.Tk):
         elif chk.MY_OS == 'win':  # Windows
             pad = 8
         else:  # Linux
-            pad = 1
+            pad = 0
 
         for lbl in self.board_labels:
             lbl.grid(row=_row, column=_col, pady=pad, padx=pad, ipady=6, ipadx=10)
@@ -870,8 +870,18 @@ class TicTacToeGUI(tk.Tk):
         report_window = tk.Toplevel(self, borderwidth=4, relief='raised')
         report_window.title('TTT')
         report_window.config(bg=self.color['result_bg'])
-        report_window.geometry('400x150')
-        report_window.minsize(200, 150)
+
+        if chk.MY_OS == 'win':
+            geom = '400x150'
+            minw = 250
+            minh = 150
+        else:
+            geom = '220x100'
+            minw = 180
+            minh = 100
+
+        report_window.geometry(geom)
+        report_window.minsize(minw, minh)
 
         self.report_calls += 1
         self.window_geometry(report_window)
@@ -1111,8 +1121,8 @@ class TicTacToeGUI(tk.Tk):
         """
         # String of player marks is shortened one character per turn played and
         #  when an autoplay option is set to always begin with p1_mark.
-        all_x = self.p1_mark * 500
-        all_o = self.p2_mark * 500
+        all_x = self.p1_mark * 5
+        all_o = self.p2_mark * 5
 
         self.all_autoplay_marks = ''.join(map(lambda x, o: x + o, all_x, all_o))
 
