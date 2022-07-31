@@ -143,9 +143,10 @@ class TicTacToeGUI(tk.Tk):
         if chk.MY_OS == 'lin':
             self.font['report'] = ('TkHeadingFont', 10, 'italic bold')
         elif chk.MY_OS == 'dar':
+            self.font['report'] = ('TkHeadingFont', 13, 'italic bold')
             self.font['sm_button'] = ('TkHeadingFont', 10)
             self.font['who'] = ('TkHeadingFont', 11, 'italic bold')
-            self.font['button'] = ('TkHeadingFont', 10, 'bold')
+            self.font['button'] = ('TkHeadingFont', 11, 'bold')
             self.font['scores'] = ('TkHeadingFont', 12)
             self.font['condensed'] = ('TkTooltipFont', 10)
 
@@ -871,11 +872,15 @@ class TicTacToeGUI(tk.Tk):
         report_window.title('TTT')
         report_window.config(bg=self.color['result_bg'])
 
-        if chk.MY_OS == 'win':
+        if chk.MY_OS == 'win':  # Windows
             geom = '400x150'
             minw = 250
             minh = 150
-        else:
+        elif chk.MY_OS == 'dar':  # macOS
+            geom = '180x90'
+            minw = 140
+            minh = 90
+        else:  # Linux
             geom = '220x100'
             minw = 180
             minh = 100
