@@ -1121,8 +1121,8 @@ class TicTacToeGUI(tk.Tk):
         """
         # String of player marks is shortened one character per turn played and
         #  when an autoplay option is set to always begin with p1_mark.
-        all_x = self.p1_mark * 5
-        all_o = self.p2_mark * 5
+        all_x = self.p1_mark * 500
+        all_o = self.p2_mark * 500
 
         self.all_autoplay_marks = ''.join(map(lambda x, o: x + o, all_x, all_o))
 
