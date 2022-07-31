@@ -281,14 +281,17 @@ class TicTacToeGUI(tk.Tk):
         #   row index 2.
         _row = 2
         _col = 0
+
+        # Set platform-specific padding between play Labels (squares).
+        if chk.MY_OS == 'dar':  # macOS
+            pad = 6
+        elif chk.MY_OS == 'win':  # Windows
+            pad = 8
+        else:  # Linux
+            pad = 1
+
         for lbl in self.board_labels:
-            # if chk.MY_OS in 'win, dar':
-            if chk.MY_OS == 'dar':
-                lbl.grid(row=_row, column=_col, pady=6, padx=6, ipady=6, ipadx=10)
-            elif chk.MY_OS == 'win':
-                lbl.grid(row=_row, column=_col, pady=6, padx=6, ipady=6, ipadx=10)
-            else:  # Linux (lin)
-                lbl.grid(row=_row, column=_col, pady=1, padx=1, ipady=6, ipadx=10)
+            lbl.grid(row=_row, column=_col, pady=pad, padx=pad, ipady=6, ipadx=10)
             _col += 1
             if _col > 2:
                 _col = 0
@@ -394,8 +397,8 @@ class TicTacToeGUI(tk.Tk):
             lbl.config(text=' ', height=1, width=2,
                        bg=self.color['sq_not_won'], fg=self.color['mark_fg'],
                        font=self.font['mark'],
-
                        )
+
             if chk.MY_OS == 'dar':
                 lbl.config(borderwidth=12)
             else:
@@ -828,8 +831,8 @@ class TicTacToeGUI(tk.Tk):
 
     def window_geometry(self, toplevel: tk) -> None:
         """
-        Set the xy geometry of a *toplevel* window in top-left corner of
-        app widget. If it is moved, then put at the new geometry
+        Set the xy geometry of a *toplevel* window near top-left corner
+        of app window. If it is moved, then put at the new geometry
         determined by the report_geometry variable.
         Calculate the height of the system's window title bar to use as
         a y-offset for the *toplevel* xy geometry.
@@ -837,9 +840,10 @@ class TicTacToeGUI(tk.Tk):
         :param toplevel: The tkinter toplevel object to position.
         :return: None
         """
+
         if self.report_geometry:
             toplevel.geometry(self.report_geometry)
-        else:  # Set the initial xy position.
+        else:
             toplevel.geometry(f'+{app.winfo_x()}+{app.winfo_y()}')
 
         # Need to position the geometry of the Report window by applying
@@ -866,6 +870,8 @@ class TicTacToeGUI(tk.Tk):
         report_window = tk.Toplevel(self, borderwidth=4, relief='raised')
         report_window.title('TTT')
         report_window.config(bg=self.color['result_bg'])
+        report_window.geometry('400x150')
+        report_window.minsize(200, 150)
 
         self.report_calls += 1
         self.window_geometry(report_window)
@@ -874,13 +880,6 @@ class TicTacToeGUI(tk.Tk):
         #  the Report window.
         report_window.attributes('-topmost', True)
         report_window.focus_force()
-
-        if chk.MY_OS == 'dar':
-            report_window.minsize(180, 80)
-        elif chk.MY_OS == 'win':
-            report_window.minsize(180, 80)
-        elif chk.MY_OS == 'lin':
-            report_window.minsize(150, 90)
 
         report_lbl = tk.Label(report_window, text=win_msg,
                               font=self.font['report'],
@@ -910,6 +909,9 @@ class TicTacToeGUI(tk.Tk):
 
             :return: None
             """
+
+            # Need to retain screen position of results window between games in case
+            #   user has moved it from default position.
             self.report_geometry = (
                 f'+{report_window.winfo_x()}'
                 f'+{report_window.winfo_y() - self.titlebar_offset}'
