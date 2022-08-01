@@ -246,7 +246,7 @@ class TicTacToeGUI(tk.Tk):
                                           borderwidth=2,
                                           indicatoron=False,
                                           command=self.auto_command)
-        self.auto_go_stop_txt.set('Start autoplay')
+        self.auto_go_stop_txt.set('Start auto')
         self.auto_go_stop_radiobtn.config(state=tk.DISABLED)
 
         # ttk.Buttons are used b/c tk.Buttons cannot be configured in macOS.
@@ -378,13 +378,13 @@ class TicTacToeGUI(tk.Tk):
         self.auto_random_mode.grid(
             row=8, column=0, padx=0, pady=(4, 0), sticky=tk.W)
         self.auto_go_stop_radiobtn.grid(
-            row=8, column=1, rowspan=2, padx=0, pady=(12, 0), sticky=tk.EW)
+            row=8, column=1, rowspan=2, padx=8, pady=(6, 0), sticky=tk.W)
 
         self.auto_strategy_mode.grid(
             row=9, column=0, padx=0, pady=0, sticky=tk.W)
 
         self.who_autostarts.grid(
-            row=10, column=0, padx=(15, 0), pady=5, sticky=tk.W)
+            row=10, column=0, padx=(10, 0), pady=5, sticky=tk.W)
         self.quit_button.grid(
             row=10, column=2, padx=5, pady=(0, 5), sticky=tk.E)
 
@@ -470,7 +470,7 @@ class TicTacToeGUI(tk.Tk):
                     self.pvpc_mode.deselect()
 
                 detail = ('Wait for autoplay to finish,\n'
-                          'or click Stop autoplay button.')
+                          'or click "Stop auto" button.')
                 self.whose_turn.set(self.curr_automode)
 
             else:
@@ -967,7 +967,7 @@ class TicTacToeGUI(tk.Tk):
         return: None
         """
         self.quit_button.config(state=tk.NORMAL, command=utils.quit_game)
-        self.auto_go_stop_txt.set('Start autoplay')
+        self.auto_go_stop_txt.set('Start auto')
         self.auto_go_stop_radiobtn.config(state=tk.NORMAL)
 
         self.auto_turns_header.grid_remove()
@@ -1029,15 +1029,15 @@ class TicTacToeGUI(tk.Tk):
         """
         if 'Start' in self.auto_go_stop_txt.get():
             if self.mode_selection.get() in 'auto-random, auto-strategy':
-                self.auto_go_stop_txt.set('Stop autoplay')
+                self.auto_go_stop_txt.set('Stop auto')
                 self.autoplay_on.set(True)
                 self.auto_start()
             else:
-                self.auto_go_stop_txt.set('Start autoplay')
+                self.auto_go_stop_txt.set('Start auto')
                 self.autoplay_on.set(False)
 
         else:
-            self.auto_go_stop_txt.set('Start autoplay')
+            self.auto_go_stop_txt.set('Start auto')
             self.autoplay_on.set(False)
             self.auto_stop('canceled')
 
