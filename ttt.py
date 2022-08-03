@@ -268,7 +268,7 @@ class TicTacToeGUI(tk.Tk):
 
         self.quit_button.config(style="My.TButton",
                                 text='Quit', width=4,
-                                command=utils.quit_game)
+                                command=lambda: utils.quit_game(mainloop=app))
 
         # Configure game board play squares:
         self.setup_game_board()
@@ -598,7 +598,7 @@ class TicTacToeGUI(tk.Tk):
         else:
             messagebox.showerror('Oops!', 'This square was already played!')
 
-        self.quit_button.config(command=lambda: utils.quit_game(False))
+        self.quit_button.config(command=lambda: utils.quit_game(app, False))
 
     def color_the_mark(self, _id: int) -> None:
         """
@@ -934,14 +934,14 @@ class TicTacToeGUI(tk.Tk):
             self.new_game()
             report_window.destroy()
 
-        again = tk.Button(report_window, text='New Game (\u23CE)',  # Return symbol.
+        again = tk.Button(report_window, text='New Game (\u23CE)',  # Unicode Return/Enter key symbol.
                           font=self.font['button'],
                           relief='groove', overrelief='raised', border=3,
                           command=restart_game)
         not_again = tk.Button(report_window, text='Quit',
                               font=self.font['sm_button'],
                               relief='groove', overrelief='raised', border=3,
-                              command=utils.quit_game)
+                              command=lambda: utils.quit_game(mainloop=app))
         report_window.bind('<Return>', lambda _: restart_game())
         report_window.bind('<KP_Enter>', lambda _: restart_game())
 
@@ -966,7 +966,8 @@ class TicTacToeGUI(tk.Tk):
 
         return: None
         """
-        self.quit_button.config(state=tk.NORMAL, command=utils.quit_game)
+        self.quit_button.config(state=tk.NORMAL,
+                                command=lambda: utils.quit_game(mainloop=app))
         self.auto_go_stop_txt.set('Start auto')
         self.auto_go_stop_radiobtn.config(state=tk.NORMAL)
 

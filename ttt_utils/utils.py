@@ -1,11 +1,17 @@
-import __main__
+"""
+Housekeeping functions:.
+manage_args - Handles command line arguments.
+quit_gui - Safe and informative exit from the program.
+"""
+# Copyright (C) 2021 C. Echt under GNU General Public License'
+
+# Standard library imports:
 import argparse
 import sys
 
+# Local program imports:
+import __main__
 import ttt_utils
-
-
-# Copyright (C) 2021 C. Echt under GNU General Public License'
 
 
 def manage_args() -> None:
@@ -31,7 +37,7 @@ def manage_args() -> None:
         sys.exit(0)
 
 
-def quit_game(keybind=None) -> None:
+def quit_game(mainloop, keybind=None) -> None:
     """
     Error-free and informative exit from the program.
     Called from widget or keybindings.
@@ -40,6 +46,7 @@ def quit_game(keybind=None) -> None:
     close window icon ("X") or key command. This is required to cleanly
     exit and close the tk thread running Matplotlib.
 
+    :param mainloop: The main tk.Tk() window running the mainloop.
     :param keybind: Implicit event passed from bind().
     """
 
@@ -47,9 +54,9 @@ def quit_game(keybind=None) -> None:
 
     # pylint: disable=broad-except
     try:
-        __main__.app.update_idletasks()
-        __main__.app.after(200)
-        __main__.app.destroy()
+        mainloop.update_idletasks()
+        mainloop.after(200)
+        mainloop.destroy()
     except Exception as err:
         print(f'An error occurred: {err}')
         sys.exit('Program exit with unexpected condition.')
