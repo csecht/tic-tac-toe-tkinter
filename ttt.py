@@ -20,6 +20,7 @@ https://gist.github.com/riya1620/72c2b668ef29da061c44d97a82318572
 """
 # Copyright: (c) 2022 Craig S. Echt, under MIT License
 
+# Standard library imports:
 import random
 import sys
 
@@ -33,6 +34,7 @@ except (ImportError, ModuleNotFoundError) as error:
           '\nLinux users may need this: $ sudo apt-get install python3-tk\n'
           f'See also: https://tkdocs.com/tutorial/install.html \n{error}')
 
+# Local program imports:
 from ttt_utils import utils, platform_check as chk
 
 
