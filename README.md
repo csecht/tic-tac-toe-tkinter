@@ -16,9 +16,14 @@ Recent Python packages can be downloaded from https://www.python.org/downloads/.
 
 ### Usage: 
 From a command line:
-From within the tic-tac-toe-tk-main folder, execute `ttt.py` from a Terminal or Command Prompt:
-- Linux/MacOS: `python3 ttt.py` or `./ttt.py`
-- Windows: `python3 ttt.py` or `python ttt.py` or `py ttt.py`, depending on your system environment.
+From within the tic-tac-toe-tk-main folder, from a Terminal or Command Prompt, depending on your system environment:
+
+
+            python3 -m plot_jobs (recommended for all systems)
+            py plot_jobs.py (Windows)
+            python3 plot_jobs.py (Linux, Mac)
+            ./plot_jobs.py (Linux, Mac)
+
 
 ### Play action
 There are four play modes:
