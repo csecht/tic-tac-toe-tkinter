@@ -970,8 +970,9 @@ class TicTacToeGUI(tk.Tk):
         """
         self.quit_button.config(state=tk.NORMAL,
                                 command=lambda: utils.quit_game(mainloop=app))
-        self.auto_go_stop_txt.set('Start auto')
-        self.auto_go_stop_radiobtn.config(state=tk.NORMAL)
+        if self.mode_selection.get() in 'auto-random, auto-strategy':
+            self.auto_go_stop_txt.set('Start auto')
+            self.auto_go_stop_radiobtn.config(state=tk.NORMAL)
 
         self.auto_turns_header.grid_remove()
         self.auto_turns_lbl.grid_remove()
