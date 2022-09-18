@@ -50,6 +50,20 @@ class TicTacToeGUI(tk.Tk):
         auto_command, auto_start, auto_stop, auto_setup, auto_turn_limit,
         autoplay_random, autoplay_strategy, auto_flash.
     """
+    # Slots provide a sorted list of Class attributes; possible performance improvement;
+    #   slight memory reduction.
+    __slots__ = (
+        'after_id', 'all_autoplay_marks', 'auto_after', 'auto_go_stop_radiobtn', 'auto_go_stop_txt',
+        'auto_random_mode', 'auto_strategy_mode', 'auto_turns_header', 'auto_turns_lbl',
+        'auto_turns_remaining', 'autoplay_on', 'board_labels', 'choose_pc_pref', 'color',
+        'curr_automode', 'curr_pmode', 'font', 'mode_selection', 'p1_mark', 'p1_points', 'p1_score',
+        'p2_mark', 'p2_points', 'p2_score', 'play_after', 'player1', 'player1_header',
+        'player1_score_lbl', 'player2', 'player2_header', 'player2_score_lbl', 'prev_game_num',
+        'prev_game_num_header', 'prev_game_num_lbl', 'pvp_mode', 'pvpc_mode', 'quit_button',
+        'report_calls', 'report_geometry', 'score_header', 'separator', 'ties_header', 'ties_lbl',
+        'ties_num', 'titlebar_offset', 'who_autostarts', 'whose_turn', 'whose_turn_lbl',
+        'winner_found'
+    )
 
     def __init__(self):
         super().__init__()
@@ -936,7 +950,8 @@ class TicTacToeGUI(tk.Tk):
             self.new_game()
             report_window.destroy()
 
-        again = tk.Button(report_window, text='New Game (\u23CE)',  # Unicode Return/Enter key symbol.
+        again = tk.Button(report_window, text='New Game (\u23CE)',
+                          # Unicode Return/Enter key symbol.
                           font=self.font['button'],
                           relief='groove', overrelief='raised', border=3,
                           command=restart_game)
