@@ -10,7 +10,7 @@ import argparse
 import sys
 
 # Local program imports:
-import __main__
+from __main__ import __doc__
 import ttt_utils
 
 
@@ -25,13 +25,13 @@ def manage_args() -> None:
     args = parser.parse_args()
     if args.about:
         print('====================== ABOUT START ====================')
-        print(__main__.__doc__)
+        print(__doc__)
         print(f'{"Author:".ljust(13)}', ttt_utils.__author__)
         print(f'{"Version:".ljust(13)}', ttt_utils.__version__)
         print(f'{"Status:".ljust(13)}', ttt_utils.__dev_status__)
         print(f'{"URL:".ljust(13)}', ttt_utils.URL)
         print(ttt_utils.__copyright__)
-        print(ttt_utils.LICENSE)
+        print(ttt_utils.__license__)
         print('====================== ABOUT END ====================')
 
         sys.exit(0)
