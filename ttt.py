@@ -50,19 +50,21 @@ class TicTacToeGUI(tk.Tk):
         auto_command, auto_start, auto_stop, auto_setup, auto_turn_limit,
         autoplay_random, autoplay_strategy, auto_flash.
     """
-    # Slots provide a sorted list of Class attributes; possible performance improvement;
-    #   slight memory reduction.
+    # Using __slots__ for Class attributes gives slight reduction of memory
+    #   usage and possible performance improvement.
     __slots__ = (
-        'after_id', 'all_autoplay_marks', 'auto_after', 'auto_go_stop_radiobtn', 'auto_go_stop_txt',
-        'auto_random_mode', 'auto_strategy_mode', 'auto_turns_header', 'auto_turns_lbl',
-        'auto_turns_remaining', 'autoplay_on', 'board_labels', 'choose_pc_pref', 'color',
-        'curr_automode', 'curr_pmode', 'font', 'mode_selection', 'p1_mark', 'p1_points', 'p1_score',
-        'p2_mark', 'p2_points', 'p2_score', 'play_after', 'player1', 'player1_header',
-        'player1_score_lbl', 'player2', 'player2_header', 'player2_score_lbl', 'prev_game_num',
-        'prev_game_num_header', 'prev_game_num_lbl', 'pvp_mode', 'pvpc_mode', 'quit_button',
-        'report_calls', 'report_geometry', 'score_header', 'separator', 'ties_header', 'ties_lbl',
-        'ties_num', 'titlebar_offset', 'who_autostarts', 'whose_turn', 'whose_turn_lbl',
-        'winner_found'
+        'after_id', 'all_autoplay_marks', 'auto_after', 'auto_go_stop_radiobtn',
+        'auto_go_stop_txt', 'auto_random_mode', 'auto_strategy_mode',
+        'auto_turns_header', 'auto_turns_lbl', 'auto_turns_remaining',
+        'autoplay_on', 'board_labels', 'choose_pc_pref', 'color',
+        'curr_automode', 'curr_pmode', 'font', 'mode_selection', 'p1_mark',
+        'p1_points', 'p1_score', 'p2_mark', 'p2_points', 'p2_score',
+        'play_after', 'player1', 'player1_header', 'player1_score_lbl',
+        'player2', 'player2_header', 'player2_score_lbl', 'prev_game_num',
+        'prev_game_num_header', 'prev_game_num_lbl', 'pvp_mode', 'pvpc_mode',
+        'quit_button', 'report_calls', 'report_geometry', 'score_header',
+        'separator', 'ties_header', 'ties_lbl', 'ties_num', 'titlebar_offset',
+        'who_autostarts', 'whose_turn', 'whose_turn_lbl', 'winner_found'
     )
 
     def __init__(self):
@@ -166,11 +168,12 @@ class TicTacToeGUI(tk.Tk):
             self.font['scores'] = ('TkHeadingFont', 12)
             self.font['condensed'] = ('TkTooltipFont', 10)
 
+        # Need tk to match system's default white shade.
         if chk.MY_OS == 'dar':
             self.color['tk_white'] = 'white'
         elif chk.MY_OS == 'lin':
             self.color['tk_white'] = 'grey85'
-        elif chk.MY_OS == 'win':
+        else:  # platform is 'win'
             self.color['tk_white'] = 'grey95'
 
         # Player's turn widgets.
@@ -421,8 +424,10 @@ class TicTacToeGUI(tk.Tk):
             else:
                 lbl.config(highlightthickness=6)
 
-            lbl.bind('<Button-1>', lambda event, lbl_idx=i: self.human_turn(
-                self.board_labels[lbl_idx]))
+            lbl.bind('<Button-1>',
+                     lambda event, lbl_idx=i:
+                     self.human_turn(self.board_labels[lbl_idx])
+                     )
             lbl.bind('<Enter>', lambda event, l=lbl: self.on_enter(l))
             lbl.bind('<Leave>', lambda event, l=lbl: self.on_leave(l))
 
@@ -889,15 +894,15 @@ class TicTacToeGUI(tk.Tk):
         report_window.config(bg=self.color['result_bg'])
 
         if chk.MY_OS == 'win':  # Windows
-            geom = '400x150'
-            minw = 250
+            geom = '420x150'
+            minw = 270
             minh = 150
         elif chk.MY_OS == 'dar':  # macOS
-            geom = '180x90'
+            geom = '190x90'
             minw = 140
             minh = 90
         else:  # Linux
-            geom = '220x100'
+            geom = '230x100'
             minw = 180
             minh = 100
 
