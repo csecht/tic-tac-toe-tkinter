@@ -30,23 +30,24 @@ There are four play modes:
 - Player vs Player
 - Player vs PC (computer)
 - Autoplay, random (computer plays itself randomly)
-- Autoplay, strategy (computer itself with rules)
+- Autoplay, strategy (computer vs. itself with rules, 1st play random)
+- Autoplay, center (like strategy, but 1st play in center)
 
 In Player v PC game mode, you can choose among computer play options:
 - PC plays random
-- PC plays corners
-- PC plays center
-- PC plays strategy.
+- PC plays rules-based strategy
+- PC plays strategy, prefers corners
+- PC play strategy, prefers center
 
 In Autoplay mode, PC plays itself. You can choose to have Player 1 (X) start every game or have both Players alternate game starts. 1000 turns are played at about 3 turns per second. Scores are updated in realtime through the series of about 110 to 130 games. Studying autoplay results in different play modes can be instructive for improving your game strategies!
 
 ### Screenshots
 
-Player 1 wins 1st game in Player v Player mode. Ready for Player 1 to start 2nd game with a click (or with Return/Enter). The result window can be repositioned from its default location.
+Player ties 8th game in Player v PC mode. Game result pop-up window prompts player to play again (or with Return/Enter) or quit. The pop-up window can be repositioned.
 
-![pvp-game](images/player1_wins.png)
+![pvpc-game](images/tie_game_pc.png)
 
-Autoplay random mode with Player 1 starting all games, in progress, with 555 turns remaining:
+Autoplay game in progress with random mode, players alternating start turns, 446 play turns remaining:
 
 ![autoplay-game](images/autoplay.png)
 
