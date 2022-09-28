@@ -766,13 +766,9 @@ class TicTacToeGUI(tk.Tk):
         a mark string as the label text.
 
         :return: The number of turns played, as integer.
-         """
-        turn = 0
-        for lbl in self.board_labels:
-            if lbl['text'] != ' ':
-                turn += 1
-
-        return turn
+        """
+        #  Count of labels with text other than a space.
+        return len([i for i in self.board_labels if ' ' not in i['text']])
 
     def check_winner(self, mark: str) -> None:
         """
