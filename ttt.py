@@ -392,7 +392,7 @@ class TicTacToeGUI(tk.Tk):
 
         if chk.MY_OS == 'dar':
             self.pvp_mode.grid(
-                row=5, column=0, padx=(10, 0), pady=5, sticky=tk.W)
+                row=5, column=0, padx=(20, 0), pady=5, sticky=tk.W)
             self.pvpc_mode.grid(
                 row=5, column=1, columnspan=2, padx=(20, 0), pady=5, sticky=tk.W)
             self.choose_pc_pref.grid(
@@ -418,7 +418,7 @@ class TicTacToeGUI(tk.Tk):
         self.auto_go_stop_radiobtn.grid(
             row=8, column=1, rowspan=2, padx=8, pady=(6, 0), sticky=tk.W)
 
-        if chk.MY_OS == 'win':
+        if chk.MY_OS in 'win, dar':
             padx = (5, 0)
         else:
             padx = 0
