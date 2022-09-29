@@ -312,10 +312,10 @@ class TicTacToeGUI(tk.Tk):
 
         # Squeeze everything in with pretty spanning, padding, and stickies.
         #  Grid statements are sorted by row, then column.
-        # self.rowconfigure(0, minsize=80)
+        self.whose_turn_lbl.grid(  # padx matches that of board_labels.
+            row=0, column=0, padx=0, pady=(5, 0))
+
         if chk.MY_OS in 'lin, dar':
-            self.whose_turn_lbl.grid(  # padx matches that of board_labels.
-                row=0, column=0, padx=0, pady=(5, 0))
             self.prev_game_num_header.grid(
                 row=0, column=2, rowspan=2, padx=(0, 8), pady=(8, 0), sticky=tk.NE)
             self.prev_game_num_lbl.grid(
@@ -390,32 +390,44 @@ class TicTacToeGUI(tk.Tk):
                 rowspan=2,
                 padx=0, pady=(85, 0), sticky=tk.W)
 
-        self.pvp_mode.grid(
-            row=5, column=0, padx=(10, 0), pady=5, sticky=tk.W)
         if chk.MY_OS == 'dar':
+            self.pvp_mode.grid(
+                row=5, column=0, padx=(10, 0), pady=5, sticky=tk.W)
             self.pvpc_mode.grid(
                 row=5, column=1, columnspan=2, padx=(20, 0), pady=5, sticky=tk.W)
             self.choose_pc_pref.grid(
                 row=5, column=1, columnspan=2, padx=(0, 25), pady=0, sticky=tk.E)
-        else:  # is Linux or Windows
+        elif chk.MY_OS == 'lin':
+            self.pvp_mode.grid(
+                row=5, column=0, padx=(10, 0), pady=5, sticky=tk.W)
             self.pvpc_mode.grid(
                 row=5, column=1, columnspan=2, padx=(0, 0), pady=5, sticky=tk.W)
             self.choose_pc_pref.grid(
                 row=5, column=1, columnspan=2, padx=(0, 35), pady=0, sticky=tk.E)
+        else:  # is Windows
+            self.pvp_mode.grid(
+                row=5, column=0, padx=(25, 0), pady=5, sticky=tk.W)
+            self.pvpc_mode.grid(
+                row=5, column=1, columnspan=2, padx=(30, 0), pady=5, sticky=tk.W)
+            self.choose_pc_pref.grid(
+                row=5, column=1, columnspan=2, padx=(0, 45), pady=0, sticky=tk.E)
 
         self.separator.grid(
             row=7, column=0, columnspan=3, padx=10, sticky=tk.EW)
 
-        self.auto_random_mode.grid(
-            row=8, column=0, padx=0, pady=(4, 0), sticky=tk.W)
         self.auto_go_stop_radiobtn.grid(
             row=8, column=1, rowspan=2, padx=8, pady=(6, 0), sticky=tk.W)
 
+        if chk.MY_OS == 'win':
+            padx = (5, 0)
+        else:
+            padx = 0
+        self.auto_random_mode.grid(
+            row=8, column=0, padx=padx, pady=(4, 0), sticky=tk.W)
         self.auto_strategy_mode.grid(
-            row=9, column=0, padx=0, pady=0, sticky=tk.W)
-
+            row=9, column=0, padx=padx, pady=0, sticky=tk.W)
         self.auto_center_mode.grid(
-            row=10, column=0, padx=0, pady=0, sticky=tk.W)
+            row=10, column=0, padx=padx, pady=0, sticky=tk.W)
 
         self.who_autostarts.grid(
             row=11, column=0, padx=(10, 0), pady=5, sticky=tk.W)
@@ -1110,14 +1122,14 @@ class TicTacToeGUI(tk.Tk):
         self.whose_turn.set('PC autoplay')
         self.whose_turn_lbl.config(bg=const.COLOR['tk_white'])
 
+        self.auto_turns_lbl.grid(row=0, column=2, rowspan=2,
+                                 padx=(0, 8), pady=(0, 0), sticky=tk.SE)
         if chk.MY_OS in 'lin, dar':
             self.auto_turns_header.grid(row=0, column=2, rowspan=2,
                                         padx=(0, 8), pady=(0, 16), sticky=tk.SE)
-            self.auto_turns_lbl.grid(row=0, column=2, rowspan=2,
-                                     padx=(0, 8), pady=(0, 0), sticky=tk.SE)
         else:  # is Windows
             self.auto_turns_header.grid(row=0, column=2, rowspan=2,
-                                        padx=(0, 8), pady=(0, 21), sticky=tk.SE)
+                                        padx=(0, 8), pady=(0, 30), sticky=tk.SE)
 
         self.auto_go_stop_radiobtn.config(state=tk.NORMAL)
         self.who_autostarts.config(state=tk.DISABLED)
