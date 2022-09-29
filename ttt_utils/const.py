@@ -30,3 +30,15 @@ PLAY_AFTER = 600
 
 # Milliseconds for after(), pause between autoplay turns and game turnovers.
 AUTO_AFTER = 300
+
+# Foreground and background colors.
+COLOR = {'score_fg': 'DodgerBlue4',
+         'result_bg': 'yellow3',
+         'disabled_fg': 'grey65',
+         'tk_white': '',  # defined in configure_widgets()
+         'mark_fg': 'yellow2',
+         'sq_won': 'blue',
+         'sq_not_won': 'black',
+         'sq_mouseover': 'grey15',
+         'radiobtn_bg': 'DodgerBlue1',
+         }

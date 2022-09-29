@@ -58,15 +58,15 @@ class TicTacToeGUI(tk.Tk):
         'auto_random_mode', 'auto_strategy_mode', 'auto_center_mode',
         'auto_turns_header', 'auto_turns_lbl', 'auto_turns_remaining',
         'autoplay_on', 'board_labels', 'choose_pc_pref',
-        'color', 'curr_pmode', 'display_automode', 'font', 'mode_selection',
+        'curr_pmode', 'display_automode', 'font', 'mode_selection',
         'p1_points', 'p1_score', 'p2_points', 'p2_score',
         'player1_header', 'player1_score_lbl',
         'player2_header', 'player2_score_lbl',
         'prev_game_num', 'prev_game_num_header', 'prev_game_num_lbl',
-        'pvp_mode', 'pvpc_mode',
-        'quit_button', 'report_calls', 'report_geometry', 'score_header',
+        'pvp_mode', 'pvpc_mode', 'quit_button', 'result_calls',
+        'resultwin_geometry', 'result_window_open', 'score_header',
         'separator', 'ties_header', 'ties_lbl', 'ties_num', 'titlebar_offset',
-        'who_autostarts', 'whose_turn', 'whose_turn_lbl', 'winner_found'
+        'who_autostarts', 'whose_turn', 'whose_turn_lbl', 'winner_found',
     )
 
     def __init__(self):
@@ -117,27 +117,16 @@ class TicTacToeGUI(tk.Tk):
 
         # Additional widgets.
         self.separator = ttk.Separator()
-        self.after_id = None
-        self.auto_marks = ''  # Used to dole out autoplay marks in proper order.
+        self.after_id = None  # A handler for after() and after_cancel() calls.
+        self.auto_marks = ''  # Used to dole out autoplay marks in proper register.
         self.display_automode = ''  # Used to display whose_turn.
-        self.curr_pmode = ''  # Used to evaluate conditions.
-        self.report_geometry = ''
-        self.report_calls = 0
-        self.titlebar_offset = 0
+        self.curr_pmode = ''  # Used to evaluate mode state.
+        self.result_calls = 0  # Allows recording of initial Result window position.
+        self.resultwin_geometry = ''  # Used to remember Result window position.
+        self.result_window_open = False  # A flag to prevent duplicate windows.
+        self.titlebar_offset = 0  # Used for accurate positioning of Result win.
 
-        self.font = {}
-
-        # Foreground and background colors.
-        self.color = {'score_fg': 'DodgerBlue4',
-                      'result_bg': 'yellow3',
-                      'disabled_fg': 'grey65',
-                      'tk_white': '',  # defined in configure_widgets()
-                      'mark_fg': 'yellow2',
-                      'sq_won': 'blue',
-                      'sq_not_won': 'black',
-                      'sq_mouseover': 'grey15',
-                      'radiobtn_bg': 'DodgerBlue1',
-                      }
+        self.font = {}  # Dictionary is filled in configure_widgets().
 
         self.configure_widgets()
         self.grid_widgets()
@@ -146,32 +135,34 @@ class TicTacToeGUI(tk.Tk):
         """Initial configurations of app window widgets."""
         ttk.Style().theme_use('alt')
 
-        self.font['sm_button'] = ('TkHeadingFont', 8)
-        self.font['who'] = ('TkHeadingFont', 7, 'italic bold')
-        self.font['button'] = ('TkHeadingFont', 8, 'bold')
-        self.font['scores'] = ('TkHeadingFont', 9)
-        self.font['report'] = ('TkHeadingFont', 9, 'italic bold')
-        self.font['condensed'] = ('TkTooltipFont', 8)
-        self.font['mark'] = ('TkFixedFont', 50)
+        self.font = {
+            'sm_button': ('TkHeadingFont', 8),
+            'who': ('TkHeadingFont', 7, 'italic bold'),
+            'button': ('TkHeadingFont', 8, 'bold'),
+            'scores': ('TkHeadingFont', 9),
+            'report': ('TkHeadingFont', 9, 'italic bold'),
+            'condensed': ('TkTooltipFont', 8),
+            'mark': ('TkFixedFont', 50),
+        }
 
-        # Need to apply OS-specific adjustments.
+        # Need to apply OS-specific font adjustments.
         if chk.MY_OS == 'lin':
             self.font['report'] = ('TkHeadingFont', 10, 'italic bold')
         elif chk.MY_OS == 'dar':
-            self.font['report'] = ('TkHeadingFont', 13, 'italic bold')
             self.font['sm_button'] = ('TkHeadingFont', 10)
             self.font['who'] = ('TkHeadingFont', 11, 'italic bold')
             self.font['button'] = ('TkHeadingFont', 11, 'bold')
             self.font['scores'] = ('TkHeadingFont', 12)
+            self.font['report'] = ('TkHeadingFont', 13, 'italic bold')
             self.font['condensed'] = ('TkTooltipFont', 10)
 
         # Need tk to match system's default white shade.
         if chk.MY_OS == 'dar':
-            self.color['tk_white'] = 'white'
+            const.COLOR['tk_white'] = 'white'
         elif chk.MY_OS == 'lin':
-            self.color['tk_white'] = 'grey85'
+            const.COLOR['tk_white'] = 'grey85'
         else:  # platform is 'win'
-            self.color['tk_white'] = 'grey95'
+            const.COLOR['tk_white'] = 'grey95'
 
         # Player's turn widgets.
         self.prev_game_num_header.config(text='Games played',
@@ -191,25 +182,25 @@ class TicTacToeGUI(tk.Tk):
         # ︴symbol from https://coolsymbol.com/line-symbols.html
         self.score_header.config(
             text='Score ︴', font=self.font['scores'],
-            fg=self.color['score_fg'])
+            fg=const.COLOR['score_fg'])
         self.player1_header.config(
             text='Player 1:', font=self.font['scores'],
-            fg=self.color['score_fg'])
+            fg=const.COLOR['score_fg'])
         self.player2_header.config(
             text='Player 2:', font=self.font['scores'],
-            fg=self.color['score_fg'])
+            fg=const.COLOR['score_fg'])
         self.player1_score_lbl.config(
             textvariable=self.p1_score, font=self.font['scores'],
-            fg=self.color['score_fg'])
+            fg=const.COLOR['score_fg'])
         self.player2_score_lbl.config(
             textvariable=self.p2_score, font=self.font['scores'],
-            fg=self.color['score_fg'])
+            fg=const.COLOR['score_fg'])
         self.ties_header.config(
             text='Ties:', font=self.font['scores'],
-            fg=self.color['score_fg'])
+            fg=const.COLOR['score_fg'])
         self.ties_lbl.config(
             textvariable=self.ties_num, font=self.font['scores'],
-            fg=self.color['score_fg'])
+            fg=const.COLOR['score_fg'])
 
         # Play mode control widgets:
         self.pvp_mode.config(text='Player v Player',
@@ -262,8 +253,8 @@ class TicTacToeGUI(tk.Tk):
         self.auto_go_stop_radiobtn.config(textvariable=self.auto_go_stop_txt,
                                           font=self.font['button'],
                                           variable=self.autoplay_on,
-                                          fg=self.color['mark_fg'],
-                                          bg=self.color['radiobtn_bg'],
+                                          fg=const.COLOR['mark_fg'],
+                                          bg=const.COLOR['radiobtn_bg'],
                                           borderwidth=2,
                                           indicatoron=False,
                                           command=self.auto_command)
@@ -273,12 +264,12 @@ class TicTacToeGUI(tk.Tk):
         # ttk.Buttons are used b/c tk.Buttons cannot be configured in macOS.
         style = ttk.Style()
         style.map('My.TButton',
-                  foreground=[('pressed', self.color['disabled_fg']),
-                              ('active', self.color['mark_fg']),
-                              ('disabled', self.color['disabled_fg'])
+                  foreground=[('pressed', const.COLOR['disabled_fg']),
+                              ('active', const.COLOR['mark_fg']),
+                              ('disabled', const.COLOR['disabled_fg'])
                               ],
-                  background=[('pressed', self.color['tk_white']),
-                              ('active', self.color['radiobtn_bg'])],
+                  background=[('pressed', const.COLOR['tk_white']),
+                              ('active', const.COLOR['radiobtn_bg'])],
                   )
         style.configure('My.TButton', font=self.font['sm_button'])
         self.who_autostarts.configure(style="My.TButton",
@@ -307,78 +298,97 @@ class TicTacToeGUI(tk.Tk):
         # Set platform-specific padding between play Labels (squares).
         if chk.MY_OS == 'dar':  # macOS
             pad = 6
-        elif chk.MY_OS == 'win':  # Windows
-            pad = 8
-        else:  # Linux
+        elif chk.MY_OS == 'lin':  # Linux
             pad = 0
+        else:  # Windows
+            pad = 8
 
         for lbl in self.board_labels:
             lbl.grid(row=_row, column=_col, pady=pad, padx=pad, ipady=6, ipadx=10)
             _col += 1
             if _col > 2:
-                _col = 0
                 _row += 1
+                _col = 0
 
         # Squeeze everything in with pretty spanning, padding, and stickies.
         #  Grid statements are sorted by row, then column.
         # self.rowconfigure(0, minsize=80)
-        self.whose_turn_lbl.grid(  # padx matches that of board_labels.
-            row=0, column=0, padx=0, pady=(5, 0))
-        self.prev_game_num_header.grid(
-            row=0, column=2, rowspan=2, padx=(0, 8), pady=(8, 0), sticky=tk.NE)
-        self.prev_game_num_lbl.grid(
-            row=0, column=2, rowspan=2, padx=(0, 8), pady=(22, 0), sticky=tk.NE)
-        if chk.MY_OS == 'win':
+        if chk.MY_OS in 'lin, dar':
+            self.whose_turn_lbl.grid(  # padx matches that of board_labels.
+                row=0, column=0, padx=0, pady=(5, 0))
+            self.prev_game_num_header.grid(
+                row=0, column=2, rowspan=2, padx=(0, 8), pady=(8, 0), sticky=tk.NE)
+            self.prev_game_num_lbl.grid(
+                row=0, column=2, rowspan=2, padx=(0, 8), pady=(22, 0), sticky=tk.NE)
+        else:  # is Windows
             self.prev_game_num_header.grid(
                 row=0, column=2, rowspan=2, padx=(0, 8), pady=(13, 0), sticky=tk.NE)
             self.prev_game_num_lbl.grid(
                 row=0, column=2, rowspan=2, padx=(0, 8), pady=(35, 0), sticky=tk.NE)
 
         # There is duplication in the elif statements to allow easy editing and
-        #  cut/paste options for platform-specific needs.
+        #   cut/paste actions for platform-specific adjustments.
         if chk.MY_OS == 'dar':
             self.score_header.grid(
                 row=0, column=1, rowspan=2, padx=(10, 0), pady=(0, 10), sticky=tk.W)
             self.player1_header.grid(
-                row=0, column=1, rowspan=2, padx=(0, 0), pady=(0, 40), sticky=tk.E)
+                row=0, column=1, rowspan=2, padx=(0, 0), pady=(0, 35), sticky=tk.E)
             self.player2_header.grid(
                 row=0, column=1, rowspan=2, padx=(0, 0), pady=(20, 10), sticky=tk.E)
         elif chk.MY_OS == 'lin':
             self.score_header.grid(
                 row=0, column=1, rowspan=2, padx=(10, 0), pady=(0, 10), sticky=tk.W)
             self.player1_header.grid(
-                row=0, column=1, rowspan=2, padx=(0, 8), pady=(0, 40), sticky=tk.E)
+                row=0, column=1, rowspan=2, padx=(0, 8), pady=(0, 35), sticky=tk.E)
             self.player2_header.grid(
                 row=0, column=1, rowspan=2, padx=(0, 8), pady=(20, 10), sticky=tk.E)
-        elif chk.MY_OS == 'win':
+        else:  # is Windows
             self.score_header.grid(
                 row=0, column=1, rowspan=2, padx=(10, 0), pady=(0, 10), sticky=tk.W)
             self.player1_header.grid(
-                row=0, column=1, rowspan=2, padx=(0, 8), pady=(0, 50), sticky=tk.E)
+                row=0, column=1, rowspan=2, padx=(0, 8), pady=(0, 45), sticky=tk.E)
             self.player2_header.grid(
                 row=0, column=1, rowspan=2, padx=(0, 8), pady=(30, 10), sticky=tk.E)
 
-        self.player1_score_lbl.grid(
-            row=0, column=2, rowspan=2, padx=0, pady=(0, 40), sticky=tk.W)
-        self.player2_score_lbl.grid(
-            row=0, column=2, rowspan=2, padx=0, pady=(20, 10), sticky=tk.W)
-        if chk.MY_OS == 'win':
+        if chk.MY_OS in 'lin, dar':
             self.player1_score_lbl.grid(
-                row=0, column=2, rowspan=2, padx=0, pady=(0, 50), sticky=tk.W)
+                row=0, column=1,
+                rowspan=2, columnspan=2,
+                padx=(112, 0), pady=(0, 35), sticky=tk.W)
             self.player2_score_lbl.grid(
-                row=0, column=2, rowspan=2, padx=0, pady=(30, 10), sticky=tk.W)
+                row=0, column=1,
+                rowspan=2, columnspan=2,
+                padx=(112, 0), pady=(20, 10), sticky=tk.W)
+        else:  # is Windows
+            self.player1_score_lbl.grid(
+                row=0, column=2,
+                rowspan=2,
+                padx=0, pady=(0, 50), sticky=tk.W)
+            self.player2_score_lbl.grid(
+                row=0, column=2,
+                rowspan=2,
+                padx=0, pady=(30, 10), sticky=tk.W)
 
         # Auto-turn counting labels are gridded in auto_start().
 
-        self.ties_header.grid(
-            row=0, column=1, rowspan=2, padx=(0, 8), pady=(55, 0), sticky=tk.E)
-        self.ties_lbl.grid(
-            row=0, column=2, rowspan=2, padx=0, pady=(55, 0), sticky=tk.W)
-        if chk.MY_OS == 'win':
+        if chk.MY_OS in 'lin, dar':
             self.ties_header.grid(
-                row=0, column=1, rowspan=2, padx=(0, 8), pady=(85, 0), sticky=tk.E)
+                row=0, column=1,
+                rowspan=2,
+                padx=(0, 8), pady=(55, 0), sticky=tk.E)
             self.ties_lbl.grid(
-                row=0, column=2, rowspan=2, padx=0, pady=(85, 0), sticky=tk.W)
+                row=0, column=1,
+                rowspan=2, columnspan=2,
+                padx=(112, 0), pady=(55, 0), sticky=tk.W)
+        else:  # is Windows
+            self.ties_header.grid(
+                row=0, column=1,
+                rowspan=2,
+                padx=(0, 8), pady=(85, 0), sticky=tk.E)
+            self.ties_lbl.grid(
+                row=0, column=2,
+                rowspan=2,
+                padx=0, pady=(85, 0), sticky=tk.W)
 
         self.pvp_mode.grid(
             row=5, column=0, padx=(10, 0), pady=5, sticky=tk.W)
@@ -387,7 +397,7 @@ class TicTacToeGUI(tk.Tk):
                 row=5, column=1, columnspan=2, padx=(20, 0), pady=5, sticky=tk.W)
             self.choose_pc_pref.grid(
                 row=5, column=1, columnspan=2, padx=(0, 25), pady=0, sticky=tk.E)
-        else:
+        else:  # is Linux or Windows
             self.pvpc_mode.grid(
                 row=5, column=1, columnspan=2, padx=(0, 0), pady=5, sticky=tk.W)
             self.choose_pc_pref.grid(
@@ -420,14 +430,14 @@ class TicTacToeGUI(tk.Tk):
         """
         for i, lbl in enumerate(self.board_labels):
             lbl.config(text=' ', height=1, width=2,
-                       bg=self.color['sq_not_won'],
-                       fg=self.color['mark_fg'],
+                       bg=const.COLOR['sq_not_won'],
+                       fg=const.COLOR['mark_fg'],
                        font=self.font['mark'],
                        )
 
             if chk.MY_OS == 'dar':
                 lbl.config(borderwidth=12)
-            else:
+            else:  # is Linux or Windows.
                 lbl.config(highlightthickness=6)
 
             lbl.bind('<Button-1>',
@@ -448,31 +458,33 @@ class TicTacToeGUI(tk.Tk):
             lbl.unbind('<Enter>')
             lbl.unbind('<Leave>')
 
-    def on_enter(self, label: tk) -> None:
+    @staticmethod
+    def on_enter(label: tk) -> None:
         """
-        On mouseover, indicate game board square with a color change.
+        On mouseover, indicate game board square with a COLOR change.
 
         :param label: The tk.Label object.
         :return: None
        """
-        if label['bg'] == self.color['sq_not_won']:
-            label['bg'] = self.color['sq_mouseover']
-        elif label['bg'] == self.color['sq_won']:
-            label['bg'] = self.color['sq_won']
+        if label['bg'] == const.COLOR['sq_not_won']:
+            label['bg'] = const.COLOR['sq_mouseover']
+        elif label['bg'] == const.COLOR['sq_won']:
+            label['bg'] = const.COLOR['sq_won']
 
-    def on_leave(self, label: tk):
+    @staticmethod
+    def on_leave(label: tk):
         """
-        On mouse leave, game board square returns to entered color.
+        On mouse leave, game board square returns to entered COLOR.
 
         :param label: The tk.Label object.
         :return: None
         """
-        if label['bg'] == self.color['sq_mouseover']:
-            label['bg'] = self.color['sq_not_won']
-        elif label['bg'] == self.color['sq_not_won']:
-            label['bg'] = self.color['sq_not_won']
-        elif label['bg'] == self.color['sq_won']:
-            label['bg'] = self.color['sq_won']
+        if label['bg'] == const.COLOR['sq_mouseover']:
+            label['bg'] = const.COLOR['sq_not_won']
+        elif label['bg'] == const.COLOR['sq_not_won']:
+            label['bg'] = const.COLOR['sq_not_won']
+        elif label['bg'] == const.COLOR['sq_won']:
+            label['bg'] = const.COLOR['sq_won']
 
     def mode_control(self) -> None:
         """
@@ -534,15 +546,21 @@ class TicTacToeGUI(tk.Tk):
             if mode in 'pvp, pvpc':
                 self.auto_go_stop_radiobtn.config(state=tk.DISABLED)
                 self.who_autostarts.configure(state=tk.DISABLED)
-            else:
+                self.your_turn_player1()
+            else: # One of the auto modes.
                 self.auto_go_stop_radiobtn.config(state=tk.NORMAL)
                 self.who_autostarts.configure(state=tk.NORMAL)
-
-            if 'auto-' in mode:
                 self.whose_turn.set('PC autoplay')
-                self.whose_turn_lbl.config(bg=self.color['tk_white'])
-            else:
-                self.your_turn_player1()
+                self.whose_turn_lbl.config(bg=const.COLOR['tk_white'])
+
+            # Need this to deactivate the auto_go_stop_radiobtn which
+            #   would otherwise open a duplicate Result window (a
+            #   'started' auto game would be instantly 'canceled' b/c the
+            #   game board wasn't reset). So force user to click
+            #   'New Game' or 'Quit' in Result window BEFORE selecting an
+            #   autoplay mode and clicking on an active auto_go_stop_radiobtn.
+            if self.result_window_open:
+                self.auto_go_stop_radiobtn.config(state=tk.DISABLED)
 
     def your_turn_player1(self) -> None:
         """
@@ -557,7 +575,7 @@ class TicTacToeGUI(tk.Tk):
         else:
             self.whose_turn.set(f'{const.PLAYER1} plays {const.P1_MARK}')
 
-        self.whose_turn_lbl.config(bg=self.color['result_bg'])
+        self.whose_turn_lbl.config(bg=const.COLOR['result_bg'])
 
     def human_turn(self, played_lbl: tk) -> None:
         """
@@ -579,16 +597,16 @@ class TicTacToeGUI(tk.Tk):
         def h_plays_p1():
             played_lbl['text'] = const.P1_MARK
             self.whose_turn.set(f'{const.PLAYER2} plays {const.P2_MARK}')
-            self.whose_turn_lbl.config(bg=self.color['tk_white'])
+            self.whose_turn_lbl.config(bg=const.COLOR['tk_white'])
 
         def h_plays_p2():
             played_lbl['text'] = const.P2_MARK
-            played_lbl.config(fg=self.color['tk_white'])
+            played_lbl.config(fg=const.COLOR['tk_white'])
             self.your_turn_player1()
 
         def h_plays_p1_v_pc():
             played_lbl['text'] = const.P1_MARK
-            self.whose_turn_lbl.config(bg=self.color['tk_white'])
+            self.whose_turn_lbl.config(bg=const.COLOR['tk_white'])
             self.whose_turn.set(f'PC plays {const.P2_MARK}')
 
         if played_lbl['text'] == ' ':
@@ -634,8 +652,8 @@ class TicTacToeGUI(tk.Tk):
     def color_the_mark(self, _id: int) -> None:
         """
         In PvP and PvPC modes (or any non-auto mode), provide alternate
-        colors for Player1 and Player2 marks. Default color
-        (self.color['mark_fg']) is set in setup_game_board().
+        colors for Player1 and Player2 marks. Default COLOR
+        (const.COLOR['mark_fg']) is set in setup_game_board().
         This method changes that to an alternate fg.
 
         :param _id: The board label's list index of the played square.
@@ -643,7 +661,7 @@ class TicTacToeGUI(tk.Tk):
         """
 
         if not self.display_automode:
-            self.board_labels[_id].config(fg=self.color['tk_white'])
+            self.board_labels[_id].config(fg=const.COLOR['tk_white'])
 
     def pc_turn(self) -> None:
         """
@@ -763,11 +781,10 @@ class TicTacToeGUI(tk.Tk):
     def turn_number(self) -> int:
         """
         Keep count of turns per game by counting play labels with
-        a mark string as the label text.
+        label text other than a space string.
 
         :return: The number of turns played, as integer.
         """
-        #  Count of labels with text other than a space.
         return len([i for i in self.board_labels if ' ' not in i['text']])
 
     def check_winner(self, mark: str) -> None:
@@ -797,6 +814,14 @@ class TicTacToeGUI(tk.Tk):
                 self.winner_found = True
                 self.prev_game_num.set(self.prev_game_num.get() + 1)
 
+                # Record to file all winning board_labels lists.
+                # 888 unique combinations according to:
+                # https://stackoverflow.com/questions/28712279/
+                # all-possible-tic-tac-toe-winning-combinations
+                # winlist = f'{[i["text"] for i in self.board_labels]}\n'
+                # with open('wins', 'a') as file:
+                #     file.write(winlist)
+
                 if 'auto-' in self.mode_selection.get():
                     award_points(mark)
                     self.auto_flash_win(combo, mark)
@@ -811,6 +836,14 @@ class TicTacToeGUI(tk.Tk):
         if self.turn_number() == 9 and not self.winner_found:
             self.winner_found = True
             self.prev_game_num.set(self.prev_game_num.get() + 1)
+
+            # Record to file all tied board_labels lists.
+            # 9!/(5!*4!) = 126 unique combinations, according to:
+            # https://www.crows.org/blogpost/1685693/357431/The-Mathematics-of-Tic-Tac-Toe
+            #  Or is it 126-8 = 118 once winning moves (on last play) are considered?
+            # tielist = f'{[i["text"] for i in self.board_labels]}\n'
+            # with open('ties', 'a') as file:
+            #     file.write(tielist)
 
             self.p1_points += 0.5
             self.p2_points += 0.5
@@ -834,25 +867,25 @@ class TicTacToeGUI(tk.Tk):
         """
         _x, _y, _z = combo
 
-        app.after(10, lambda: self.board_labels[_x].config(bg=self.color['sq_won']))
-        app.after(200, lambda: self.board_labels[_y].config(bg=self.color['sq_won']))
-        app.after(400, lambda: self.board_labels[_z].config(bg=self.color['sq_won']))
+        app.after(10, lambda: self.board_labels[_x].config(bg=const.COLOR['sq_won']))
+        app.after(200, lambda: self.board_labels[_y].config(bg=const.COLOR['sq_won']))
+        app.after(400, lambda: self.board_labels[_z].config(bg=const.COLOR['sq_won']))
 
     def flash_tie(self) -> None:
         """
-        Make entire game board blue (self.color['sq_won']) on a tie game.
+        Make entire game board blue (const.COLOR['sq_won']) on a tie game.
 
         :return: None
         """
         for lbl in self.board_labels:
-            lbl.config(bg=self.color['sq_won'])
+            lbl.config(bg=const.COLOR['sq_won'])
             app.update_idletasks()
 
     def window_geometry(self, toplevel: tk) -> None:
         """
         Set the xy geometry of a *toplevel* window near top-left corner
         of app window. If it is moved, then put at the new geometry
-        determined by the report_geometry variable.
+        determined by the resultwin_geometry variable.
         Calculate the height of the system's window title bar to use as
         a y-offset for the *toplevel* xy geometry.
 
@@ -860,8 +893,8 @@ class TicTacToeGUI(tk.Tk):
         :return: None
         """
 
-        if self.report_geometry:
-            toplevel.geometry(self.report_geometry)
+        if self.resultwin_geometry:
+            toplevel.geometry(self.resultwin_geometry)
         else:
             toplevel.geometry(f'+{app.winfo_x()}+{app.winfo_y()}')
 
@@ -871,11 +904,11 @@ class TicTacToeGUI(tk.Tk):
         #   include the system's title bar.
         # Title bar height is determined only once from the initial
         #   placement of the Report window at top-left of the app window.
-        if self.report_calls == 1:
+        if self.result_calls == 1:
             app.update_idletasks()
             self.titlebar_offset = toplevel.winfo_y() - app.winfo_y()
 
-    def display_result(self, win_msg: str) -> None:
+    def display_result(self, result_msg: str) -> None:
         """
         Pop-up a game result window to announce winner or tie with
         PvP and PvPC modes, or with a canceled autoplay.
@@ -883,12 +916,14 @@ class TicTacToeGUI(tk.Tk):
         Play again option can be invoked with Return or Enter.
         Display tally of players' wins within a single play mode.
 
-        :param win_msg: The result string to display in result window.
+        :param result_msg: The result string to display in result window.
         :return: None
         """
-        report_window = tk.Toplevel(self, borderwidth=4, relief='raised')
-        report_window.title('Result')
-        report_window.config(bg=self.color['result_bg'])
+        self.result_window_open = True
+
+        result_window = tk.Toplevel(self, borderwidth=4, relief='raised')
+        result_window.title('Result')
+        result_window.config(bg=const.COLOR['result_bg'])
 
         if chk.MY_OS == 'win':  # Windows
             geom = '420x150'
@@ -903,24 +938,24 @@ class TicTacToeGUI(tk.Tk):
             minw = 180
             minh = 100
 
-        report_window.geometry(geom)
-        report_window.minsize(minw, minh)
+        result_window.geometry(geom)
+        result_window.minsize(minw, minh)
 
-        self.report_calls += 1
-        self.window_geometry(report_window)
+        self.result_calls += 1
+        self.window_geometry(result_window)
 
         # Need prevent focus shifting to app window which would cover up
         #  the Report window.
-        report_window.attributes('-topmost', True)
-        report_window.focus_force()
+        result_window.attributes('-topmost', True)
+        result_window.focus_force()
 
-        report_lbl = tk.Label(report_window, text=win_msg,
+        result_lbl = tk.Label(result_window, text=result_msg,
                               font=self.font['report'],
-                              bg=self.color['result_bg'])
+                              bg=const.COLOR['result_bg'])
 
         self.block_all_player_action()
         self.whose_turn.set('Game pending...')
-        self.whose_turn_lbl.config(bg=self.color['tk_white'])
+        self.whose_turn_lbl.config(bg=const.COLOR['tk_white'])
 
         # Need to update players' cumulative wins in the app window.
         self.p1_score.set(self.p1_points)
@@ -928,12 +963,12 @@ class TicTacToeGUI(tk.Tk):
 
         def no_exit_on_x():
             messagebox.showinfo(
-                parent=report_window,
+                parent=result_window,
                 title='Click a button',
                 detail='Use either "New Game" or "Quit"'
                        ' to close Report window.')
 
-        report_window.protocol('WM_DELETE_WINDOW', no_exit_on_x)
+        result_window.protocol('WM_DELETE_WINDOW', no_exit_on_x)
 
         def restart_game():
             """
@@ -945,26 +980,27 @@ class TicTacToeGUI(tk.Tk):
 
             # Need to retain screen position of results window between games in case
             #   user has moved it from default position.
-            self.report_geometry = (
-                f'+{report_window.winfo_x()}'
-                f'+{report_window.winfo_y() - self.titlebar_offset}'
+            self.resultwin_geometry = (
+                f'+{result_window.winfo_x()}'
+                f'+{result_window.winfo_y() - self.titlebar_offset}'
             )
             self.new_game()
-            report_window.destroy()
+            self.result_window_open = False
+            result_window.destroy()
 
-        again = tk.Button(report_window, text='New Game (\u23CE)',
+        again = tk.Button(result_window, text='New Game (\u23CE)',
                           # Unicode Return/Enter key symbol.
                           font=self.font['button'],
                           relief='groove', overrelief='raised', border=3,
                           command=restart_game)
-        not_again = tk.Button(report_window, text='Quit',
+        not_again = tk.Button(result_window, text='Quit',
                               font=self.font['sm_button'],
                               relief='groove', overrelief='raised', border=3,
                               command=lambda: utils.quit_game(mainloop=app))
-        report_window.bind('<Return>', lambda _: restart_game())
-        report_window.bind('<KP_Enter>', lambda _: restart_game())
+        result_window.bind('<Return>', lambda _: restart_game())
+        result_window.bind('<KP_Enter>', lambda _: restart_game())
 
-        report_lbl.pack(pady=3, padx=3)
+        result_lbl.pack(pady=3, padx=3)
         again.pack(pady=(0, 0))
         not_again.pack(pady=5)
 
@@ -1002,12 +1038,12 @@ class TicTacToeGUI(tk.Tk):
                 self.your_turn_player1()
             else:
                 self.whose_turn.set(f'{const.PLAYER2} plays {const.P2_MARK}')
-                self.whose_turn_lbl.config(bg=self.color['tk_white'])
+                self.whose_turn_lbl.config(bg=const.COLOR['tk_white'])
 
         elif self.mode_selection.get() == 'pvpc':
             if self.prev_game_num.get() % 2 != 0:
                 self.whose_turn.set(f'PC plays {const.P2_MARK}')
-                self.whose_turn_lbl.config(bg=self.color['tk_white'])
+                self.whose_turn_lbl.config(bg=const.COLOR['tk_white'])
 
                 self.pc_turn()
             else:
@@ -1072,13 +1108,14 @@ class TicTacToeGUI(tk.Tk):
         self.setup_game_board()
         self.reset_game_and_score()
         self.whose_turn.set('PC autoplay')
-        self.whose_turn_lbl.config(bg=self.color['tk_white'])
+        self.whose_turn_lbl.config(bg=const.COLOR['tk_white'])
 
-        self.auto_turns_header.grid(row=0, column=2, rowspan=2,
-                                    padx=(0, 8), pady=(0, 16), sticky=tk.SE)
-        self.auto_turns_lbl.grid(row=0, column=2, rowspan=2,
-                                 padx=(0, 8), pady=(0, 0), sticky=tk.SE)
-        if chk.MY_OS == 'win':
+        if chk.MY_OS in 'lin, dar':
+            self.auto_turns_header.grid(row=0, column=2, rowspan=2,
+                                        padx=(0, 8), pady=(0, 16), sticky=tk.SE)
+            self.auto_turns_lbl.grid(row=0, column=2, rowspan=2,
+                                     padx=(0, 8), pady=(0, 0), sticky=tk.SE)
+        else:  # is Windows
             self.auto_turns_header.grid(row=0, column=2, rowspan=2,
                                         padx=(0, 8), pady=(0, 21), sticky=tk.SE)
 
@@ -1099,8 +1136,8 @@ class TicTacToeGUI(tk.Tk):
 
     def auto_stop(self, stop_msg: str) -> None:
         """
-        Stop autoplay method and call Results popup window.
-        Disable player game actions (resets when Results window closes).
+        Stop autoplay method and call Result popup window.
+        Disable player game actions (resets when Result window closes).
 
         :param stop_msg: Information on source of auto_stop call.
         :return: None
@@ -1332,15 +1369,15 @@ class TicTacToeGUI(tk.Tk):
         _x, _y, _z = combo
 
         def winner_show():
-            self.board_labels[_x].config(text=mark, bg=self.color['sq_won'])
-            self.board_labels[_y].config(text=mark, bg=self.color['sq_won'])
-            self.board_labels[_z].config(text=mark, bg=self.color['sq_won'])
+            self.board_labels[_x].config(text=mark, bg=const.COLOR['sq_won'])
+            self.board_labels[_y].config(text=mark, bg=const.COLOR['sq_won'])
+            self.board_labels[_z].config(text=mark, bg=const.COLOR['sq_won'])
             app.update_idletasks()
 
         def winner_erase():
-            self.board_labels[_x].config(text=' ', bg=self.color['sq_not_won'])
-            self.board_labels[_y].config(text=' ', bg=self.color['sq_not_won'])
-            self.board_labels[_z].config(text=' ', bg=self.color['sq_not_won'])
+            self.board_labels[_x].config(text=' ', bg=const.COLOR['sq_not_won'])
+            self.board_labels[_y].config(text=' ', bg=const.COLOR['sq_not_won'])
+            self.board_labels[_z].config(text=' ', bg=const.COLOR['sq_not_won'])
 
         app.after(1, winner_show)
         app.after(300, winner_erase)
