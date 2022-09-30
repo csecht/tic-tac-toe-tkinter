@@ -827,9 +827,6 @@ class TicTacToeGUI(tk.Tk):
                 self.prev_game_num.set(self.prev_game_num.get() + 1)
 
                 # Record to file all winning board_labels lists.
-                # 888 unique combinations according to:
-                # https://stackoverflow.com/questions/28712279/
-                # all-possible-tic-tac-toe-winning-combinations
                 # winlist = f'{[i["text"] for i in self.board_labels]}\n'
                 # with open('wins', 'a') as file:
                 #     file.write(winlist)
@@ -850,9 +847,6 @@ class TicTacToeGUI(tk.Tk):
             self.prev_game_num.set(self.prev_game_num.get() + 1)
 
             # Record to file all tied board_labels lists.
-            # 9!/(5!*4!) = 126 unique combinations, according to:
-            # https://www.crows.org/blogpost/1685693/357431/The-Mathematics-of-Tic-Tac-Toe
-            #  Or is it 126-8 = 118 once winning moves (on last play) are considered?
             # tielist = f'{[i["text"] for i in self.board_labels]}\n'
             # with open('ties', 'a') as file:
             #     file.write(tielist)
@@ -1092,6 +1086,7 @@ class TicTacToeGUI(tk.Tk):
         """
         Check that an autoplay mode is selected before calling
         auto_start() when the auto_go_stop_radiobtn Radiobutton invoked.
+        Toggles text displayed on auto_go_stop_radiobtn.
         Called as the auto_go_stop_radiobtn command.
 
         :return: None
@@ -1372,7 +1367,8 @@ class TicTacToeGUI(tk.Tk):
         """
         For each auto_play win, flashes the winning marks. Flashes the
         center square only on a tie (using combo = (4, 4, 4)), then
-        calls auto_setup() for the next auto_play() game.
+        calls auto_setup() for the next auto_play() game. Note that on
+        a tie, the last played mark does not show on the game board.
 
         :param combo: The tuple index values for the winning squares on
                       the board.
