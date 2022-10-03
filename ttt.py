@@ -559,7 +559,7 @@ class TicTacToeGUI(tk.Tk):
                 self.auto_go_stop_radiobtn.config(state=tk.DISABLED)
                 self.who_autostarts.configure(state=tk.DISABLED)
                 self.your_turn_player1()
-            else: # One of the auto modes.
+            else:  # One of the auto modes.
                 self.auto_go_stop_radiobtn.config(state=tk.NORMAL)
                 self.who_autostarts.configure(state=tk.NORMAL)
                 self.whose_turn.set('PC autoplay')
@@ -777,7 +777,7 @@ class TicTacToeGUI(tk.Tk):
         app.update_idletasks()
 
     def play_random(self, turn_number: int, mark: str) -> None:
-        """ Place *mark* in a random position of board_labels index.
+        """ Play *mark* in a random position of board_labels index.
 
         :param mark: The player's mark string to play.
         :param turn_number: The current turn number, from turn_number().
@@ -835,12 +835,11 @@ class TicTacToeGUI(tk.Tk):
                     award_points(mark)
                     self.auto_flash_win(combo, mark)
                     break
-
-                # Mode selection is pvp or pvpc.
-                award_points(mark)
-                self.flash_win(combo)
-                self.display_result(f'{mark} WINS!')
-                break
+                else:  # Mode selection is pvp or pvpc.
+                    award_points(mark)
+                    self.flash_win(combo)
+                    self.display_result(f'{mark} WINS!')
+                    break
 
         if self.turn_number() == 9 and not self.winner_found:
             self.winner_found = True
@@ -1403,6 +1402,9 @@ if __name__ == '__main__':
     utils.manage_args()
 
     print('tty.py now running...')
+    # ^^^ If, for some reason, import Path from pathlib is used, then can
+    #  print file name as f'{Path(sys.modules["__main__"].__file__).stem}
+
     app = TicTacToeGUI()
     app.title('TIC TAC TOE')
     app.resizable(False, False)
