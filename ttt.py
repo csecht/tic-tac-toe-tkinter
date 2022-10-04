@@ -36,6 +36,7 @@ except (ImportError, ModuleNotFoundError) as error:
 
 # Local program imports:
 from ttt_utils import const, utils, platform_check as chk
+from ttt_utils.const import P1_MARK, P2_MARK, COLOR
 
 
 class TicTacToeGUI(tk.Tk):
@@ -158,11 +159,11 @@ class TicTacToeGUI(tk.Tk):
 
         # Need tk to match system's default white shade.
         if chk.MY_OS == 'dar':
-            const.COLOR['tk_white'] = 'white'
+            COLOR['tk_white'] = 'white'
         elif chk.MY_OS == 'lin':
-            const.COLOR['tk_white'] = 'grey85'
+            COLOR['tk_white'] = 'grey85'
         else:  # platform is 'win'
-            const.COLOR['tk_white'] = 'grey95'
+            COLOR['tk_white'] = 'grey95'
 
         # Player's turn widgets.
         self.prev_game_num_header.config(text='Games played',
@@ -171,7 +172,8 @@ class TicTacToeGUI(tk.Tk):
                                       font=self.font['condensed'])
         self.whose_turn_lbl.config(textvariable=self.whose_turn, height=4,
                                    font=self.font['who'])
-        self.your_turn_player1()
+
+        self.your_turn_player1()  # Starting prompt for Player1 to begin play.
 
         self.auto_turns_header.config(text='Turns to go',
                                       font=self.font['condensed'])
@@ -179,28 +181,28 @@ class TicTacToeGUI(tk.Tk):
                                    font=self.font['condensed'])
 
         # Players' scores widgets:
-        # ︴symbol from https://coolsymbol.com/line-symbols.html
+        # ︴squiggle symbol from https://coolsymbol.com/line-symbols.html
         self.score_header.config(
             text='Score ︴', font=self.font['scores'],
-            fg=const.COLOR['score_fg'])
+            fg=COLOR['score_fg'])
         self.player1_header.config(
             text='Player 1:', font=self.font['scores'],
-            fg=const.COLOR['score_fg'])
+            fg=COLOR['score_fg'])
         self.player2_header.config(
             text='Player 2:', font=self.font['scores'],
-            fg=const.COLOR['score_fg'])
+            fg=COLOR['score_fg'])
         self.player1_score_lbl.config(
             textvariable=self.p1_score, font=self.font['scores'],
-            fg=const.COLOR['score_fg'])
+            fg=COLOR['score_fg'])
         self.player2_score_lbl.config(
             textvariable=self.p2_score, font=self.font['scores'],
-            fg=const.COLOR['score_fg'])
+            fg=COLOR['score_fg'])
         self.ties_header.config(
             text='Ties:', font=self.font['scores'],
-            fg=const.COLOR['score_fg'])
+            fg=COLOR['score_fg'])
         self.ties_lbl.config(
             textvariable=self.ties_num, font=self.font['scores'],
-            fg=const.COLOR['score_fg'])
+            fg=COLOR['score_fg'])
 
         # Play mode control widgets:
         self.pvp_mode.config(text='Player v Player',
@@ -208,7 +210,7 @@ class TicTacToeGUI(tk.Tk):
                              variable=self.mode_selection,
                              value='pvp',
                              command=self.mode_control)
-        self.pvp_mode.select()
+        self.pvp_mode.select()  # Start default mode is Player v Player.
 
         self.pvpc_mode.config(text='Player v PC',
                               font=self.font['condensed'],
@@ -222,7 +224,7 @@ class TicTacToeGUI(tk.Tk):
         self.choose_pc_pref.config(font=self.font['condensed'],
                                    width=14,
                                    values=('PC plays random',
-                                           'PC plays corners',
+                                           # 'PC plays corners',
                                            'PC plays center',
                                            'PC plays strategy'),
                                    state=tk.DISABLED)
@@ -253,8 +255,8 @@ class TicTacToeGUI(tk.Tk):
         self.auto_go_stop_radiobtn.config(textvariable=self.auto_go_stop_txt,
                                           font=self.font['button'],
                                           variable=self.autoplay_on,
-                                          fg=const.COLOR['mark_fg'],
-                                          bg=const.COLOR['radiobtn_bg'],
+                                          fg=COLOR['mark_fg'],
+                                          bg=COLOR['radiobtn_bg'],
                                           borderwidth=2,
                                           indicatoron=False,
                                           command=self.auto_command)
@@ -264,12 +266,12 @@ class TicTacToeGUI(tk.Tk):
         # ttk.Buttons are used b/c tk.Buttons cannot be configured in macOS.
         style = ttk.Style()
         style.map('My.TButton',
-                  foreground=[('pressed', const.COLOR['disabled_fg']),
-                              ('active', const.COLOR['mark_fg']),
-                              ('disabled', const.COLOR['disabled_fg'])
+                  foreground=[('pressed', COLOR['disabled_fg']),
+                              ('active', COLOR['mark_fg']),
+                              ('disabled', COLOR['disabled_fg'])
                               ],
-                  background=[('pressed', const.COLOR['tk_white']),
-                              ('active', const.COLOR['radiobtn_bg'])],
+                  background=[('pressed', COLOR['tk_white']),
+                              ('active', COLOR['radiobtn_bg'])],
                   )
         style.configure('My.TButton', font=self.font['sm_button'])
         self.who_autostarts.configure(style="My.TButton",
@@ -282,7 +284,7 @@ class TicTacToeGUI(tk.Tk):
                                 text='Quit', width=4,
                                 command=lambda: utils.quit_game(mainloop=app))
 
-        # Configure game board play squares:
+        # Configure game board playing squares (Labels):
         self.setup_game_board()
 
     def grid_widgets(self) -> None:
@@ -442,8 +444,8 @@ class TicTacToeGUI(tk.Tk):
         """
         for i, lbl in enumerate(self.board_labels):
             lbl.config(text=' ', height=1, width=2,
-                       bg=const.COLOR['sq_not_won'],
-                       fg=const.COLOR['mark_fg'],
+                       bg=COLOR['sq_not_won'],
+                       fg=COLOR['mark_fg'],
                        font=self.font['mark'],
                        )
 
@@ -478,10 +480,10 @@ class TicTacToeGUI(tk.Tk):
         :param label: The tk.Label object.
         :return: None
        """
-        if label['bg'] == const.COLOR['sq_not_won']:
-            label['bg'] = const.COLOR['sq_mouseover']
-        elif label['bg'] == const.COLOR['sq_won']:
-            label['bg'] = const.COLOR['sq_won']
+        if label['bg'] == COLOR['sq_not_won']:
+            label['bg'] = COLOR['sq_mouseover']
+        elif label['bg'] == COLOR['sq_won']:
+            label['bg'] = COLOR['sq_won']
 
     @staticmethod
     def on_leave(label: tk):
@@ -491,12 +493,12 @@ class TicTacToeGUI(tk.Tk):
         :param label: The tk.Label object.
         :return: None
         """
-        if label['bg'] == const.COLOR['sq_mouseover']:
-            label['bg'] = const.COLOR['sq_not_won']
-        elif label['bg'] == const.COLOR['sq_not_won']:
-            label['bg'] = const.COLOR['sq_not_won']
-        elif label['bg'] == const.COLOR['sq_won']:
-            label['bg'] = const.COLOR['sq_won']
+        if label['bg'] == COLOR['sq_mouseover']:
+            label['bg'] = COLOR['sq_not_won']
+        elif label['bg'] == COLOR['sq_not_won']:
+            label['bg'] = COLOR['sq_not_won']
+        elif label['bg'] == COLOR['sq_won']:
+            label['bg'] = COLOR['sq_won']
 
     def mode_control(self) -> None:
         """
@@ -563,7 +565,7 @@ class TicTacToeGUI(tk.Tk):
                 self.auto_go_stop_radiobtn.config(state=tk.NORMAL)
                 self.who_autostarts.configure(state=tk.NORMAL)
                 self.whose_turn.set('PC autoplay')
-                self.whose_turn_lbl.config(bg=const.COLOR['tk_white'])
+                self.whose_turn_lbl.config(bg=COLOR['tk_white'])
 
             # Need this to deactivate the auto_go_stop_radiobtn which
             #   would otherwise open a duplicate Result window (a
@@ -582,12 +584,12 @@ class TicTacToeGUI(tk.Tk):
         """
         # Need to inform player when it's their turn after PC has played.
         if self.mode_selection.get() == 'pvpc' and self.turn_number() == 1:
-            self.whose_turn.set(f'PC played {const.P2_MARK}\n'
+            self.whose_turn.set(f'PC played {P2_MARK}\n'
                                 f'Your turn {const.PLAYER1}')
         else:
-            self.whose_turn.set(f'{const.PLAYER1} plays {const.P1_MARK}')
+            self.whose_turn.set(f'{const.PLAYER1} plays {P1_MARK}')
 
-        self.whose_turn_lbl.config(bg=const.COLOR['result_bg'])
+        self.whose_turn_lbl.config(bg=COLOR['result_bg'])
 
     def human_turn(self, played_lbl: tk) -> None:
         """
@@ -607,19 +609,19 @@ class TicTacToeGUI(tk.Tk):
         #  At start of a new game, turn # = 0.
         #  On even PvPC games, pc will have already played 1st turn.
         def h_plays_p1():
-            played_lbl['text'] = const.P1_MARK
-            self.whose_turn.set(f'{const.PLAYER2} plays {const.P2_MARK}')
-            self.whose_turn_lbl.config(bg=const.COLOR['tk_white'])
+            played_lbl['text'] = P1_MARK
+            self.whose_turn.set(f'{const.PLAYER2} plays {P2_MARK}')
+            self.whose_turn_lbl.config(bg=COLOR['tk_white'])
 
         def h_plays_p2():
-            played_lbl['text'] = const.P2_MARK
-            played_lbl.config(fg=const.COLOR['tk_white'])
+            played_lbl['text'] = P2_MARK
+            played_lbl.config(fg=COLOR['tk_white'])
             self.your_turn_player1()
 
         def h_plays_p1_v_pc():
-            played_lbl['text'] = const.P1_MARK
-            self.whose_turn_lbl.config(bg=const.COLOR['tk_white'])
-            self.whose_turn.set(f'PC plays {const.P2_MARK}')
+            played_lbl['text'] = P1_MARK
+            self.whose_turn_lbl.config(bg=COLOR['tk_white'])
+            self.whose_turn.set(f'PC plays {P2_MARK}')
 
         if played_lbl['text'] == ' ':
             if self.mode_selection.get() == 'pvp':
@@ -652,7 +654,7 @@ class TicTacToeGUI(tk.Tk):
                 app.update_idletasks()
 
                 if self.turn_number() >= 5:
-                    self.check_winner(const.P1_MARK)
+                    self.check_winner(P1_MARK)
 
                 if self.turn_number() < 9 and not self.winner_found:
                     self.pc_turn()
@@ -665,7 +667,7 @@ class TicTacToeGUI(tk.Tk):
         """
         In PvP and PvPC modes (or any non-auto mode), provide alternate
         colors for Player1 and Player2 marks. Default COLOR
-        (const.COLOR['mark_fg']) is set in setup_game_board().
+        (COLOR['mark_fg']) is set in setup_game_board().
         This method changes that to an alternate fg.
 
         :param _id: The board label's list index of the played square.
@@ -673,7 +675,7 @@ class TicTacToeGUI(tk.Tk):
         """
 
         if not self.display_automode:
-            self.board_labels[_id].config(fg=const.COLOR['tk_white'])
+            self.board_labels[_id].config(fg=COLOR['tk_white'])
 
     def pc_turn(self) -> None:
         """
@@ -705,16 +707,19 @@ class TicTacToeGUI(tk.Tk):
 
             # Preference: all PC moves are random.
             if self.choose_pc_pref.get() == 'PC plays random':
-                self.play_random(turn_number, const.P2_MARK)
+                self.play_random(turn_number, P2_MARK)
 
             # Preference: play the center when it is available.
             elif self.choose_pc_pref.get() == 'PC plays center':
                 if self.board_labels[4]['text'] == ' ':
-                    self.board_labels[4]['text'] = const.P2_MARK
+                    self.board_labels[4]['text'] = P2_MARK
                     self.color_the_mark(4)
+            # Preference: strategy, adaptive defense to human's first two turns.
+            elif self.choose_pc_pref.get() == 'PC plays strategy':
+                self.pc_defense(turn_number)
 
-            # Start here when playing 'strategically' or 'prefers corners'.
-            # Play for win.
+            # Prefer now to play for win, then for block, then what's available.
+            # Play to win:
             if turn_number == self.turn_number():
                 for combo in const.WINING_COMBOS:
                     _x, _y, _z = combo
@@ -722,20 +727,22 @@ class TicTacToeGUI(tk.Tk):
                     y_txt = self.board_labels[_y]['text']
                     z_txt = self.board_labels[_z]['text']
 
-                    if x_txt == y_txt == const.P2_MARK and z_txt == ' ':
-                        self.board_labels[_z]['text'] = const.P2_MARK
+                    if x_txt == y_txt == P2_MARK and z_txt == ' ':
+                        self.board_labels[_z]['text'] = P2_MARK
                         self.color_the_mark(_z)
                         break
-                    if y_txt == z_txt == const.P2_MARK and x_txt == ' ':
-                        self.board_labels[_x]['text'] = const.P2_MARK
+                    if y_txt == z_txt == P2_MARK and x_txt == ' ':
+                        self.board_labels[_x]['text'] = P2_MARK
                         self.color_the_mark(_x)
                         break
-                    if x_txt == z_txt == const.P2_MARK and y_txt == ' ':
-                        self.board_labels[_y]['text'] = const.P2_MARK
+                    if x_txt == z_txt == P2_MARK and y_txt == ' ':
+                        self.board_labels[_y]['text'] = P2_MARK
                         self.color_the_mark(_y)
                         break
 
-            # Play to block
+            # Play to block:
+            #  Note: Need this separate 'if', not elif or continuation of
+            #  preceding 'if', to prioritize winning over blocking.
             if turn_number == self.turn_number():
                 for combo in const.WINING_COMBOS:
                     _x, _y, _z = combo
@@ -743,34 +750,35 @@ class TicTacToeGUI(tk.Tk):
                     y_txt = self.board_labels[_y]['text']
                     z_txt = self.board_labels[_z]['text']
 
-                    if x_txt == y_txt == const.P1_MARK and z_txt == ' ':
-                        self.board_labels[_z]['text'] = const.P2_MARK
+                    if x_txt == y_txt == P1_MARK and z_txt == ' ':
+                        self.board_labels[_z]['text'] = P2_MARK
                         self.color_the_mark(_z)
                         break
-                    if y_txt == z_txt == const.P1_MARK and x_txt == ' ':
-                        self.board_labels[_x]['text'] = const.P2_MARK
+                    if y_txt == z_txt == P1_MARK and x_txt == ' ':
+                        self.board_labels[_x]['text'] = P2_MARK
                         self.color_the_mark(_x)
                         break
-                    if x_txt == z_txt == const.P1_MARK and y_txt == ' ':
-                        self.board_labels[_y]['text'] = const.P2_MARK
+                    if x_txt == z_txt == P1_MARK and y_txt == ' ':
+                        self.board_labels[_y]['text'] = P2_MARK
                         self.color_the_mark(_y)
                         break
 
-            # Prefer corners, as optioned.
-            if self.choose_pc_pref.get() == 'PC plays corners':
-                for _c in const.CORNERS:
-                    c_txt = self.board_labels[_c]['text']
-                    if turn_number == self.turn_number() and c_txt == ' ':
-                        self.board_labels[_c]['text'] = const.P2_MARK
-                        self.color_the_mark(_c)
-                        break
+                # Strategy defense and obvious moves are taken care of,
+                #   so try a corner strategy to win.
+                if self.choose_pc_pref.get() == 'PC plays strategy':
+                    for _c in const.CORNERS:
+                        c_txt = self.board_labels[_c]['text']
+                        if turn_number == self.turn_number() and c_txt == ' ':
+                            self.board_labels[_c]['text'] = P2_MARK
+                            self.color_the_mark(_c)
+                            break
 
             # If no preferred play available, then play random.
             if turn_number == self.turn_number():
-                self.play_random(turn_number, const.P2_MARK)
+                self.play_random(turn_number, P2_MARK)
 
         if self.turn_number() >= 5:
-            self.check_winner(const.P2_MARK)
+            self.check_winner(P2_MARK)
 
         self.your_turn_player1()
 
@@ -789,6 +797,46 @@ class TicTacToeGUI(tk.Tk):
             if self.board_labels[random_idx]['text'] == ' ':
                 self.board_labels[random_idx]['text'] = mark
                 self.color_the_mark(random_idx)
+
+    def pc_defense(self, turn_number: int) -> None:
+        """
+        A defensive response to human's first two turns in PvPC mode.
+        Purpose is to minimize PC losses.
+
+        :param turn_number: The current turn number, from turn_number().
+        :return: None
+        """
+        # When human starts with a side square, need to play center to
+        #   avoid possibility of a loss.
+        if turn_number == 1 or turn_number == 5:
+            for _s in const.SIDES:
+                s_txt = self.board_labels[_s]['text']
+                if s_txt == P1_MARK:
+                    if self.board_labels[4]['text'] == ' ':
+                        self.board_labels[4]['text'] = P2_MARK
+                        self.color_the_mark(4)
+                        break
+        # When human is on two adjacent side squares, need to defend with
+        #   PC play to the common corner to avoid possibility of a loss.
+        if turn_number == 3:
+            side_list = []
+            for _s in const.SIDES:
+                s_txt = self.board_labels[_s]['text']
+                if s_txt == P1_MARK:
+                    side_list.append(_s)
+
+            if side_list == [1, 3] and self.board_labels[0]['text'] == ' ':
+                self.board_labels[0]['text'] = P2_MARK
+                self.color_the_mark(0)
+            elif side_list == [1, 5] and self.board_labels[2]['text'] == ' ':
+                self.board_labels[2]['text'] = P2_MARK
+                self.color_the_mark(2)
+            elif side_list == [3, 7] and self.board_labels[6]['text'] == ' ':
+                self.board_labels[6]['text'] = P2_MARK
+                self.color_the_mark(6)
+            elif side_list == [5, 7] and self.board_labels[8]['text'] == ' ':
+                self.board_labels[8]['text'] = P2_MARK
+                self.color_the_mark(8)
 
     def turn_number(self) -> int:
         """
@@ -810,7 +858,7 @@ class TicTacToeGUI(tk.Tk):
         """
 
         def award_points(winning_mark):
-            if winning_mark == const.P1_MARK:
+            if winning_mark == P1_MARK:
                 self.p1_points += 1
             else:
                 self.p2_points += 1
@@ -872,18 +920,18 @@ class TicTacToeGUI(tk.Tk):
         """
         _x, _y, _z = combo
 
-        app.after(10, lambda: self.board_labels[_x].config(bg=const.COLOR['sq_won']))
-        app.after(200, lambda: self.board_labels[_y].config(bg=const.COLOR['sq_won']))
-        app.after(400, lambda: self.board_labels[_z].config(bg=const.COLOR['sq_won']))
+        app.after(10, lambda: self.board_labels[_x].config(bg=COLOR['sq_won']))
+        app.after(200, lambda: self.board_labels[_y].config(bg=COLOR['sq_won']))
+        app.after(400, lambda: self.board_labels[_z].config(bg=COLOR['sq_won']))
 
     def flash_tie(self) -> None:
         """
-        Make entire game board blue (const.COLOR['sq_won']) on a tie game.
+        Make entire game board blue (COLOR['sq_won']) on a tie game.
 
         :return: None
         """
         for lbl in self.board_labels:
-            lbl.config(bg=const.COLOR['sq_won'])
+            lbl.config(bg=COLOR['sq_won'])
             app.update_idletasks()
 
     def window_geometry(self, toplevel: tk) -> None:
@@ -928,7 +976,7 @@ class TicTacToeGUI(tk.Tk):
 
         result_window = tk.Toplevel(self, borderwidth=4, relief='raised')
         result_window.title('Result')
-        result_window.config(bg=const.COLOR['result_bg'])
+        result_window.config(bg=COLOR['result_bg'])
 
         if chk.MY_OS == 'win':  # Windows
             geom = '420x150'
@@ -956,11 +1004,11 @@ class TicTacToeGUI(tk.Tk):
 
         result_lbl = tk.Label(result_window, text=result_msg,
                               font=self.font['report'],
-                              bg=const.COLOR['result_bg'])
+                              bg=COLOR['result_bg'])
 
         self.block_all_player_action()
         self.whose_turn.set('Game pending...')
-        self.whose_turn_lbl.config(bg=const.COLOR['tk_white'])
+        self.whose_turn_lbl.config(bg=COLOR['tk_white'])
 
         # Need to update players' cumulative wins in the app window.
         self.p1_score.set(self.p1_points)
@@ -1042,13 +1090,13 @@ class TicTacToeGUI(tk.Tk):
             if self.prev_game_num.get() % 2 == 0:
                 self.your_turn_player1()
             else:
-                self.whose_turn.set(f'{const.PLAYER2} plays {const.P2_MARK}')
-                self.whose_turn_lbl.config(bg=const.COLOR['tk_white'])
+                self.whose_turn.set(f'{const.PLAYER2} plays {P2_MARK}')
+                self.whose_turn_lbl.config(bg=COLOR['tk_white'])
 
         elif self.mode_selection.get() == 'pvpc':
             if self.prev_game_num.get() % 2 != 0:
-                self.whose_turn.set(f'PC plays {const.P2_MARK}')
-                self.whose_turn_lbl.config(bg=const.COLOR['tk_white'])
+                self.whose_turn.set(f'PC plays {P2_MARK}')
+                self.whose_turn_lbl.config(bg=COLOR['tk_white'])
 
                 self.pc_turn()
             else:
@@ -1114,7 +1162,7 @@ class TicTacToeGUI(tk.Tk):
         self.setup_game_board()
         self.reset_game_and_score()
         self.whose_turn.set('PC autoplay')
-        self.whose_turn_lbl.config(bg=const.COLOR['tk_white'])
+        self.whose_turn_lbl.config(bg=COLOR['tk_white'])
 
         self.auto_turns_lbl.grid(row=0, column=2, rowspan=2,
                                  padx=(0, 8), pady=(0, 0), sticky=tk.SE)
@@ -1172,13 +1220,13 @@ class TicTacToeGUI(tk.Tk):
         if len(self.auto_marks) > 0:
             if self.who_autostarts['text'] == 'Player 1 starts':
                 # All games start with p1_mark.
-                self.auto_marks = self.auto_marks.lstrip(const.P2_MARK)
+                self.auto_marks = self.auto_marks.lstrip(P2_MARK)
             else:
                 # Games alternate starts between p1_mark and p2_mark.
                 if self.prev_game_num.get() % 2 == 0:
-                    self.auto_marks = self.auto_marks.lstrip(const.P2_MARK)
+                    self.auto_marks = self.auto_marks.lstrip(P2_MARK)
                 else:
-                    self.auto_marks = self.auto_marks.lstrip(const.P1_MARK)
+                    self.auto_marks = self.auto_marks.lstrip(P1_MARK)
 
         self.setup_game_board()
         self.unbind_game_board()
@@ -1192,8 +1240,8 @@ class TicTacToeGUI(tk.Tk):
         """
         # String of player marks is shortened one character per turn played and
         #  when an autoplay option is set to always begin with p1_mark.
-        marks1 = const.P1_MARK * 500
-        marks2 = const.P2_MARK * 500
+        marks1 = P1_MARK * 500
+        marks2 = P2_MARK * 500
 
         self.auto_marks = ''.join(map(lambda m1, m2: m1 + m2, marks1, marks2))
 
@@ -1261,13 +1309,13 @@ class TicTacToeGUI(tk.Tk):
                 y_txt = self.board_labels[_y]['text']
                 z_txt = self.board_labels[_z]['text']
 
-                if x_txt == y_txt == const.P1_MARK and z_txt == ' ':
+                if x_txt == y_txt == P1_MARK and z_txt == ' ':
                     self.board_labels[_z]['text'] = mark
                     break
-                if y_txt == z_txt == const.P1_MARK and x_txt == ' ':
+                if y_txt == z_txt == P1_MARK and x_txt == ' ':
                     self.board_labels[_x]['text'] = mark
                     break
-                if x_txt == z_txt == const.P1_MARK and y_txt == ' ':
+                if x_txt == z_txt == P1_MARK and y_txt == ' ':
                     self.board_labels[_y]['text'] = mark
                     break
 
@@ -1279,13 +1327,13 @@ class TicTacToeGUI(tk.Tk):
                 y_txt = self.board_labels[_y]['text']
                 z_txt = self.board_labels[_z]['text']
 
-                if x_txt == y_txt == const.P2_MARK and z_txt == ' ':
+                if x_txt == y_txt == P2_MARK and z_txt == ' ':
                     self.board_labels[_z]['text'] = mark
                     break
-                if y_txt == z_txt == const.P2_MARK and x_txt == ' ':
+                if y_txt == z_txt == P2_MARK and x_txt == ' ':
                     self.board_labels[_x]['text'] = mark
                     break
-                if x_txt == z_txt == const.P2_MARK and y_txt == ' ':
+                if x_txt == z_txt == P2_MARK and y_txt == ' ':
                     self.board_labels[_y]['text'] = mark
                     break
 
@@ -1376,15 +1424,15 @@ class TicTacToeGUI(tk.Tk):
         _x, _y, _z = combo
 
         def winner_show():
-            self.board_labels[_x].config(text=mark, bg=const.COLOR['sq_won'])
-            self.board_labels[_y].config(text=mark, bg=const.COLOR['sq_won'])
-            self.board_labels[_z].config(text=mark, bg=const.COLOR['sq_won'])
+            self.board_labels[_x].config(text=mark, bg=COLOR['sq_won'])
+            self.board_labels[_y].config(text=mark, bg=COLOR['sq_won'])
+            self.board_labels[_z].config(text=mark, bg=COLOR['sq_won'])
             app.update_idletasks()
 
         def winner_erase():
-            self.board_labels[_x].config(text=' ', bg=const.COLOR['sq_not_won'])
-            self.board_labels[_y].config(text=' ', bg=const.COLOR['sq_not_won'])
-            self.board_labels[_z].config(text=' ', bg=const.COLOR['sq_not_won'])
+            self.board_labels[_x].config(text=' ', bg=COLOR['sq_not_won'])
+            self.board_labels[_y].config(text=' ', bg=COLOR['sq_not_won'])
+            self.board_labels[_z].config(text=' ', bg=COLOR['sq_not_won'])
 
         app.after(1, winner_show)
         app.after(300, winner_erase)
