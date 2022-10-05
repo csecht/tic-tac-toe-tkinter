@@ -26,11 +26,11 @@ CORNERS = [0, 2, 6, 8]
 
 SIDES = [1, 3, 5, 7]
 
-# Milliseconds for after(), pause between turns in play PC mode.
-PLAY_AFTER = 600
-
-# Milliseconds for after(), pause between autoplay turns and game turnovers.
-AUTO_AFTER = 300
+# Milliseconds, used in after() calls.
+PLAY_AFTER = 600  # PC response time for PvPC mode.
+AUTO_FAST = 100  # Fast cycle time for all autoplay modes.
+AUTO_SLOW = 800  # Slow cycle time for all autoplay modes.
+AUTO_SHOW = 1  # Necessary for proper auto_flash_win() operation.
 
 # Foreground and background colors.
 COLOR = {'score_fg': 'DodgerBlue4',
@@ -44,6 +44,8 @@ COLOR = {'score_fg': 'DodgerBlue4',
          'radiobtn_bg': 'DodgerBlue1',
          }
 
+# TIES (32) and WINS (1884) are all possible end-game board configurations,
+#   in index order; 3 rows x 3 col indices: 012345678.
 TIES = (
     'OOXXOOOXX', 'OOXXXOOOX', 'OOXXXOOXO', 'OOXXXOOXX', 'OXOOOXXOX', 'OXOOXOXOX',
     'OXOOXXXOO', 'OXOOXXXOX', 'OXOXOOXOX', 'OXOXOXXOX', 'OXOXXOOOX', 'OXOXXOXOX',

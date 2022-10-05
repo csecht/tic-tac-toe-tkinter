@@ -55,19 +55,23 @@ class TicTacToeGUI(tk.Tk):
     # Using __slots__ for Class attributes gives slight reduction of memory
     #   usage and possible performance improvement.
     __slots__ = (
-        'after_id', 'auto_marks', 'auto_go_stop_radiobtn', 'auto_go_stop_txt',
+        'after_id', 'auto_erase', 'auto_marks',
+        'auto_go_stop_radiobtn', 'auto_go_stop_txt',
         'auto_random_mode', 'auto_strategy_mode', 'auto_center_mode',
         'auto_turns_header', 'auto_turns_lbl', 'auto_turns_remaining',
-        'autoplay_on', 'board_labels', 'choose_pc_pref',
-        'curr_pmode', 'display_automode', 'font', 'mode_selection',
+        'autoplay_on', 'autospeed_fast', 'autospeed_lbl',
+        'autospeed_selection', 'autospeed_slow', 'board_labels',
+        'choose_pc_pref', 'curr_pmode', 'display_automode', 'font',
+        'mode_selection',
         'p1_points', 'p1_score', 'p2_points', 'p2_score',
         'player1_header', 'player1_score_lbl',
         'player2_header', 'player2_score_lbl',
         'prev_game_num', 'prev_game_num_header', 'prev_game_num_lbl',
         'pvp_mode', 'pvpc_mode', 'quit_button', 'result_calls',
         'resultwin_geometry', 'result_window_open', 'score_header',
-        'separator', 'ties_header', 'ties_lbl', 'ties_num', 'titlebar_offset',
-        'who_autostarts', 'whose_turn', 'whose_turn_lbl', 'winner_found',
+        'separator', 'ties_header', 'ties_lbl', 'ties_num',
+        'titlebar_offset', 'who_autostarts', 'whose_turn',
+        'whose_turn_lbl', 'winner_found',
     )
 
     def __init__(self):
@@ -97,7 +101,7 @@ class TicTacToeGUI(tk.Tk):
         self.player1_score_lbl = tk.Label()
         self.player2_score_lbl = tk.Label()
         self.ties_header = tk.Label()
-        self.ties_num = tk.IntVar(value=0)
+        self.ties_num = tk.IntVar()
         self.ties_lbl = tk.Label()
 
         # Play action widgets.
@@ -113,6 +117,11 @@ class TicTacToeGUI(tk.Tk):
         self.auto_go_stop_radiobtn = tk.Radiobutton()
         self.auto_go_stop_txt = tk.StringVar()
         self.who_autostarts = ttk.Button()
+        self.autospeed_lbl = tk.Label()
+        self.autospeed_selection = tk.StringVar()
+        self.autospeed_fast = tk.Radiobutton()
+        self.autospeed_slow = tk.Radiobutton()
+        self.auto_erase = 0
 
         self.quit_button = ttk.Button()
 
@@ -135,6 +144,8 @@ class TicTacToeGUI(tk.Tk):
     def configure_widgets(self) -> None:
         """Initial configurations of app window widgets."""
         ttk.Style().theme_use('alt')
+
+        self.ties_num.set(0)
 
         self.font = {
             'sm_button': ('TkHeadingFont', 8),
@@ -260,6 +271,20 @@ class TicTacToeGUI(tk.Tk):
                                           borderwidth=2,
                                           indicatoron=False,
                                           command=self.auto_command)
+        self.autospeed_lbl.config(text='Auto-speed',
+                                  font=self.font['condensed'])
+        self.autospeed_fast.config(text='Fast',
+                                   font=self.font['condensed'],
+                                   variable=self.autospeed_selection,
+                                   value='fast',
+                                   command=self.autospeed_control)
+        self.autospeed_slow.config(text='Slow',
+                                   font=self.font['condensed'],
+                                   variable=self.autospeed_selection,
+                                   value='slow',
+                                   command=self.autospeed_control)
+        self.autospeed_slow.select()  # Set starting/default auto-speed.
+
         self.auto_go_stop_txt.set('Start auto')
         self.auto_go_stop_radiobtn.config(state=tk.DISABLED)
 
@@ -419,6 +444,21 @@ class TicTacToeGUI(tk.Tk):
 
         self.auto_go_stop_radiobtn.grid(
             row=8, column=1, rowspan=2, padx=8, pady=(6, 0), sticky=tk.W)
+        self.autospeed_lbl.grid(
+            row=8, column=1,
+            rowspan=2, columnspan=2,
+            padx=(0, 60), pady=(6, 0),
+            sticky=tk.E)
+        self.autospeed_fast.grid(
+            row=9, column=1,
+            columnspan=2,
+            padx=(0, 100), pady=(16, 0),
+            sticky=tk.E)
+        self.autospeed_slow.grid(
+            row=9, column=1,
+            columnspan=2,
+            padx=(0, 40), pady=(16, 0),
+            sticky=tk.E)
 
         if chk.MY_OS in 'win, dar':
             padx = (5, 0)
@@ -808,7 +848,7 @@ class TicTacToeGUI(tk.Tk):
         """
         # When human starts with a side square, need to play center to
         #   avoid possibility of a loss.
-        if turn_number == 1 or turn_number == 5:
+        if turn_number in (1, 5):
             for _s in const.SIDES:
                 s_txt = self.board_labels[_s]['text']
                 if s_txt == P1_MARK:
@@ -883,11 +923,12 @@ class TicTacToeGUI(tk.Tk):
                     award_points(mark)
                     self.auto_flash_win(combo, mark)
                     break
-                else:  # Mode selection is pvp or pvpc.
-                    award_points(mark)
-                    self.flash_win(combo)
-                    self.display_result(f'{mark} WINS!')
-                    break
+
+                # Not an auto- mode, so mode selection is pvp or pvpc.
+                award_points(mark)
+                self.flash_win(combo)
+                self.display_result(f'{mark} WINS!')
+                break
 
         if self.turn_number() == 9 and not self.winner_found:
             self.winner_found = True
@@ -1257,6 +1298,27 @@ class TicTacToeGUI(tk.Tk):
         else:
             self.who_autostarts['text'] = 'Player 1 starts'
 
+    def autospeed_control(self) -> int:
+        """
+        Set after() times used in auto_flash_win() and autoplay modes.
+        Called as Radiobutton command from self.autospeed_fast and
+        self.autospeed_slow.
+        Called from auto_flash_win() to set time for auto_erase.
+
+        :return: Milliseconds to use in after() calls.
+        """
+
+        if self.autospeed_selection.get() == 'fast':
+            auto_after = const.AUTO_FAST
+        else:
+            auto_after = const.AUTO_SLOW
+
+        # Note: Erase time needs to be less than auto_after time for
+        #   proper display of game board winner/result flash.
+        self.auto_erase = int(auto_after * 0.9)
+
+        return auto_after
+
     def autoplay_random(self) -> None:
         """
         Automatically play computer vs. computer for 1000 turns
@@ -1284,7 +1346,8 @@ class TicTacToeGUI(tk.Tk):
 
             # Need a pause so user can see what plays were made; allows
             #   auto_stop() to break the call cycle.
-            self.after_id = app.after(const.AUTO_AFTER, self.autoplay_random)
+            self.after_id = app.after(self.autospeed_control(),
+                                      self.autoplay_random)
         else:
             self.auto_stop('ended')
 
@@ -1345,7 +1408,7 @@ class TicTacToeGUI(tk.Tk):
         """
         Automatically play computer vs. computer for 1000 turns
         (~120 games) or until stopped by user. Each turn is played on a
-        timed interval set by the const.AUTO_AFTER time used in the
+        timed interval set by the self.autospeed_control() time used in the
         after_id caller, so one turn per call. First play is at a
         random position, subsequent plays follow win or block rules.
 
@@ -1370,7 +1433,8 @@ class TicTacToeGUI(tk.Tk):
 
             # Need a pause so user can see what plays were made and also
             #   allow auto_stop() to break the call cycle.
-            self.after_id = app.after(const.AUTO_AFTER, self.autoplay_strategy)
+            self.after_id = app.after(self.autospeed_control(),
+                                      self.autoplay_strategy)
         else:
             self.auto_stop('ended')
 
@@ -1378,8 +1442,8 @@ class TicTacToeGUI(tk.Tk):
         """
         Automatically play computer vs. computer for 1000 turns
         (~120 games) or until stopped by user. Each turn is played on a
-        timed interval set by the utils.AUTO_AFTER time used in the
-        after_id caller, so one turn per call. First play is at the
+        timed interval set by the autospeed_control() time used in the
+        after_id caller, so, one turn per call. First play is at the
         center position, subsequent plays follow win or block rules.
 
         :return: None
@@ -1406,7 +1470,8 @@ class TicTacToeGUI(tk.Tk):
 
             # Need a pause so user can see what plays were made and also
             #   allow auto_stop() to break the call cycle.
-            self.after_id = app.after(const.AUTO_AFTER, self.autoplay_center)
+            self.after_id = app.after(self.autospeed_control(),
+                                      self.autoplay_center)
         else:
             self.auto_stop('ended')
 
@@ -1434,11 +1499,12 @@ class TicTacToeGUI(tk.Tk):
             self.board_labels[_y].config(text=' ', bg=COLOR['sq_not_won'])
             self.board_labels[_z].config(text=' ', bg=COLOR['sq_not_won'])
 
-        app.after(1, winner_show)
-        app.after(300, winner_erase)
+        self.autospeed_control()  # Set auto_erase time.
+        app.after(const.AUTO_SHOW, winner_show)
+        app.after(self.auto_erase, winner_erase)
 
-        # Need to allow idle time for auto_setup to complete given auto_after
-        #   time; keeps auto_marks in correct register.
+        # Need to allow idle time for auto_setup to complete given
+        #   autospeed_control() time; keeps auto_marks in correct register.
         app.after_idle(self.auto_setup)
 
 
