@@ -7,6 +7,8 @@ PLAY_AFTER, AUTO_AFTER: ms integers for tk after() function.
 """
 # Copyright (C) 2022 C.S. Echt under GNU General Public License'
 
+from . import platform_check
+
 # Used only for display of player ID.
 PLAYER1 = 'PLAYER 1'
 PLAYER2 = 'PLAYER 2'
@@ -43,6 +45,27 @@ COLOR = {'score_fg': 'DodgerBlue4',
          'sq_mouseover': 'grey15',
          'radiobtn_bg': 'DodgerBlue1',
          }
+
+FONT = {
+    'sm_button': ('TkHeadingFont', 8),
+    'who': ('TkHeadingFont', 7, 'italic bold'),
+    'button': ('TkHeadingFont', 8, 'bold'),
+    'scores': ('TkHeadingFont', 9),
+    'report': ('TkHeadingFont', 9, 'italic bold'),
+    'condensed': ('TkTooltipFont', 8),
+    'mark': ('TkFixedFont', 50),
+}
+
+# Need to apply OS-specific font adjustments.
+if platform_check.MY_OS == 'lin':
+    FONT['report'] = ('TkHeadingFont', 10, 'italic bold')
+elif platform_check.MY_OS == 'dar':
+    FONT['sm_button'] = ('TkHeadingFont', 10)
+    FONT['who'] = ('TkHeadingFont', 11, 'italic bold')
+    FONT['button'] = ('TkHeadingFont', 11, 'bold')
+    FONT['scores'] = ('TkHeadingFont', 12)
+    FONT['report'] = ('TkHeadingFont', 13, 'italic bold')
+    FONT['condensed'] = ('TkTooltipFont', 10)
 
 # TIES (32) and WINS (1884) are all possible end-game board configurations,
 #   in index order; 3 rows x 3 col indices: 012345678.

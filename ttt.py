@@ -36,7 +36,7 @@ except (ImportError, ModuleNotFoundError) as error:
 
 # Local program imports:
 from ttt_utils import const, utils, platform_check as chk
-from ttt_utils.const import P1_MARK, P2_MARK, COLOR
+from ttt_utils.const import P1_MARK, P2_MARK, COLOR, FONT
 
 
 class TicTacToeGUI(tk.Tk):
@@ -61,7 +61,7 @@ class TicTacToeGUI(tk.Tk):
         'auto_turns_header', 'auto_turns_lbl', 'auto_turns_remaining',
         'autoplay_on', 'autospeed_fast', 'autospeed_lbl',
         'autospeed_selection', 'autospeed_slow', 'board_labels',
-        'choose_pc_pref', 'curr_pmode', 'display_automode', 'font',
+        'choose_pc_pref', 'curr_pmode', 'display_automode',
         'mode_selection',
         'p1_points', 'p1_score', 'p2_points', 'p2_score',
         'player1_header', 'player1_score_lbl',
@@ -138,8 +138,6 @@ class TicTacToeGUI(tk.Tk):
         self.winner_found = False  # Used for game flow control.
         self.quit_button = ttk.Button()
 
-        self.font = {}  # Dictionary is filled in configure_widgets().
-
         self.configure_widgets()
         self.grid_widgets()
 
@@ -149,27 +147,6 @@ class TicTacToeGUI(tk.Tk):
 
         self.prev_game_num.set(0)
         self.ties_num.set(0)
-
-        self.font = {
-            'sm_button': ('TkHeadingFont', 8),
-            'who': ('TkHeadingFont', 7, 'italic bold'),
-            'button': ('TkHeadingFont', 8, 'bold'),
-            'scores': ('TkHeadingFont', 9),
-            'report': ('TkHeadingFont', 9, 'italic bold'),
-            'condensed': ('TkTooltipFont', 8),
-            'mark': ('TkFixedFont', 50),
-        }
-
-        # Need to apply OS-specific font adjustments.
-        if chk.MY_OS == 'lin':
-            self.font['report'] = ('TkHeadingFont', 10, 'italic bold')
-        elif chk.MY_OS == 'dar':
-            self.font['sm_button'] = ('TkHeadingFont', 10)
-            self.font['who'] = ('TkHeadingFont', 11, 'italic bold')
-            self.font['button'] = ('TkHeadingFont', 11, 'bold')
-            self.font['scores'] = ('TkHeadingFont', 12)
-            self.font['report'] = ('TkHeadingFont', 13, 'italic bold')
-            self.font['condensed'] = ('TkTooltipFont', 10)
 
         # Need tk to match system's default white shade.
         if chk.MY_OS == 'dar':
@@ -181,53 +158,53 @@ class TicTacToeGUI(tk.Tk):
 
         # Player's turn widgets.
         self.prev_game_num_header.config(text='Games played',
-                                         font=self.font['condensed'])
+                                         font=FONT['condensed'])
         self.prev_game_num_lbl.config(textvariable=self.prev_game_num,
-                                      font=self.font['condensed'])
+                                      font=FONT['condensed'])
         self.whose_turn_lbl.config(textvariable=self.whose_turn, height=4,
-                                   font=self.font['who'])
+                                   font=FONT['who'])
 
         self.your_turn_player1()  # Starting prompt for Player1 to begin play.
 
         self.auto_turns_header.config(text='Turns to go',
-                                      font=self.font['condensed'])
+                                      font=FONT['condensed'])
         self.auto_turns_lbl.config(textvariable=self.auto_turns_remaining,
-                                   font=self.font['condensed'])
+                                   font=FONT['condensed'])
 
         # Players' scores widgets:
         # ︴squiggle symbol from https://coolsymbol.com/line-symbols.html
         self.score_header.config(
-            text='Score ︴', font=self.font['scores'],
+            text='Score ︴', font=FONT['scores'],
             fg=COLOR['score_fg'])
         self.player1_header.config(
-            text='Player 1:', font=self.font['scores'],
+            text='Player 1:', font=FONT['scores'],
             fg=COLOR['score_fg'])
         self.player2_header.config(
-            text='Player 2:', font=self.font['scores'],
+            text='Player 2:', font=FONT['scores'],
             fg=COLOR['score_fg'])
         self.player1_score_lbl.config(
-            textvariable=self.p1_score, font=self.font['scores'],
+            textvariable=self.p1_score, font=FONT['scores'],
             fg=COLOR['score_fg'])
         self.player2_score_lbl.config(
-            textvariable=self.p2_score, font=self.font['scores'],
+            textvariable=self.p2_score, font=FONT['scores'],
             fg=COLOR['score_fg'])
         self.ties_header.config(
-            text='Ties:', font=self.font['scores'],
+            text='Ties:', font=FONT['scores'],
             fg=COLOR['score_fg'])
         self.ties_lbl.config(
-            textvariable=self.ties_num, font=self.font['scores'],
+            textvariable=self.ties_num, font=FONT['scores'],
             fg=COLOR['score_fg'])
 
         # Play mode control widgets:
         self.pvp_mode.config(text='Player v Player',
-                             font=self.font['condensed'],
+                             font=FONT['condensed'],
                              variable=self.mode_selection,
                              value='pvp',
                              command=self.mode_control)
         self.pvp_mode.select()  # Start default mode is Player v Player.
 
         self.pvpc_mode.config(text='Player v PC',
-                              font=self.font['condensed'],
+                              font=FONT['condensed'],
                               variable=self.mode_selection,
                               value='pvpc',
                               command=self.mode_control)
@@ -235,14 +212,14 @@ class TicTacToeGUI(tk.Tk):
         # choose_pc_pref is enabled as readonly when pvpc_mode is selected.
         #   Set drop-down list font size to match displayed font size.
         #   Set random, 1st in tuple, as the default.
-        self.choose_pc_pref.config(font=self.font['condensed'],
+        self.choose_pc_pref.config(font=FONT['condensed'],
                                    width=14,
                                    values=('PC plays random',
                                            # 'PC plays corners',
                                            'PC plays center',
                                            'PC plays strategy'),
                                    state=tk.DISABLED)
-        self.option_add("*TCombobox*Font", self.font['condensed'])
+        self.option_add("*TCombobox*Font", FONT['condensed'])
         if chk.MY_OS == 'dar':
             self.choose_pc_pref.config(width=13)
         self.choose_pc_pref.current(0)
@@ -252,22 +229,22 @@ class TicTacToeGUI(tk.Tk):
         self.separator.configure(orient='horizontal')
 
         self.auto_random_mode.config(text='Autoplay random',
-                                     font=self.font['condensed'],
+                                     font=FONT['condensed'],
                                      variable=self.mode_selection,
                                      value='auto-random',
                                      command=self.mode_control)
         self.auto_strategy_mode.config(text='Autoplay strategy\n(random 1st)',
-                                       font=self.font['condensed'],
+                                       font=FONT['condensed'],
                                        variable=self.mode_selection,
                                        value='auto-strategy',
                                        command=self.mode_control)
         self.auto_center_mode.config(text='Autoplay center\n(center 1st)',
-                                     font=self.font['condensed'],
+                                     font=FONT['condensed'],
                                      variable=self.mode_selection,
                                      value='auto-center',
                                      command=self.mode_control)
         self.auto_go_stop_radiobtn.config(textvariable=self.auto_go_stop_txt,
-                                          font=self.font['button'],
+                                          font=FONT['button'],
                                           variable=self.autoplay_on,
                                           fg=COLOR['mark_fg'],
                                           bg=COLOR['radiobtn_bg'],
@@ -275,18 +252,18 @@ class TicTacToeGUI(tk.Tk):
                                           indicatoron=False,
                                           command=self.auto_command)
         self.autospeed_lbl.config(text='Auto-speed',
-                                  font=self.font['condensed'])
+                                  font=FONT['condensed'])
         self.autospeed_fast.config(text='Fast',
-                                   font=self.font['condensed'],
+                                   font=FONT['condensed'],
                                    variable=self.autospeed_selection,
                                    value='fast',
                                    command=self.autospeed_control)
         self.autospeed_slow.config(text='Slow',
-                                   font=self.font['condensed'],
+                                   font=FONT['condensed'],
                                    variable=self.autospeed_selection,
                                    value='slow',
                                    command=self.autospeed_control)
-        self.autospeed_slow.select()  # Set starting/default auto-speed.
+        self.autospeed_slow.select()  # Set default auto-speed to 'slow'.
 
         self.auto_go_stop_txt.set('Start auto')
         self.auto_go_stop_radiobtn.config(state=tk.DISABLED)
@@ -301,7 +278,7 @@ class TicTacToeGUI(tk.Tk):
                   background=[('pressed', COLOR['tk_white']),
                               ('active', COLOR['radiobtn_bg'])],
                   )
-        style.configure('My.TButton', font=self.font['sm_button'])
+        style.configure('My.TButton', font=FONT['sm_button'])
         self.who_autostarts.configure(style="My.TButton",
                                       text='Player 1 starts', width=14,
                                       state=tk.DISABLED,
@@ -489,7 +466,7 @@ class TicTacToeGUI(tk.Tk):
             lbl.config(text=' ', height=1, width=2,
                        bg=COLOR['sq_not_won'],
                        fg=COLOR['mark_fg'],
-                       font=self.font['mark'],
+                       font=FONT['mark'],
                        )
 
             if chk.MY_OS == 'dar':
@@ -1053,7 +1030,7 @@ class TicTacToeGUI(tk.Tk):
 
         result_lbl = tk.Label(self.result_window,
                               text=result_msg,
-                              font=self.font['report'],
+                              font=FONT['report'],
                               bg=COLOR['result_bg'])
 
         self.block_all_player_action()
@@ -1092,11 +1069,11 @@ class TicTacToeGUI(tk.Tk):
 
         again = tk.Button(self.result_window, text='New Game (\u23CE)',
                           # Unicode Return/Enter key symbol.
-                          font=self.font['button'],
+                          font=FONT['button'],
                           relief='groove', overrelief='raised', border=3,
                           command=restart_game)
         not_again = tk.Button(self.result_window, text='Quit',
-                              font=self.font['sm_button'],
+                              font=FONT['sm_button'],
                               relief='groove', overrelief='raised', border=3,
                               command=lambda: utils.quit_game(mainloop=app))
         self.result_window.bind('<Return>', lambda _: restart_game())
