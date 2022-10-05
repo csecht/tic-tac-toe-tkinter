@@ -68,7 +68,7 @@ class TicTacToeGUI(tk.Tk):
         'player2_header', 'player2_score_lbl',
         'prev_game_num', 'prev_game_num_header', 'prev_game_num_lbl',
         'pvp_mode', 'pvpc_mode', 'quit_button', 'result_calls',
-        'resultwin_geometry', 'result_window_open', 'score_header',
+        'result_window', 'resultwin_geometry', 'score_header',
         'separator', 'ties_header', 'ties_lbl', 'ties_num',
         'titlebar_offset', 'who_autostarts', 'whose_turn',
         'whose_turn_lbl', 'winner_found',
@@ -77,11 +77,11 @@ class TicTacToeGUI(tk.Tk):
     def __init__(self):
         super().__init__()
 
+        # Game stats widgets.
         self.p1_points = 0
         self.p2_points = 0
         self.p1_score = tk.IntVar()
         self.p2_score = tk.IntVar()
-        self.winner_found = False
         self.prev_game_num_header = tk.Label()
         self.prev_game_num = tk.IntVar()
         self.prev_game_num_lbl = tk.Label()
@@ -131,10 +131,12 @@ class TicTacToeGUI(tk.Tk):
         self.auto_marks = ''  # Used to dole out autoplay marks in proper register.
         self.display_automode = ''  # Used to display whose_turn.
         self.curr_pmode = ''  # Used to evaluate mode state.
+        self.result_window = None  # Will be a toplevel in display_result().
         self.result_calls = 0  # Allows recording of initial Result window position.
         self.resultwin_geometry = ''  # Used to remember Result window position.
-        self.result_window_open = False  # A flag to prevent duplicate windows.
         self.titlebar_offset = 0  # Used for accurate positioning of Result win.
+        self.winner_found = False  # Used for game flow control.
+        self.quit_button = ttk.Button()
 
         self.font = {}  # Dictionary is filled in configure_widgets().
 
@@ -614,8 +616,11 @@ class TicTacToeGUI(tk.Tk):
             #   game board wasn't reset). So force user to click
             #   'New Game' or 'Quit' in Result window BEFORE selecting an
             #   autoplay mode and clicking on an active auto_go_stop_radiobtn.
-            if self.result_window_open:
-                self.auto_go_stop_radiobtn.config(state=tk.DISABLED)
+            try:
+                if self.result_window.winfo_exists():
+                    self.auto_go_stop_radiobtn.config(state=tk.DISABLED)
+            except AttributeError:
+                pass
 
     def your_turn_player1(self) -> None:
         """
@@ -806,13 +811,14 @@ class TicTacToeGUI(tk.Tk):
 
                 # Strategy defense and obvious moves are taken care of,
                 #   so try a corner strategy to win.
-                if self.choose_pc_pref.get() == 'PC plays strategy':
-                    for _c in const.CORNERS:
-                        c_txt = self.board_labels[_c]['text']
-                        if turn_number == self.turn_number() and c_txt == ' ':
-                            self.board_labels[_c]['text'] = P2_MARK
-                            self.color_the_mark(_c)
-                            break
+                # if self.choose_pc_pref.get() == 'PC plays strategy':
+                #     random.shuffle(const.CORNERS)
+                #     for _c in const.CORNERS:
+                #         c_txt = self.board_labels[_c]['text']
+                #         if turn_number == self.turn_number() and c_txt == ' ':
+                #             self.board_labels[_c]['text'] = P2_MARK
+                #             self.color_the_mark(_c)
+                #             break
 
             # If no preferred play available, then play random.
             if turn_number == self.turn_number():
@@ -849,7 +855,7 @@ class TicTacToeGUI(tk.Tk):
         """
         # When human starts with a side square, need to play center to
         #   avoid possibility of a loss.
-        if turn_number in (1, 5):
+        if turn_number in (1, 3, 5):
             for _s in const.SIDES:
                 s_txt = self.board_labels[_s]['text']
                 if s_txt == P1_MARK:
@@ -1014,37 +1020,39 @@ class TicTacToeGUI(tk.Tk):
         :param result_msg: The result string to display in result window.
         :return: None
         """
-        self.result_window_open = True
 
-        result_window = tk.Toplevel(self, borderwidth=4, relief='raised')
-        result_window.title('Result')
-        result_window.config(bg=COLOR['result_bg'])
+        self.result_window = tk.Toplevel(self,
+                                         bg=COLOR['result_bg'],
+                                         borderwidth=4,
+                                         relief='raised')
+        self.result_window.title('Result')
 
         if chk.MY_OS == 'win':  # Windows
-            geom = '420x150'
+            size = '420x150'
             minw = 270
             minh = 150
         elif chk.MY_OS == 'dar':  # macOS
-            geom = '190x90'
+            size = '190x90'
             minw = 140
             minh = 90
         else:  # Linux
-            geom = '230x100'
+            size = '230x100'
             minw = 180
             minh = 100
 
-        result_window.geometry(geom)
-        result_window.minsize(minw, minh)
+        self.result_window.geometry(size)
+        self.result_window.minsize(minw, minh)
 
         self.result_calls += 1
-        self.window_geometry(result_window)
+        self.window_geometry(self.result_window)
 
         # Need prevent focus shifting to app window which would cover up
         #  the Report window.
-        result_window.attributes('-topmost', True)
-        result_window.focus_force()
+        self.result_window.attributes('-topmost', True)
+        self.result_window.focus_force()
 
-        result_lbl = tk.Label(result_window, text=result_msg,
+        result_lbl = tk.Label(self.result_window,
+                              text=result_msg,
                               font=self.font['report'],
                               bg=COLOR['result_bg'])
 
@@ -1058,12 +1066,12 @@ class TicTacToeGUI(tk.Tk):
 
         def no_exit_on_x():
             messagebox.showinfo(
-                parent=result_window,
+                parent=self.result_window,
                 title='Click a button',
                 detail='Use either "New Game" or "Quit"'
                        ' to close Report window.')
 
-        result_window.protocol('WM_DELETE_WINDOW', no_exit_on_x)
+        self.result_window.protocol('WM_DELETE_WINDOW', no_exit_on_x)
 
         def restart_game():
             """
@@ -1076,24 +1084,23 @@ class TicTacToeGUI(tk.Tk):
             # Need to retain screen position of results window between games in case
             #   user has moved it from default position.
             self.resultwin_geometry = (
-                f'+{result_window.winfo_x()}'
-                f'+{result_window.winfo_y() - self.titlebar_offset}'
+                f'+{self.result_window.winfo_x()}'
+                f'+{self.result_window.winfo_y() - self.titlebar_offset}'
             )
             self.new_game()
-            self.result_window_open = False
-            result_window.destroy()
+            self.result_window.destroy()
 
-        again = tk.Button(result_window, text='New Game (\u23CE)',
+        again = tk.Button(self.result_window, text='New Game (\u23CE)',
                           # Unicode Return/Enter key symbol.
                           font=self.font['button'],
                           relief='groove', overrelief='raised', border=3,
                           command=restart_game)
-        not_again = tk.Button(result_window, text='Quit',
+        not_again = tk.Button(self.result_window, text='Quit',
                               font=self.font['sm_button'],
                               relief='groove', overrelief='raised', border=3,
                               command=lambda: utils.quit_game(mainloop=app))
-        result_window.bind('<Return>', lambda _: restart_game())
-        result_window.bind('<KP_Enter>', lambda _: restart_game())
+        self.result_window.bind('<Return>', lambda _: restart_game())
+        self.result_window.bind('<KP_Enter>', lambda _: restart_game())
 
         result_lbl.pack(pady=3, padx=3)
         again.pack(pady=(0, 0))
