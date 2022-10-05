@@ -83,7 +83,7 @@ class TicTacToeGUI(tk.Tk):
         self.p2_score = tk.IntVar()
         self.winner_found = False
         self.prev_game_num_header = tk.Label()
-        self.prev_game_num = tk.IntVar(value=0)
+        self.prev_game_num = tk.IntVar()
         self.prev_game_num_lbl = tk.Label()
 
         # Player's turn widgets.
@@ -145,6 +145,7 @@ class TicTacToeGUI(tk.Tk):
         """Initial configurations of app window widgets."""
         ttk.Style().theme_use('alt')
 
+        self.prev_game_num.set(0)
         self.ties_num.set(0)
 
         self.font = {
