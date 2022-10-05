@@ -42,11 +42,11 @@ In Autoplay mode, PC plays itself. You can choose to have Player 1 (X) start eve
 
 ### Screenshots
 
-Player wins first game in Player v PC mode. A Result pop-up window prompts user to play again or quit the program. The pop-up window can be repositioned.
+Player (X) wins 3rd game in Player v PC mode. A Result pop-up window prompts user to play again or quit the program. The pop-up window can be repositioned.
 
 ![pvpc-game](images/X_wins_PvPC.png)
 
-Autoplay game in progress with random mode, with PC players alternating start turns, 446 play turns remaining:
+Autoplay game in progress with random mode, with PC players alternating start turns, 818 turns remaining, autoplay speed set to Slow, the default:
 
 ![autoplay-game](images/autoplay.png)
 
