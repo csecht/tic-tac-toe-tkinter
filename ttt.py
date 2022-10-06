@@ -43,14 +43,15 @@ class TicTacToeGUI(tk.Tk):
     """
     Display the tkinter GUI playing board and its control buttons.
     Provide multi-mode play action, with scoring.
-    Methods: configure_widgets, your_turn_player1, grid_widgets,
-        setup_game_board, unbind_game_board, on_enter, on_leave,
-        mode_control, human_turn, pc_turn, play_random, turn_number,
-        check_winner, flash_win, flash_tie, window_geometry, display_result,
-        block_all_player_action, new_game, reset_game_and_score,
-        auto_command, auto_start, auto_stop, auto_setup, auto_turns_limit,
-        autoplay_random, autoengine, autoplay_strategy, autoplay_center,
-        auto_flash_win.
+    Methods: auto_command, auto_flash_win, auto_setup, auto_start,
+    auto_stop, auto_turns_limit, autoengine, autoplay_center,
+    autoplay_random, autoplay_strategy, autospeed_control,
+    autostart_set_who, block_all_player_action, check_winner,
+    color_the_mark, configure_widgets, display_result, flash_tie,
+    flash_win, grid_widgets, human_turn, mode_control, new_game,
+    on_enter, on_leave, pc_defense, pc_turn, play_random,
+    reset_game_and_score, setup_game_board, turn_number,
+    unbind_game_board, window_geometry, your_turn_player1
     """
     # Using __slots__ for Class attributes gives slight reduction of memory
     #   usage and possible performance improvement.
