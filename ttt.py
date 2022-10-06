@@ -36,7 +36,7 @@ except (ImportError, ModuleNotFoundError) as error:
 
 # Local program imports:
 from ttt_utils import const, utils, platform_check as chk
-from ttt_utils.const import P1_MARK, P2_MARK, COLOR, FONT
+from ttt_utils.const import P1_MARK, P2_MARK, MARKS1, MARKS2, COLOR, FONT
 
 
 class TicTacToeGUI(tk.Tk):
@@ -1214,7 +1214,8 @@ class TicTacToeGUI(tk.Tk):
         Stop autoplay method and call Result popup window.
         Disable player game actions (resets when Result window closes).
 
-        :param stop_msg: Information on source of auto_stop call.
+        :param stop_msg: Information on type of auto_stop call; e.g.,
+            "ended", "cancelled", etc.
         :return: None
         """
         if self.after_id:
@@ -1254,17 +1255,15 @@ class TicTacToeGUI(tk.Tk):
 
     def auto_turns_limit(self) -> None:
         """
-        Provide for 1000 alternating pc player marks in autoplay turns;
-        Good for about 120 games.
+        Provide for alternating pc player marks in autoplay turns;
+        If 500 marks per player (values set by const.MARKS*),
+        then 1000 turns yields about 110 games.
 
         :return: None
         """
-        # String of player marks is shortened one character per turn played and
-        #  when an autoplay option is set to always begin with p1_mark.
-        marks1 = P1_MARK * 500
-        marks2 = P2_MARK * 500
-
-        self.auto_marks = ''.join(map(lambda m1, m2: m1 + m2, marks1, marks2))
+        # String of player marks is shortened one character per turn played
+        #   and when an autoplay option is set to always begin with p1_mark.
+        self.auto_marks = ''.join(map(lambda m1, m2: m1 + m2, MARKS1, MARKS2))
 
     def autostart_set_who(self) -> None:
         """
@@ -1344,13 +1343,13 @@ class TicTacToeGUI(tk.Tk):
         :returns: None
         """
 
-        # Play to win.
         for combo in const.WINING_COMBOS:
             _x, _y, _z = combo
             x_txt = self.board_labels[_x]['text']
             y_txt = self.board_labels[_y]['text']
             z_txt = self.board_labels[_z]['text']
 
+            # Play to win.
             if x_txt == y_txt == P1_MARK and z_txt == ' ':
                 self.board_labels[_z]['text'] = mark
                 break
@@ -1402,7 +1401,7 @@ class TicTacToeGUI(tk.Tk):
             # Need to move to next mark for next turn.
             self.auto_marks = self.auto_marks.lstrip(mark)
 
-            # Need a pause so user can see what plays were made and also
+            # Need a pause so user can see what play was made and also
             #   allow auto_stop() to break the call cycle.
             self.after_id = app.after(self.autospeed_control(),
                                       self.autoplay_strategy)

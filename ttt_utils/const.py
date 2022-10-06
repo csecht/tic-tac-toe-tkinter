@@ -1,9 +1,11 @@
 """
-Constants used by ttt.py.
+Constants and configuration settings used in main script.
 PLAYER1, PLAYER2: the displayed player names.
 P1_MARK, P2_MARK: 'X', 'O', respectively, but can be changed.
-WINING_COMBOS: list of tuples.
-PLAY_AFTER, AUTO_AFTER: ms integers for tk after() function.
+MARKS1, MARKS2: string of duplicate marks that determine number of auto turns.
+WINING_COMBOS, CORNERS, SIDES: lists of game board indices.
+PLAY_AFTER, AUTO_FAST, AUTO_SLOW, AUTO_SHOW: ms integers for tk after() function.
+TIES, WINS: unused; tuples of end-game board mark configurations, in index order.
 """
 # Copyright (C) 2022 C.S. Echt under GNU General Public License'
 
@@ -16,6 +18,10 @@ PLAYER2 = 'PLAYER 2'
 # Can use any utf-8 character for play marks.
 P1_MARK = 'X'
 P2_MARK = 'O'
+
+# Set number of auto-player turns; used in auto_turns_limit().
+MARKS1 = P1_MARK * 500
+MARKS2 = P2_MARK * 500
 
 # 3x3 game board indices for winning combinations and corners.
 WINING_COMBOS = [
