@@ -1485,9 +1485,7 @@ if __name__ == '__main__':
 
     utils.manage_args()
 
-    print('ttt.py now running...')
-    # ^^^ If, for some reason, import Path from pathlib is used, then can
-    #  get file name from f'{Path(sys.modules["__main__"].__file__).stem}
+    print(f'{utils.program_name()} now running...')
 
     app = TicTacToeGUI()
     app.title('TIC TAC TOE')

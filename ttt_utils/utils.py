@@ -8,6 +8,7 @@ quit_gui - Safe and informative exit from the program.
 # Standard library imports:
 import argparse
 import sys
+from pathlib import Path
 
 # Local program imports:
 from __main__ import __doc__
@@ -35,6 +36,16 @@ def manage_args() -> None:
         print('====================== ABOUT END ====================')
 
         sys.exit(0)
+
+
+def program_name() -> str:
+    """
+    Extract the main program's file name from the full path.
+    Expected use is for printing and Terminal message display.
+
+    :return: Name of the main script file.
+    """
+    return Path(sys.modules['__main__'].__file__).name
 
 
 def quit_game(mainloop, keybind=None) -> None:
