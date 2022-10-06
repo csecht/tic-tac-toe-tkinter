@@ -1003,8 +1003,8 @@ class TicTacToeGUI(tk.Tk):
             minw = 270
             minh = 150
         elif chk.MY_OS == 'dar':  # macOS
-            size = '190x90'
-            minw = 140
+            size = '200x90'
+            minw = 150
             minh = 90
         else:  # Linux
             size = '230x100'
