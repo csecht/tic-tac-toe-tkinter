@@ -32,6 +32,13 @@ WINING_COMBOS = [
 
 CORNERS = [0, 2, 6, 8]
 
+CORNER_DICT = {
+    0: [1, 3],
+    2: [1, 5],
+    6: [3, 7],
+    8: [5, 7]
+}
+
 SIDES = [1, 3, 5, 7]
 
 # Milliseconds, used in after() calls.

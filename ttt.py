@@ -1331,7 +1331,7 @@ class TicTacToeGUI(tk.Tk):
         Called from autoplay_strategy() and autoplay_center().
 
         :param turn_number: Current turn count from turn_number().
-        :param mark: The played mark character string play.
+        :param mark: The played mark character, as str.
         :returns: None
         """
 
@@ -1369,11 +1369,11 @@ class TicTacToeGUI(tk.Tk):
         # A play to center early is a defensive move when opponent has
         #   played a side; increases TIEs. Is not relevant when mode is
         #   "Autoplay center".
+        # Sort const.SIDES to ascending order in case random.shuffle() is used.
         if self.mode_selection.get() == 'Autoplay strategy':
             if turn_number == self.turn_number() and turn_number < 5:
                 for _s in const.SIDES:
-                    s_txt = self.board_labels[_s]['text']
-                    if s_txt == opponent:
+                    if self.board_labels[_s]['text'] == opponent:
                         if self.board_labels[4]['text'] == ' ':
                             self.board_labels[4]['text'] = mark
                             break
@@ -1382,21 +1382,19 @@ class TicTacToeGUI(tk.Tk):
             #   to the common corner; increases TIEs.
             # With Autoplay strategy and defensive center, get ~ 75% ties.
             # With Autoplay center, results in ~85% ties.
+            # Need const.SIDES in ascending order, so sort() in case random.shuffle is used.
+            const.SIDES.sort()
             if turn_number == self.turn_number() and turn_number < 5:
-                side_list = []
+                sides_played = []
+                # Create list of indices of opponent's played square
                 for _s in const.SIDES:
-                    s_txt = self.board_labels[_s]['text']
-                    if s_txt == opponent:
-                        side_list.append(_s)
+                    if self.board_labels[_s]['text'] == opponent:
+                        sides_played.append(_s)
 
-                if side_list == [1, 3] and self.board_labels[0]['text'] == ' ':
-                    self.board_labels[0]['text'] = mark
-                elif side_list == [1, 5] and self.board_labels[2]['text'] == ' ':
-                    self.board_labels[2]['text'] = mark
-                elif side_list == [3, 7] and self.board_labels[6]['text'] == ' ':
-                    self.board_labels[6]['text'] = mark
-                elif side_list == [5, 7] and self.board_labels[8]['text'] == ' ':
-                    self.board_labels[8]['text'] = mark
+                # Have current player play the appropriate corner.
+                for key, val in const.CORNER_DICT.items():
+                    if self.board_labels[key]['text'] == ' ' and sides_played == val:
+                        self.board_labels[key]['text'] = mark
 
         # No preferred play available, so play random.
         if turn_number == self.turn_number():
