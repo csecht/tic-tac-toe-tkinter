@@ -37,7 +37,7 @@ SIDES = [1, 3, 5, 7]
 # Milliseconds, used in after() calls.
 PLAY_AFTER = 600  # PC response time for PvPC mode.
 AUTO_FAST = 100  # Fast cycle time for all autoplay modes.
-AUTO_SLOW = 800  # Slow cycle time for all autoplay modes.
+AUTO_SLOW = 1000  # Slow cycle time for all autoplay modes.
 AUTO_SHOW = 1  # Necessary for proper auto_flash_win() operation.
 
 # Foreground and background colors.

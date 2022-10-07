@@ -229,18 +229,18 @@ class TicTacToeGUI(tk.Tk):
         self.auto_random_mode.config(text='Autoplay random',
                                      font=FONT['condensed'],
                                      variable=self.mode_selection,
-                                     value='auto-random',
+                                     value='Autoplay random',
                                      command=self.mode_control)
-        self.auto_strategy_mode.config(text='Autoplay strategy\n(random 1st)',
-                                       font=FONT['condensed'],
-                                       variable=self.mode_selection,
-                                       value='auto-strategy',
-                                       command=self.mode_control)
-        self.auto_center_mode.config(text='Autoplay center\n(center 1st)',
+        self.auto_center_mode.config(text='Autoplay center',
                                      font=FONT['condensed'],
                                      variable=self.mode_selection,
-                                     value='auto-center',
+                                     value='Autoplay center',
                                      command=self.mode_control)
+        self.auto_strategy_mode.config(text='Autoplay strategy',
+                                       font=FONT['condensed'],
+                                       variable=self.mode_selection,
+                                       value='Autoplay strategy',
+                                       command=self.mode_control)
         self.auto_go_stop_radiobtn.config(textvariable=self.auto_go_stop_txt,
                                           font=FONT['button'],
                                           variable=self.autoplay_on,
@@ -422,22 +422,16 @@ class TicTacToeGUI(tk.Tk):
             row=7, column=0, columnspan=3, padx=10, sticky=tk.EW)
 
         self.auto_go_stop_radiobtn.grid(
-            row=8, column=1, rowspan=2, padx=8, pady=(6, 0), sticky=tk.W)
+            row=8, column=1, rowspan=2, padx=(16, 0), pady=(6, 0), sticky=tk.W)
         self.autospeed_lbl.grid(
-            row=8, column=1,
-            rowspan=2, columnspan=2,
-            padx=(0, 60), pady=(6, 0),
-            sticky=tk.E)
+            row=8, column=1, rowspan=2, columnspan=2,
+            padx=(0, 54), pady=(6, 0), sticky=tk.E)
         self.autospeed_fast.grid(
-            row=9, column=1,
-            columnspan=2,
-            padx=(0, 100), pady=(16, 0),
-            sticky=tk.E)
+            row=9, column=1, columnspan=2,
+            padx=(0, 100), pady=(16, 0), sticky=tk.E)
         self.autospeed_slow.grid(
-            row=9, column=1,
-            columnspan=2,
-            padx=(0, 40), pady=(16, 0),
-            sticky=tk.E)
+            row=9, column=1, columnspan=2,
+            padx=(0, 40), pady=(16, 0), sticky=tk.E)
 
         if chk.MY_OS in 'win, dar':
             padx = (5, 0)
@@ -445,9 +439,9 @@ class TicTacToeGUI(tk.Tk):
             padx = 0
         self.auto_random_mode.grid(
             row=8, column=0, padx=padx, pady=(4, 0), sticky=tk.W)
-        self.auto_strategy_mode.grid(
-            row=9, column=0, padx=padx, pady=0, sticky=tk.W)
         self.auto_center_mode.grid(
+            row=9, column=0, padx=padx, pady=0, sticky=tk.W)
+        self.auto_strategy_mode.grid(
             row=10, column=0, padx=padx, pady=0, sticky=tk.W)
 
         self.who_autostarts.grid(
@@ -532,11 +526,11 @@ class TicTacToeGUI(tk.Tk):
         # If a game is in progress, ignore any mode selections & post msg.
         if self.turn_number() > 0:
             if self.autoplay_on.get():
-                if mode == 'auto-random':
+                if mode == 'Autoplay random':
                     self.auto_random_mode.deselect()
-                elif mode == 'auto-strategy':
+                elif mode == 'Autoplay strategy':
                     self.auto_strategy_mode.deselect()
-                elif mode == 'auto-center':
+                elif mode == 'Autoplay center':
                     self.auto_center_mode.deselect()
                 elif mode == 'pvp':
                     self.pvp_mode.deselect()
@@ -547,7 +541,7 @@ class TicTacToeGUI(tk.Tk):
                           'or click "Stop auto" button.')
                 self.whose_turn.set(self.display_automode)
 
-            else:
+            else:  # Mode is PvP or PvPC.
                 if self.curr_pmode == 'pvp':
                     self.pvp_mode.select()
                     self.choose_pc_pref.config(state=tk.DISABLED)
@@ -584,8 +578,9 @@ class TicTacToeGUI(tk.Tk):
                 self.auto_go_stop_radiobtn.config(state=tk.NORMAL)
                 self.who_autostarts.configure(state=tk.NORMAL)
 
-            if mode in 'auto-random, auto-strategy, auto-center':
-                self.whose_turn.set('PC autoplay')
+            if 'Autoplay' in mode:
+                self.whose_turn.set(mode)
+                self.display_automode = mode
                 self.whose_turn_lbl.config(bg=COLOR['tk_white'])
             else:
                 self.your_turn_player1()
@@ -834,8 +829,8 @@ class TicTacToeGUI(tk.Tk):
                         self.board_labels[4]['text'] = P2_MARK
                         self.color_the_mark(4)
                         break
-        # When human is on two adjacent side squares, need to defend with
-        #   PC play to the common corner to avoid possibility of a loss.
+        # When human is on two adjacent side squares, defend with play
+        #   to the common corner to avoid possibility of a loss.
         if turn_number == 3:
             side_list = []
             for _s in const.SIDES:
@@ -875,8 +870,6 @@ class TicTacToeGUI(tk.Tk):
         :return: None
         """
 
-        automodes = 'auto-random, auto-strategy, auto-center'
-
         def award_points(winning_mark):
             if winning_mark == P1_MARK:
                 self.p1_points += 1
@@ -899,7 +892,7 @@ class TicTacToeGUI(tk.Tk):
                 # with open('wins', 'a') as file:
                 #     file.write(winlist)
 
-                if self.mode_selection.get() in automodes:
+                if 'Autoplay' in self.mode_selection.get():
                     award_points(mark)
                     self.auto_flash_win(combo, mark)
                     break
@@ -923,7 +916,7 @@ class TicTacToeGUI(tk.Tk):
 
             self.ties_num.set(self.ties_num.get() + 1)
 
-            if self.mode_selection.get() in automodes:
+            if 'Autoplay' in self.mode_selection.get():
                 self.auto_flash_win((4, 4, 4), 'TIE')
             else:  # Mode selection is pvp or pvpc.
                 self.flash_tie()
@@ -1097,9 +1090,6 @@ class TicTacToeGUI(tk.Tk):
         """
         self.quit_button.config(state=tk.NORMAL,
                                 command=lambda: utils.quit_game(mainloop=app))
-        if 'auto-' in self.mode_selection.get():
-            self.auto_go_stop_txt.set('Start auto')
-            self.auto_go_stop_radiobtn.config(state=tk.NORMAL)
 
         self.auto_turns_header.grid_remove()
         self.auto_turns_lbl.grid_remove()
@@ -1125,12 +1115,16 @@ class TicTacToeGUI(tk.Tk):
 
         # At the end of an autoplay series or when stopped by user, need
         #   to clear auto scores and games.
-        if ('Autoplay' in self.display_automode or
+        if ('Autoplay' in self.mode_selection.get() or
                 self.auto_turns_remaining.get() > 0):
             self.reset_game_and_score()
-            self.display_automode = ''
+            self.whose_turn.set(self.display_automode)
+            self.whose_turn_lbl.config(bg=COLOR['tk_white'])
             self.auto_turns_remaining.set(0)
             self.auto_marks = ''
+            self.auto_go_stop_txt.set('Start auto')
+            self.auto_go_stop_radiobtn.config(state=tk.NORMAL)
+
 
     def reset_game_and_score(self) -> None:
         """
@@ -1160,7 +1154,7 @@ class TicTacToeGUI(tk.Tk):
         :return: None
         """
         if 'Start' in self.auto_go_stop_txt.get():
-            if 'auto-' in self.mode_selection.get():
+            if 'Autoplay' in self.mode_selection.get():
                 self.auto_go_stop_txt.set('Stop auto')
                 self.autoplay_on.set(True)
                 self.auto_start()
@@ -1182,7 +1176,7 @@ class TicTacToeGUI(tk.Tk):
         """
         self.setup_game_board()
         self.reset_game_and_score()
-        self.whose_turn.set('PC autoplay')
+        self.whose_turn.set(self.mode_selection.get())
         self.whose_turn_lbl.config(bg=COLOR['tk_white'])
 
         self.auto_turns_lbl.grid(row=0, column=2, rowspan=2,
@@ -1202,11 +1196,11 @@ class TicTacToeGUI(tk.Tk):
 
         # Start repeating calls to one of the autoplay methods;
         #   calls are controlled by after_id.
-        if self.mode_selection.get() == 'auto-random':
+        if self.mode_selection.get() == 'Autoplay random':
             self.autoplay_random()
-        elif self.mode_selection.get() == 'auto-strategy':
+        elif self.mode_selection.get() == 'Autoplay strategy':
             self.autoplay_strategy()
-        elif self.mode_selection.get() == 'auto-center':
+        elif self.mode_selection.get() == 'Autoplay center':
             self.autoplay_center()
 
     def auto_stop(self, stop_msg: str) -> None:
@@ -1332,16 +1326,17 @@ class TicTacToeGUI(tk.Tk):
 
     def autoengine(self, turn_number: int, mark: str) -> None:
         """
-        The rules engine for autoplay option. Prioritizes winning play
-        over blocking play over random play.
-        Check if able to complete or block a winning combination of
-        board labels; play random if neither available.
-        Called from autoplay_strategy(), autoplay_center().
+        The rules engine for autoplay option. Plays, in decreasing
+        priority: win, block, defend center, defend corner, random.
+        Called from autoplay_strategy() and autoplay_center().
+
         :param turn_number: Current turn count from turn_number().
         :param mark: The played mark character string play.
-
         :returns: None
         """
+
+        random.shuffle(const.WINING_COMBOS)
+        opponent = P2_MARK if mark == P1_MARK else P1_MARK
 
         for combo in const.WINING_COMBOS:
             _x, _y, _z = combo
@@ -1350,29 +1345,62 @@ class TicTacToeGUI(tk.Tk):
             z_txt = self.board_labels[_z]['text']
 
             # Play to win.
-            if x_txt == y_txt == P1_MARK and z_txt == ' ':
+            if x_txt == y_txt == mark and z_txt == ' ':
                 self.board_labels[_z]['text'] = mark
                 break
-            if y_txt == z_txt == P1_MARK and x_txt == ' ':
+            if y_txt == z_txt == mark and x_txt == ' ':
                 self.board_labels[_x]['text'] = mark
                 break
-            if x_txt == z_txt == P1_MARK and y_txt == ' ':
+            if x_txt == z_txt == mark and y_txt == ' ':
                 self.board_labels[_y]['text'] = mark
                 break
 
             # No win available, so play to block.
-            if x_txt == y_txt == P2_MARK and z_txt == ' ':
+            if x_txt == y_txt == opponent and z_txt == ' ':
                 self.board_labels[_z]['text'] = mark
                 break
-            if y_txt == z_txt == P2_MARK and x_txt == ' ':
+            if y_txt == z_txt == opponent and x_txt == ' ':
                 self.board_labels[_x]['text'] = mark
                 break
-            if x_txt == z_txt == P2_MARK and y_txt == ' ':
+            if x_txt == z_txt == opponent and y_txt == ' ':
                 self.board_labels[_y]['text'] = mark
                 break
 
+        # A play to center early is a defensive move when opponent has
+        #   played a side; increases TIEs. Is not relevant when mode is
+        #   "Autoplay center".
+        if self.mode_selection.get() == 'Autoplay strategy':
+            if turn_number == self.turn_number() and turn_number < 5:
+                for _s in const.SIDES:
+                    s_txt = self.board_labels[_s]['text']
+                    if s_txt == opponent:
+                        if self.board_labels[4]['text'] == ' ':
+                            self.board_labels[4]['text'] = mark
+                            break
+
+            # When opponent is on two adjacent side squares, defend with play
+            #   to the common corner; increases TIEs.
+            # With Autoplay strategy and defensive center, get ~ 75% ties.
+            # With Autoplay center, results in ~85% ties.
+            if turn_number == self.turn_number() and turn_number < 5:
+                side_list = []
+                for _s in const.SIDES:
+                    s_txt = self.board_labels[_s]['text']
+                    if s_txt == opponent:
+                        side_list.append(_s)
+
+                if side_list == [1, 3] and self.board_labels[0]['text'] == ' ':
+                    self.board_labels[0]['text'] = mark
+                elif side_list == [1, 5] and self.board_labels[2]['text'] == ' ':
+                    self.board_labels[2]['text'] = mark
+                elif side_list == [3, 7] and self.board_labels[6]['text'] == ' ':
+                    self.board_labels[6]['text'] = mark
+                elif side_list == [5, 7] and self.board_labels[8]['text'] == ' ':
+                    self.board_labels[8]['text'] = mark
+
         # No preferred play available, so play random.
-        self.play_random(turn_number, mark)
+        if turn_number == self.turn_number():
+            self.play_random(turn_number, mark)
 
     def autoplay_strategy(self) -> None:
         """
@@ -1411,10 +1439,12 @@ class TicTacToeGUI(tk.Tk):
     def autoplay_center(self) -> None:
         """
         Automatically play computer vs. computer for 1000 turns
-        (~120 games) or until stopped by user. Each turn is played on a
-        timed interval set by the autospeed_control() time used in the
-        after_id caller, so, one turn per call. First play is at the
-        center position, subsequent plays follow win or block rules.
+        (~120 games) or until stopped by user.
+        Each turn is played on a timed interval set by the
+        autospeed_control() time used in the after_id caller, so, one
+        turn per call. First play is at the center position, subsequent
+        plays follow win,block,random preference play order.
+        About 75% tie games.
 
         :return: None
         """
