@@ -48,7 +48,7 @@ class TicTacToeGUI(tk.Tk):
     auto_stop, auto_turns_limit, autoengine, autoplay_center,
     autoplay_random, autoplay_strategy, autospeed_control,
     autostart_set_who, block_all_player_action, check_winner,
-    color_the_mark, configure_widgets, display_result, flash_tie,
+    color_pc_mark, configure_widgets, display_result, flash_tie,
     flash_win, grid_widgets, human_turn, mode_control, new_game,
     on_enter, on_leave, pc_defense, pc_turn, play_random,
     reset_game_and_score, setup_game_board, turn_number,
@@ -516,7 +516,7 @@ class TicTacToeGUI(tk.Tk):
 
     def mode_control(self) -> None:
         """
-        Block any mode change if in the middle of a game or autoplay.
+        Block any mode change if in the middle of a game or in autoplay.
         Disable and enable Radiobuttons as each mode requires.
         Cancel/ignore an errant or mistimed play mode selection.
         Is callback from the play mode Radiobuttons.
@@ -547,18 +547,14 @@ class TicTacToeGUI(tk.Tk):
                     self.pvp_mode.select()
                     self.choose_pc_pref.config(state=tk.DISABLED)
                     self.pvpc_mode.deselect()
-                    self.auto_random_mode.deselect()
-                    self.auto_strategy_mode.deselect()
-                    self.auto_center_mode.deselect()
-                    self.display_automode = ''
                 elif self.curr_pmode == 'pvpc':
                     self.pvpc_mode.select()
                     self.choose_pc_pref.config(state='readonly')
                     self.pvp_mode.deselect()
-                    self.auto_random_mode.deselect()
-                    self.auto_strategy_mode.deselect()
-                    self.auto_center_mode.deselect()
-                    self.display_automode = ''
+                self.auto_random_mode.deselect()
+                self.auto_strategy_mode.deselect()
+                self.auto_center_mode.deselect()
+                self.display_automode = ''
 
                 detail = 'Finish the current game,\nthen change mode.'
 
@@ -674,7 +670,7 @@ class TicTacToeGUI(tk.Tk):
                       self.prev_game_num.get() % 2 != 0):
                     h_plays_p1_v_pc()  # odd prev_game, odd turn
 
-                # Need update for app.after delay to work in pc_turn().
+                # Need to update for app.after delay to work in pc_turn().
                 app.update_idletasks()
 
                 if self.turn_number() >= 5:
@@ -687,20 +683,17 @@ class TicTacToeGUI(tk.Tk):
 
         self.quit_button.config(command=lambda: utils.quit_game(app, False))
 
-    def color_the_mark(self, _id: int) -> None:
+    def color_pc_mark(self, _id: int) -> None:
         """
-        In PvP and PvPC modes (or any non-auto mode), provide alternate
-        colors for Player1 and Player2 marks. Default COLOR
-        (COLOR['mark_fg']) is set in setup_game_board().
-        This method changes that to an alternate fg.
+        In PvPC mode, provide alternate color for Player1 and
+        Player2 marks. Default COLOR (COLOR['mark_fg']) is set in
+        setup_game_board(). This method changes that to an alternate fg.
 
-        :param _id: The board label's list index of the played square.
+        :param _id: The board_labels list index of the played square.
         :return: None
         """
 
-        # Note that the label fg in pvp mode is configured in
-        #    human_turn.h_plays_p2().
-        if not self.display_automode:
+        if self.mode_selection.get() == 'pvpc':
             self.board_labels[_id].config(fg=COLOR['tk_white'])
 
     def pc_turn(self) -> None:
@@ -725,8 +718,7 @@ class TicTacToeGUI(tk.Tk):
 
         # Need to reorder winner and corner lists so Human doesn't detect a pattern
         #   of where PC will play.
-        random.shuffle(const.WINING_COMBOS)
-        random.shuffle(const.CORNERS)
+        random.shuffle(const.WINNING_COMBOS)
 
         # Loops break with the first P2_MARK played.
         while turn_number == self.turn_number():
@@ -739,12 +731,12 @@ class TicTacToeGUI(tk.Tk):
             elif self.choose_pc_pref.get() == 'PC plays center':
                 if self.board_labels[4]['text'] == ' ':
                     self.board_labels[4]['text'] = P2_MARK
-                    self.color_the_mark(4)
+                    self.color_pc_mark(4)
 
             # Prefer now to play for win, then for block, then what's available.
             # Play to win:
             if turn_number == self.turn_number():
-                for combo in const.WINING_COMBOS:
+                for combo in const.WINNING_COMBOS:
                     _x, _y, _z = combo
                     x_txt = self.board_labels[_x]['text']
                     y_txt = self.board_labels[_y]['text']
@@ -752,22 +744,22 @@ class TicTacToeGUI(tk.Tk):
 
                     if x_txt == y_txt == P2_MARK and z_txt == ' ':
                         self.board_labels[_z]['text'] = P2_MARK
-                        self.color_the_mark(_z)
+                        self.color_pc_mark(_z)
                         break
                     if y_txt == z_txt == P2_MARK and x_txt == ' ':
                         self.board_labels[_x]['text'] = P2_MARK
-                        self.color_the_mark(_x)
+                        self.color_pc_mark(_x)
                         break
                     if x_txt == z_txt == P2_MARK and y_txt == ' ':
                         self.board_labels[_y]['text'] = P2_MARK
-                        self.color_the_mark(_y)
+                        self.color_pc_mark(_y)
                         break
 
             # Play to block:
             #  Note: Need this separate 'if', not elif or continuation of
             #  preceding 'if', to prioritize winning over blocking.
             if turn_number == self.turn_number():
-                for combo in const.WINING_COMBOS:
+                for combo in const.WINNING_COMBOS:
                     _x, _y, _z = combo
                     x_txt = self.board_labels[_x]['text']
                     y_txt = self.board_labels[_y]['text']
@@ -775,15 +767,15 @@ class TicTacToeGUI(tk.Tk):
 
                     if x_txt == y_txt == P1_MARK and z_txt == ' ':
                         self.board_labels[_z]['text'] = P2_MARK
-                        self.color_the_mark(_z)
+                        self.color_pc_mark(_z)
                         break
                     if y_txt == z_txt == P1_MARK and x_txt == ' ':
                         self.board_labels[_x]['text'] = P2_MARK
-                        self.color_the_mark(_x)
+                        self.color_pc_mark(_x)
                         break
                     if x_txt == z_txt == P1_MARK and y_txt == ' ':
                         self.board_labels[_y]['text'] = P2_MARK
-                        self.color_the_mark(_y)
+                        self.color_pc_mark(_y)
                         break
 
             # Preference: play a set of defensive strategy rules.
@@ -815,7 +807,7 @@ class TicTacToeGUI(tk.Tk):
             random_idx = random.randrange(0, 9)
             if self.board_labels[random_idx]['text'] == ' ':
                 self.board_labels[random_idx]['text'] = mark
-                self.color_the_mark(random_idx)
+                self.color_pc_mark(random_idx)
 
     def pc_defense(self, turn_number: int) -> None:
         """
@@ -831,7 +823,7 @@ class TicTacToeGUI(tk.Tk):
             if self.board_labels[i]['text'] == P1_MARK:
                 if self.board_labels[4]['text'] == ' ':
                     self.board_labels[4]['text'] = P2_MARK
-                    self.color_the_mark(4)
+                    self.color_pc_mark(4)
                     print('PC plays center defense')
                     break
 
@@ -853,7 +845,7 @@ class TicTacToeGUI(tk.Tk):
             for key, val in const.ADJ_CORNER_DICT.items():
                 if self.board_labels[key]['text'] == ' ' and human_sides == val:
                     self.board_labels[key]['text'] = P2_MARK
-                    self.color_the_mark(key)
+                    self.color_pc_mark(key)
                     print('PC plays corner defense')
                     break
 
@@ -869,7 +861,7 @@ class TicTacToeGUI(tk.Tk):
             for i in const.INLINE_CORNERS:
                 if i == human_corners and self.board_labels[4]['text'] == ' ':
                     self.board_labels[4]['text'] = P2_MARK
-                    self.color_the_mark(4)
+                    self.color_pc_mark(4)
                     print('PC plays inline corners defense')
                     break
 
@@ -899,7 +891,7 @@ class TicTacToeGUI(tk.Tk):
                 self.p2_points += 1
 
         # Loop breaks when the first winning combo is found.
-        for combo in const.WINING_COMBOS:
+        for combo in const.WINNING_COMBOS:
             _x, _y, _z = combo
             lbl_x_txt = self.board_labels[_x]['text']
             lbl_y_txt = self.board_labels[_y]['text']
@@ -956,8 +948,8 @@ class TicTacToeGUI(tk.Tk):
         _x, _y, _z = combo
 
         app.after(10, lambda: self.board_labels[_x].config(bg=COLOR['sq_won']))
-        app.after(200, lambda: self.board_labels[_y].config(bg=COLOR['sq_won']))
-        app.after(400, lambda: self.board_labels[_z].config(bg=COLOR['sq_won']))
+        app.after(175, lambda: self.board_labels[_y].config(bg=COLOR['sq_won']))
+        app.after(345, lambda: self.board_labels[_z].config(bg=COLOR['sq_won']))
 
     def flash_tie(self) -> None:
         """
@@ -1360,10 +1352,10 @@ class TicTacToeGUI(tk.Tk):
         :returns: None
         """
 
-        random.shuffle(const.WINING_COMBOS)
+        random.shuffle(const.WINNING_COMBOS)
         opponent = P2_MARK if mark == P1_MARK else P1_MARK
 
-        for combo in const.WINING_COMBOS:
+        for combo in const.WINNING_COMBOS:
             _x, _y, _z = combo
             x_txt = self.board_labels[_x]['text']
             y_txt = self.board_labels[_y]['text']
