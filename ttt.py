@@ -35,8 +35,9 @@ except (ImportError, ModuleNotFoundError) as error:
           f'See also: https://tkdocs.com/tutorial/install.html \n{error}')
 
 # Local program imports:
-from ttt_utils import const, utils, platform_check as chk
+from ttt_utils import const, utils
 from ttt_utils.const import P1_MARK, P2_MARK, MARKS1, MARKS2, COLOR, FONT
+from ttt_utils.platform_check import MY_OS
 
 
 class TicTacToeGUI(tk.Tk):
@@ -148,9 +149,9 @@ class TicTacToeGUI(tk.Tk):
         self.ties_num.set(0)
 
         # Need tk to match system's default white shade.
-        if chk.MY_OS == 'dar':
+        if MY_OS == 'dar':
             COLOR['tk_white'] = 'white'
-        elif chk.MY_OS == 'lin':
+        elif MY_OS == 'lin':
             COLOR['tk_white'] = 'grey85'
         else:  # platform is 'win'
             COLOR['tk_white'] = 'grey95'
@@ -218,7 +219,7 @@ class TicTacToeGUI(tk.Tk):
                                            'PC plays strategy'),
                                    state=tk.DISABLED)
         self.option_add("*TCombobox*Font", FONT['condensed'])
-        if chk.MY_OS == 'dar':
+        if MY_OS == 'dar':
             self.choose_pc_pref.config(width=13)
         self.choose_pc_pref.current(0)
         self.choose_pc_pref.bind('<<ComboboxSelected>>',
@@ -302,9 +303,9 @@ class TicTacToeGUI(tk.Tk):
         _col = 0
 
         # Set platform-specific padding between play Labels (squares).
-        if chk.MY_OS == 'dar':  # macOS
+        if MY_OS == 'dar':  # macOS
             pad = 6
-        elif chk.MY_OS == 'lin':  # Linux
+        elif MY_OS == 'lin':  # Linux
             pad = 0
         else:  # Windows
             pad = 8
@@ -321,7 +322,7 @@ class TicTacToeGUI(tk.Tk):
         self.whose_turn_lbl.grid(  # padx matches that of board_labels.
             row=0, column=0, padx=0, pady=(5, 0))
 
-        if chk.MY_OS in 'lin, dar':
+        if MY_OS in 'lin, dar':
             self.prev_game_num_header.grid(
                 row=0, column=2, rowspan=2, padx=(0, 8), pady=(8, 0), sticky=tk.NE)
             self.prev_game_num_lbl.grid(
@@ -334,14 +335,14 @@ class TicTacToeGUI(tk.Tk):
 
         # There is duplication in the elif statements to allow easy editing and
         #   cut/paste actions for platform-specific adjustments.
-        if chk.MY_OS == 'dar':
+        if MY_OS == 'dar':
             self.score_header.grid(
                 row=0, column=1, rowspan=2, padx=(10, 0), pady=(0, 10), sticky=tk.W)
             self.player1_header.grid(
                 row=0, column=1, rowspan=2, padx=(0, 0), pady=(0, 35), sticky=tk.E)
             self.player2_header.grid(
                 row=0, column=1, rowspan=2, padx=(0, 0), pady=(20, 10), sticky=tk.E)
-        elif chk.MY_OS == 'lin':
+        elif MY_OS == 'lin':
             self.score_header.grid(
                 row=0, column=1, rowspan=2, padx=(10, 0), pady=(0, 10), sticky=tk.W)
             self.player1_header.grid(
@@ -356,7 +357,7 @@ class TicTacToeGUI(tk.Tk):
             self.player2_header.grid(
                 row=0, column=1, rowspan=2, padx=(0, 8), pady=(30, 10), sticky=tk.E)
 
-        if chk.MY_OS in 'lin, dar':
+        if MY_OS in 'lin, dar':
             self.player1_score_lbl.grid(
                 row=0, column=1,
                 rowspan=2, columnspan=2,
@@ -377,7 +378,7 @@ class TicTacToeGUI(tk.Tk):
 
         # Auto-turn counting labels are gridded in auto_start().
 
-        if chk.MY_OS in 'lin, dar':
+        if MY_OS in 'lin, dar':
             self.ties_header.grid(
                 row=0, column=1,
                 rowspan=2,
@@ -396,14 +397,14 @@ class TicTacToeGUI(tk.Tk):
                 rowspan=2,
                 padx=0, pady=(85, 0), sticky=tk.W)
 
-        if chk.MY_OS == 'dar':
+        if MY_OS == 'dar':
             self.pvp_mode.grid(
                 row=5, column=0, padx=(20, 0), pady=5, sticky=tk.W)
             self.pvpc_mode.grid(
                 row=5, column=1, columnspan=2, padx=(20, 0), pady=5, sticky=tk.W)
             self.choose_pc_pref.grid(
                 row=5, column=1, columnspan=2, padx=(0, 25), pady=0, sticky=tk.E)
-        elif chk.MY_OS == 'lin':
+        elif MY_OS == 'lin':
             self.pvp_mode.grid(
                 row=5, column=0, padx=(10, 0), pady=5, sticky=tk.W)
             self.pvpc_mode.grid(
@@ -433,7 +434,7 @@ class TicTacToeGUI(tk.Tk):
             row=9, column=1, columnspan=2,
             padx=(0, 40), pady=(16, 0), sticky=tk.E)
 
-        if chk.MY_OS in 'win, dar':
+        if MY_OS in 'win, dar':
             padx = (5, 0)
         else:
             padx = 0
@@ -462,7 +463,7 @@ class TicTacToeGUI(tk.Tk):
                        font=FONT['mark'],
                        )
 
-            if chk.MY_OS == 'dar':
+            if MY_OS == 'dar':
                 lbl.config(borderwidth=12)
             else:  # is Linux or Windows.
                 lbl.config(highlightthickness=6)
@@ -992,11 +993,11 @@ class TicTacToeGUI(tk.Tk):
                                          relief='raised')
         self.result_window.title('Result')
 
-        if chk.MY_OS == 'win':  # Windows
+        if MY_OS == 'win':  # Windows
             size = '420x150'
             minw = 270
             minh = 150
-        elif chk.MY_OS == 'dar':  # macOS
+        elif MY_OS == 'dar':  # macOS
             size = '200x90'
             minw = 150
             minh = 90
@@ -1125,7 +1126,6 @@ class TicTacToeGUI(tk.Tk):
             self.auto_go_stop_txt.set('Start auto')
             self.auto_go_stop_radiobtn.config(state=tk.NORMAL)
 
-
     def reset_game_and_score(self) -> None:
         """
         Set game number and player points to zero.
@@ -1181,7 +1181,7 @@ class TicTacToeGUI(tk.Tk):
 
         self.auto_turns_lbl.grid(row=0, column=2, rowspan=2,
                                  padx=(0, 8), pady=(0, 0), sticky=tk.SE)
-        if chk.MY_OS in 'lin, dar':
+        if MY_OS in 'lin, dar':
             self.auto_turns_header.grid(row=0, column=2, rowspan=2,
                                         padx=(0, 8), pady=(0, 16), sticky=tk.SE)
         else:  # is Windows
@@ -1297,8 +1297,9 @@ class TicTacToeGUI(tk.Tk):
         Automatically play computer vs. computer for 1000 turns
         (~130 games) or until stopped by user. All play positions are
         random. Each turn is played on a timed interval set by the
-        utils.PLAY_AFTER time used in the after_id caller, so one turn
-        per call.
+        autospeed_control() used in the after_id caller; so, one turn
+        is played per call.
+        Is called from auto_start().
 
         :return: None
         """
@@ -1328,6 +1329,9 @@ class TicTacToeGUI(tk.Tk):
         """
         The rules engine for autoplay option. Plays, in decreasing
         priority: win, block, defend center, defend corner, random.
+        Each turn is played on a timed interval set by the
+        autospeed_control() used in the after_id caller; so, one turn
+        is played per call.
         Called from autoplay_strategy() and autoplay_center().
 
         :param turn_number: Current turn count from turn_number().

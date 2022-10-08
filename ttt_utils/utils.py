@@ -1,7 +1,8 @@
 """
-Housekeeping functions:.
-manage_args - Handles command line arguments.
-quit_gui - Safe and informative exit from the program.
+Utility functions for general ousekeeping.
+manage_args: Handles command line arguments.
+program_name:
+quit_gui: Safe and informative exit from the program.
 """
 # Copyright (C) 2021-2022 C.S. Echt under GNU General Public License'
 

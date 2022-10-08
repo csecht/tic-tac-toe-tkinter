@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
 """
-Simple check of current Python version.
-Functions:
-minversion() - Exit program if not minimum required version.
-maxversion() - Warn if newer than tested versions.
+Functions to check current Python version.
+minversion: Exit program if not minimum required version.
+maxversion: Warn if current version is newer than tested versions.
 """
 # Copyright (C) 2021-2022 C.S. Echt under GNU General Public License'
 
