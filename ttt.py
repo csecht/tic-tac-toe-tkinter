@@ -550,6 +550,7 @@ class TicTacToeGUI(tk.Tk):
                     self.auto_random_mode.deselect()
                     self.auto_strategy_mode.deselect()
                     self.auto_center_mode.deselect()
+                    self.display_automode = ''
                 elif self.curr_pmode == 'pvpc':
                     self.pvpc_mode.select()
                     self.choose_pc_pref.config(state='readonly')
@@ -557,6 +558,7 @@ class TicTacToeGUI(tk.Tk):
                     self.auto_random_mode.deselect()
                     self.auto_strategy_mode.deselect()
                     self.auto_center_mode.deselect()
+                    self.display_automode = ''
 
                 detail = 'Finish the current game,\nthen change mode.'
 
@@ -726,7 +728,7 @@ class TicTacToeGUI(tk.Tk):
         random.shuffle(const.WINING_COMBOS)
         random.shuffle(const.CORNERS)
 
-        # Loops break with the first p2_mark played.
+        # Loops break with the first P2_MARK played.
         while turn_number == self.turn_number():
 
             # Preference: all PC moves are random.
@@ -738,9 +740,6 @@ class TicTacToeGUI(tk.Tk):
                 if self.board_labels[4]['text'] == ' ':
                     self.board_labels[4]['text'] = P2_MARK
                     self.color_the_mark(4)
-            # Preference: strategy, adaptive defense to human's first two turns.
-            elif self.choose_pc_pref.get() == 'PC plays strategy':
-                self.pc_defense(turn_number)
 
             # Prefer now to play for win, then for block, then what's available.
             # Play to win:
@@ -787,8 +786,14 @@ class TicTacToeGUI(tk.Tk):
                         self.color_the_mark(_y)
                         break
 
-            # If no preferred play available, then play random.
+            # Preference: play a set of defensive strategy rules.
+            if self.choose_pc_pref.get() == 'PC plays strategy':
+                if turn_number == self.turn_number():
+                    self.pc_defense(turn_number)
+
+            # No preferred plays are available, so play random.
             if turn_number == self.turn_number():
+                # print("PC plays random, turn ", turn_number)
                 self.play_random(turn_number, P2_MARK)
 
         if self.turn_number() >= 5:
@@ -814,43 +819,58 @@ class TicTacToeGUI(tk.Tk):
 
     def pc_defense(self, turn_number: int) -> None:
         """
-        A defensive response to human's first two turns in PvPC mode.
+        A defensive response to human's early turns in PvPC mode.
         Purpose is to minimize PC losses.
 
         :param turn_number: The current turn number, from turn_number().
         :return: None
         """
         # When human starts with a side square, need to play center to
-        #   avoid possibility of a loss.
-        if turn_number in (1, 3, 5):
-            for _s in const.SIDES:
-                s_txt = self.board_labels[_s]['text']
-                if s_txt == P1_MARK:
-                    if self.board_labels[4]['text'] == ' ':
-                        self.board_labels[4]['text'] = P2_MARK
-                        self.color_the_mark(4)
-                        break
-        # When human is on two adjacent side squares, defend with play
-        #   to the common corner to avoid possibility of a loss.
-        if turn_number == 3:
-            side_list = []
-            for _s in const.SIDES:
-                s_txt = self.board_labels[_s]['text']
-                if s_txt == P1_MARK:
-                    side_list.append(_s)
+        #   reduce possibility of a loss.
+        for i in const.SIDES:
+            if self.board_labels[i]['text'] == P1_MARK:
+                if self.board_labels[4]['text'] == ' ':
+                    self.board_labels[4]['text'] = P2_MARK
+                    self.color_the_mark(4)
+                    print('PC plays center defense')
+                    break
 
-            if side_list == [1, 3] and self.board_labels[0]['text'] == ' ':
-                self.board_labels[0]['text'] = P2_MARK
-                self.color_the_mark(0)
-            elif side_list == [1, 5] and self.board_labels[2]['text'] == ' ':
-                self.board_labels[2]['text'] = P2_MARK
-                self.color_the_mark(2)
-            elif side_list == [3, 7] and self.board_labels[6]['text'] == ' ':
-                self.board_labels[6]['text'] = P2_MARK
-                self.color_the_mark(6)
-            elif side_list == [5, 7] and self.board_labels[8]['text'] == ' ':
-                self.board_labels[8]['text'] = P2_MARK
-                self.color_the_mark(8)
+        # When human is on two adjacent side squares, defend with play
+        #   to the common corner.
+        # Need const.SIDES in ascending order, so sort() in case
+        #   random.shuffle was used on SIDES.
+        const.SIDES.sort()
+        if turn_number == self.turn_number():
+            human_sides = []
+
+            # Create list of indices of opponent's played side centers.
+            for i in const.SIDES:
+                if self.board_labels[i]['text'] == P1_MARK:
+                    human_sides.append(i)
+
+            # Have PC play the appropriate corner.
+            for key, val in const.ADJ_CORNER_DICT.items():
+                if self.board_labels[key]['text'] == ' ' and human_sides == val:
+                    self.board_labels[key]['text'] = P2_MARK
+                    self.color_the_mark(key)
+                    print('PC plays corner defense')
+                    break
+
+        # When human has two corners on a side, block the center.
+        if turn_number == self.turn_number():
+            human_corners = []
+
+            # Create list of indices of opponent's played corners.
+            for i in const.CORNERS:
+                if self.board_labels[i]['text'] == P1_MARK:
+                    human_corners.append(i)
+
+            for i in const.INLINE_CORNERS:
+                if i == human_corners and self.board_labels[4]['text'] == ' ':
+                    self.board_labels[4]['text'] = P2_MARK
+                    self.color_the_mark(4)
+                    print('PC plays inline corners defense')
+                    break
 
     def turn_number(self) -> int:
         """
@@ -1373,11 +1393,10 @@ class TicTacToeGUI(tk.Tk):
         # A play to center early is a defensive move when opponent has
         #   played a side; increases TIEs. Is not relevant when mode is
         #   "Autoplay center".
-        # Sort const.SIDES to ascending order in case random.shuffle() is used.
         if self.mode_selection.get() == 'Autoplay strategy':
             if turn_number == self.turn_number() and turn_number < 5:
-                for _s in const.SIDES:
-                    if self.board_labels[_s]['text'] == opponent:
+                for i in const.SIDES:
+                    if self.board_labels[i]['text'] == opponent:
                         if self.board_labels[4]['text'] == ' ':
                             self.board_labels[4]['text'] = mark
                             break
@@ -1391,12 +1410,12 @@ class TicTacToeGUI(tk.Tk):
             if turn_number == self.turn_number() and turn_number < 5:
                 sides_played = []
                 # Create list of indices of opponent's played square
-                for _s in const.SIDES:
-                    if self.board_labels[_s]['text'] == opponent:
-                        sides_played.append(_s)
+                for i in const.SIDES:
+                    if self.board_labels[i]['text'] == opponent:
+                        sides_played.append(i)
 
                 # Have current player play the appropriate corner.
-                for key, val in const.CORNER_DICT.items():
+                for key, val in const.ADJ_CORNER_DICT.items():
                     if self.board_labels[key]['text'] == ' ' and sides_played == val:
                         self.board_labels[key]['text'] = mark
 

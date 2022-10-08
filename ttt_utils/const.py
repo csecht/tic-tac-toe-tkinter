@@ -3,7 +3,7 @@ Constants and configuration settings used in main script.
 PLAYER1, PLAYER2: the displayed player names.
 P1_MARK, P2_MARK: 'X', 'O', respectively, but can be changed.
 MARKS1, MARKS2: string of duplicate marks that determine number of auto turns.
-WINING_COMBOS, CORNERS, SIDES, CORNER_DICT: lists of game board indices.
+WINING_COMBOS, CORNERS, SIDES, ADJ_CORNER_DICT: lists of game board indices.
 PLAY_AFTER, AUTO_FAST, AUTO_SLOW, AUTO_SHOW: ms integers for tk after() function.
 TIES, WINS: unused; tuples of end-game board mark configurations, in index order.
 """
@@ -32,12 +32,14 @@ WINING_COMBOS = [
 
 CORNERS = [0, 2, 6, 8]
 
-CORNER_DICT = {
+ADJ_CORNER_DICT = {
     0: [1, 3],
     2: [1, 5],
     6: [3, 7],
     8: [5, 7]
 }
+
+INLINE_CORNERS = ([0, 2], [0, 6], [2, 8], [6, 8])
 
 SIDES = [1, 3, 5, 7]
 
