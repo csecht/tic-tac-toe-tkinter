@@ -840,6 +840,7 @@ class TicTacToeGUI(tk.Tk):
         # Need const.SIDES in ascending order, so sort() in case
         #   random.shuffle was used on SIDES.
         const.SIDES.sort()
+
         if turn_number == self.turn_number():
             human_sides = []
 
@@ -856,7 +857,7 @@ class TicTacToeGUI(tk.Tk):
                     print('PC plays corner defense')
                     break
 
-        # When human has two corners on a side, block the center.
+        # When human has two corners on one side, block the center.
         if turn_number == self.turn_number():
             human_corners = []
 
@@ -1394,7 +1395,7 @@ class TicTacToeGUI(tk.Tk):
         #   played a side; increases TIEs. Is not relevant when mode is
         #   "Autoplay center".
         if self.mode_selection.get() == 'Autoplay strategy':
-            if turn_number == self.turn_number() and turn_number < 5:
+            if turn_number == self.turn_number():
                 for i in const.SIDES:
                     if self.board_labels[i]['text'] == opponent:
                         if self.board_labels[4]['text'] == ' ':
@@ -1407,9 +1408,9 @@ class TicTacToeGUI(tk.Tk):
             # With Autoplay center, results in ~85% ties.
             # Need const.SIDES in ascending order, so sort() in case random.shuffle is used.
             const.SIDES.sort()
-            if turn_number == self.turn_number() and turn_number < 5:
+            if turn_number == self.turn_number():
                 sides_played = []
-                # Create list of indices of opponent's played square
+                # Create list of indices of opponent's played square.
                 for i in const.SIDES:
                     if self.board_labels[i]['text'] == opponent:
                         sides_played.append(i)
