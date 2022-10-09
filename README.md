@@ -18,12 +18,10 @@ Recent Python packages can be downloaded from https://www.python.org/downloads/.
 From a command line:
 From within the tic-tac-toe-tk-main folder, from a Terminal or Command Prompt, depending on your system environment:
 
-
             python3 -m plot_jobs (recommended for all systems)
             py plot_jobs.py (Windows)
             python3 plot_jobs.py (Linux, Mac)
             ./plot_jobs.py (Linux, Mac)
-
 
 ### Play action
 There are four play modes:
@@ -35,10 +33,12 @@ There are four play modes:
 
 In Player v PC game mode, you can choose among computer play options:
 - PC plays random
-- PC plays center; always prefers the center
+- PC plays center; prefers the center
 - PC plays strategy; rules-based, hardest to beat
 
-In Autoplay mode, PC plays itself. You can choose to have Player 1 (X) start every game or have both Players alternate game starts. 1000 turns are played at about 3 turns per second. Scores are updated in realtime through the series of about 110 to 130 games. Studying autoplay results in different play modes can be instructive for improving your game strategies!
+Wins, ties, and mode-specific PC moves are recorded in the Terminal window with "center" and "strategy" PC modes; this may help the human player to improve their game.
+
+In Autoplay mode, the PC plays itself. You can choose to have Player 1 (X) start every game or have both Players alternate game starts. 1000 turns are played at about 3 turns per second. Scores are updated in realtime through the series of about 110 to 130 games. Studying autoplay results in different play modes can be instructive for improving your game strategies!
 
 ### Screenshots
 
