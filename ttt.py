@@ -167,9 +167,13 @@ class TicTacToeGUI(tk.Tk):
         self.your_turn_player1()  # Starting prompt for Player1 to begin play.
 
         self.auto_turns_header.config(text='Turns to go',
-                                      font=FONT['condensed'])
+                                      font=FONT['condensed'],
+                                      fg=COLOR['tk_white'],  # make invisible.
+                                      )
         self.auto_turns_lbl.config(textvariable=self.auto_turns_remaining,
-                                   font=FONT['condensed'])
+                                   font=FONT['condensed'],
+                                   fg=COLOR['tk_white'], # make invisible.
+                                   )
 
         # Players' scores widgets:
         # ︴squiggle symbol from https://coolsymbol.com/line-symbols.html
@@ -376,7 +380,17 @@ class TicTacToeGUI(tk.Tk):
                 rowspan=2,
                 padx=0, pady=(30, 10), sticky=tk.W)
 
-        # Auto-turn counting labels are gridded in auto_start().
+        self.auto_turns_lbl.grid(
+            row=0, column=2, rowspan=2,
+            padx=(0, 8), pady=(0, 0), sticky=tk.SE)
+        if MY_OS in 'lin, dar':
+            self.auto_turns_header.grid(
+                row=0, column=2, rowspan=2,
+                padx=(0, 8), pady=(0, 16), sticky=tk.SE)
+        else:  # is Windows
+            self.auto_turns_header.grid(
+                row=0, column=2, rowspan=2,
+                padx=(0, 8), pady=(0, 30), sticky=tk.SE)
 
         if MY_OS in 'lin, dar':
             self.ties_header.grid(
@@ -721,9 +735,6 @@ class TicTacToeGUI(tk.Tk):
         random.shuffle(const.WINNING_COMBOS)
         random.shuffle(const.CORNERS)
 
-        # Loops break with the first P2_MARK played.
-        # while turn_number == self.turn_number():
-
         # Preference: all PC moves are random.
         if self.choose_pc_pref.get() == 'PC plays random':
             self.play_random(turn_number, P2_MARK)
@@ -807,20 +818,6 @@ class TicTacToeGUI(tk.Tk):
 
         app.update_idletasks()
 
-    def play_random(self, turn_number: int, mark: str) -> None:
-        """ Play *mark* in a random position of board_labels index.
-
-        :param mark: The player's mark string to play.
-        :param turn_number: The current turn number, from turn_number().
-
-        :return: None
-        """
-        while turn_number == self.turn_number():
-            random_idx = random.randrange(0, 9)
-            if self.board_labels[random_idx]['text'] == ' ':
-                self.board_labels[random_idx]['text'] = mark
-                self.color_pc_mark(random_idx)
-
     def pc_defense(self, turn_number: int) -> None:
         """
         A defensive response to human's (P1) turns in PvPC mode.
@@ -896,6 +893,20 @@ class TicTacToeGUI(tk.Tk):
                     print('PC played a side for para-corners defense,'
                           f' T{turn_number + 1}:G{self.prev_game_num.get() + 1}')
                     break
+
+    def play_random(self, turn_number: int, mark: str) -> None:
+        """ Play *mark* in a random position of board_labels index.
+
+        :param mark: The player's mark string to play.
+        :param turn_number: The current turn number, from turn_number().
+
+        :return: None
+        """
+        while turn_number == self.turn_number():
+            random_idx = random.randrange(0, 9)
+            if self.board_labels[random_idx]['text'] == ' ':
+                self.board_labels[random_idx]['text'] = mark
+                self.color_pc_mark(random_idx)
 
     def turn_number(self) -> int:
         """
@@ -1141,8 +1152,9 @@ class TicTacToeGUI(tk.Tk):
         self.quit_button.config(state=tk.NORMAL,
                                 command=lambda: utils.quit_game(mainloop=app))
 
-        self.auto_turns_header.grid_remove()
-        self.auto_turns_lbl.grid_remove()
+        # Make font invisible (bg color) to remove from view.
+        self.auto_turns_header.config(fg=COLOR['tk_white'])
+        self.auto_turns_lbl.config(fg=COLOR['tk_white'])
 
         self.setup_game_board()
         self.winner_found = False
@@ -1180,7 +1192,7 @@ class TicTacToeGUI(tk.Tk):
         Set game number and player points to zero.
         Called from mode_control() when user changes between PvP and
         PvPC or changes PvPC play mode, and from auto_start(),
-        new_game(), and Combobox selection binding.
+        new_game(), and Combobox selection bindings.
 
         :return: None
         """
@@ -1228,14 +1240,9 @@ class TicTacToeGUI(tk.Tk):
         self.whose_turn.set(self.mode_selection.get())
         self.whose_turn_lbl.config(bg=COLOR['tk_white'])
 
-        self.auto_turns_lbl.grid(row=0, column=2, rowspan=2,
-                                 padx=(0, 8), pady=(0, 0), sticky=tk.SE)
-        if MY_OS in 'lin, dar':
-            self.auto_turns_header.grid(row=0, column=2, rowspan=2,
-                                        padx=(0, 8), pady=(0, 16), sticky=tk.SE)
-        else:  # is Windows
-            self.auto_turns_header.grid(row=0, column=2, rowspan=2,
-                                        padx=(0, 8), pady=(0, 30), sticky=tk.SE)
+        # Change font from invisible (bg color) to default color to view.
+        self.auto_turns_header.config(fg='black')
+        self.auto_turns_lbl.config(fg='black')
 
         self.auto_go_stop_radiobtn.config(state=tk.NORMAL)
         self.who_autostarts.config(state=tk.DISABLED)
