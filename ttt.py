@@ -36,7 +36,10 @@ except (ImportError, ModuleNotFoundError) as error:
 
 # Local program imports:
 from ttt_utils import const, utils
-from ttt_utils.const import P1_MARK, P2_MARK, MARKS1, MARKS2, COLOR, FONT
+from ttt_utils.const import (P1_MARK, P2_MARK,
+                             MARKS1, MARKS2,
+                             COLOR, FONT,
+                             SIDES, WINNING_COMBOS)
 from ttt_utils.platform_check import MY_OS
 
 
@@ -732,7 +735,7 @@ class TicTacToeGUI(tk.Tk):
 
         # Need to reorder winner and corner lists so Human doesn't detect a pattern
         #   of where PC will play.
-        random.shuffle(const.WINNING_COMBOS)
+        random.shuffle(WINNING_COMBOS)
         random.shuffle(const.CORNERS)
 
         # Preference: all PC moves are random.
@@ -748,7 +751,7 @@ class TicTacToeGUI(tk.Tk):
         # Prefer to play for win, then for block, then what's available.
         # Play to win:
         if turn_number == self.turn_number():
-            for combo in const.WINNING_COMBOS:
+            for combo in WINNING_COMBOS:
                 _x, _y, _z = combo
                 x_txt = self.board_labels[_x]['text']
                 y_txt = self.board_labels[_y]['text']
@@ -771,7 +774,7 @@ class TicTacToeGUI(tk.Tk):
         #  Note: Need this separate 'if', not elif or continuation of
         #  preceding 'if', to prioritize winning over blocking.
         if turn_number == self.turn_number():
-            for combo in const.WINNING_COMBOS:
+            for combo in WINNING_COMBOS:
                 _x, _y, _z = combo
                 x_txt = self.board_labels[_x]['text']
                 y_txt = self.board_labels[_y]['text']
@@ -844,7 +847,7 @@ class TicTacToeGUI(tk.Tk):
         # When human plays a side square, play the open center to reduce
         #   possibility of a loss.
         if turn_number == self.turn_number():
-            for i in const.SIDES:
+            for i in SIDES:
                 if self.board_labels[i]['text'] == P1_MARK:
                     if self.board_labels[4]['text'] == ' ':
                         self.board_labels[4]['text'] = P2_MARK
@@ -855,10 +858,10 @@ class TicTacToeGUI(tk.Tk):
 
         # When human is on two adjacent side squares, defend with play
         #   to the common corner.
-        # Need const.SIDES in ascending order, so sort() in case
+        # Need SIDES in ascending order, so sort() in case
         #   random.shuffle was previously used on SIDES.
         if turn_number == self.turn_number():
-            const.SIDES.sort()
+            SIDES.sort()
 
             # Have PC play the appropriate corner to defend.
             for key, val in const.ORTHO_SIDES.items():
@@ -883,8 +886,8 @@ class TicTacToeGUI(tk.Tk):
         # When human has played to opposite corners, defend with play to
         #   any side.
         if turn_number == self.turn_number():
-            random.shuffle(const.SIDES)
-            side2play = const.SIDES[0]
+            random.shuffle(SIDES)
+            side2play = SIDES[0]
 
             for i in const.PARA_CORNERS:
                 if i == human_positions:
@@ -934,7 +937,7 @@ class TicTacToeGUI(tk.Tk):
                 self.p2_points += 1
 
         # Loop breaks when the first winning combo is found.
-        for combo in const.WINNING_COMBOS:
+        for combo in WINNING_COMBOS:
             _x, _y, _z = combo
             lbl_x_txt = self.board_labels[_x]['text']
             lbl_y_txt = self.board_labels[_y]['text']
@@ -1395,10 +1398,10 @@ class TicTacToeGUI(tk.Tk):
         :returns: None
         """
 
-        random.shuffle(const.WINNING_COMBOS)
+        random.shuffle(WINNING_COMBOS)
         opponent = P2_MARK if mark == P1_MARK else P1_MARK
 
-        for combo in const.WINNING_COMBOS:
+        for combo in WINNING_COMBOS:
             _x, _y, _z = combo
             x_txt = self.board_labels[_x]['text']
             y_txt = self.board_labels[_y]['text']
@@ -1431,7 +1434,7 @@ class TicTacToeGUI(tk.Tk):
         #   "Autoplay center".
         if self.mode_selection.get() == 'Autoplay strategy':
             if turn_number == self.turn_number():
-                for i in const.SIDES:
+                for i in SIDES:
                     if self.board_labels[i]['text'] == opponent:
                         if self.board_labels[4]['text'] == ' ':
                             self.board_labels[4]['text'] = mark
@@ -1441,12 +1444,12 @@ class TicTacToeGUI(tk.Tk):
             #   to the common corner; increases TIEs.
             # With Autoplay strategy and defensive center, get ~ 75% ties.
             # With Autoplay center, results in ~85% ties.
-            # Need const.SIDES in ascending order, so sort() in case random.shuffle is used.
-            const.SIDES.sort()
+            # Need SIDES in ascending order, so sort() in case random.shuffle is used.
+            SIDES.sort()
             if turn_number == self.turn_number():
                 sides_played = []
                 # Create list of indices of opponent's played square.
-                for i in const.SIDES:
+                for i in SIDES:
                     if self.board_labels[i]['text'] == opponent:
                         sides_played.append(i)
 
