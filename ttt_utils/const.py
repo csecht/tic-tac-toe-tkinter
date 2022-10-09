@@ -3,7 +3,7 @@ Constants and configuration settings used in main script.
 PLAYER1, PLAYER2: the displayed player names.
 P1_MARK, P2_MARK: 'X', 'O', respectively, but can be changed.
 MARKS1, MARKS2: string of duplicate marks that determine number of auto turns.
-WINNING_COMBOS, CORNERS, SIDES, ADJ_CORNER_DICT: lists of game board indices.
+WINNING_COMBOS, CORNERS, SIDES, ORTHO_SIDES: lists of game board indices.
 PLAY_AFTER, AUTO_FAST, AUTO_SLOW, AUTO_SHOW: ms integers for tk after() function.
 TIES, WINS: unused; tuples of end-game board mark configurations, in index order.
 """
@@ -31,17 +31,27 @@ WINNING_COMBOS = [
 ]
 
 CORNERS = [0, 2, 6, 8]
+SIDES = [1, 3, 5, 7]
+# ORTHO_CORNERS = ([0, 2], [0, 6], [2, 8], [6, 8])
+PARA_CORNERS = ([0, 8], [2, 6])
 
-ADJ_CORNER_DICT = {
+# Dictionaries where key is index to be played in response to value for
+#   an opponent's played indices.
+# Keys are orthogonal (nearest) corner indices to opponent's played indices.
+ORTHO_SIDES = {
     0: [1, 3],
     2: [1, 5],
     6: [3, 7],
     8: [5, 7]
 }
 
-INLINE_CORNERS = ([0, 2], [0, 6], [2, 8], [6, 8])
+META_POSITIONS = {
+    0: [2, 3],
+    2: [0, 5],
+    6: [3, 8],
+    8: [5, 6]
+}
 
-SIDES = [1, 3, 5, 7]
 
 # Milliseconds, used in after() calls.
 PLAY_AFTER = 600  # PC response time for PvPC mode.
