@@ -9,7 +9,7 @@ TIES, WINS: (unused) tuples of board end-game configurations, in index order.
 """
 # Copyright (C) 2022 C.S. Echt under GNU General Public License'
 
-from . import platform_check
+from ttt_utils import platform_check  # need MY_OS
 
 # Used only for display of player ID.
 PLAYER1 = 'PLAYER 1'
@@ -70,6 +70,14 @@ COLOR = {'score_fg': 'DodgerBlue4',
          'sq_mouseover': 'grey15',
          'radiobtn_bg': 'DodgerBlue1',
          }
+
+# Need tk to match system's default white shade.
+if platform_check.MY_OS == 'dar':  # macOS
+    COLOR['tk_white'] = 'white'
+elif platform_check.MY_OS == 'lin':  # Linux (Ubuntu)
+    COLOR['tk_white'] = 'grey85'
+else:  # platform is 'win'  # Windows (10)
+    COLOR['tk_white'] = 'grey95'
 
 FONT = {
     'sm_button': ('TkHeadingFont', 8),

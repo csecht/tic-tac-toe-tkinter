@@ -46,14 +46,14 @@ from ttt_utils.platform_check import MY_OS
 class TicTacToeGUI(tk.Tk):
     """
     Display the tkinter GUI playing board and its control buttons.
-    Provide multi-mode play action, with scoring.
+    Provide multiple modes of play action, with scoring.
     Methods: auto_command, auto_flash_win, auto_setup, auto_start,
-    auto_stop, auto_turns_limit, autoengine, autoplay_center,
+    auto_stop, auto_turns_limit, play_rudiments, autoplay_center,
     autoplay_random, autoplay_strategy, autospeed_control,
-    autostart_set_who, block_all_player_action, check_winner,
+    autostart_who, block_all_player_action, check_winner,
     color_pc_mark, configure_widgets, display_result, flash_tie,
     flash_win, grid_widgets, human_turn, mode_control, new_game,
-    on_enter, on_leave, pc_defense, pc_turn, play_random,
+    on_enter, on_leave, play_defense, pc_turn, play_random,
     reset_game_and_score, setup_game_board, turn_number,
     unbind_game_board, window_geometry, your_turn_player1
     """
@@ -150,14 +150,6 @@ class TicTacToeGUI(tk.Tk):
 
         self.prev_game_num.set(0)
         self.ties_num.set(0)
-
-        # Need tk to match system's default white shade.
-        if MY_OS == 'dar':
-            COLOR['tk_white'] = 'white'
-        elif MY_OS == 'lin':
-            COLOR['tk_white'] = 'grey85'
-        else:  # platform is 'win'
-            COLOR['tk_white'] = 'grey95'
 
         # Player's turn widgets.
         self.prev_game_num_header.config(text='Games played',
@@ -287,10 +279,12 @@ class TicTacToeGUI(tk.Tk):
                                       text='Player 1 starts', width=14,
                                       state=tk.DISABLED,
                                       takefocus=False,
-                                      command=self.autostart_set_who)
-
+                                      command=self.autostart_who)
+        # TODO: Activate Quit and who_autostarts Button with Return key
+        #  when it has focus (via Tab), like Radiobuttons do.
         self.quit_button.config(style="My.TButton",
                                 text='Quit', width=4,
+                                takefocus=False,
                                 command=lambda: utils.quit_game(mainloop=app))
 
         self.keybindings()
@@ -302,7 +296,8 @@ class TicTacToeGUI(tk.Tk):
         """
         Key bindings for quit function and to play game board squares.
         Game board key actions can be an alternative to mouse clicks.
-        The idea here is for use in 2-person Player v Player mode.
+        The idea here is to be able to use both key commands and the
+        mouse when two people are playing Player v Player mode.
 
         :return: None
         """
@@ -310,7 +305,7 @@ class TicTacToeGUI(tk.Tk):
         self.bind('Control-q', lambda _: utils.quit_game(app))
         self.bind('<Escape>', lambda _: utils.quit_game(app))
 
-        # Keyboard positional 3x3 layout on either keypad or main board.
+        # Keys in positional 3x3 layout on keypad and main board.
         self.bind('<KeyPress-KP_7>',
                   lambda _: self.human_turn(self.board_labels[0]))
         self.bind('<KeyPress-KP_8>',
@@ -739,8 +734,6 @@ class TicTacToeGUI(tk.Tk):
         else:
             messagebox.showerror('Oops!', 'This square was already played!')
 
-        self.quit_button.config(command=lambda: utils.quit_game(app, False))
-
     def color_pc_mark(self, _id: int) -> None:
         """
         In PvPC mode, provide alternate color for Player1 and
@@ -774,8 +767,8 @@ class TicTacToeGUI(tk.Tk):
         if turn_number > 0:
             app.after(const.PLAY_AFTER)
 
-        # Need to reorder winner and corner lists so Human doesn't detect a pattern
-        #   of where PC will play.
+        # Need to re-order winner and corner lists so Human doesn't detect
+        #   a pattern of where PC will play.
         random.shuffle(WINNING_COMBOS)
         random.shuffle(const.CORNERS)
 
@@ -789,70 +782,23 @@ class TicTacToeGUI(tk.Tk):
                 self.board_labels[4]['text'] = P2_MARK
                 self.color_pc_mark(4)
 
-        # Prefer to play for win, then for block, then what's available.
-        # Play to win:
+        # Now prefer to play for win, then for block.
         if turn_number == self.turn_number():
-            for combo in WINNING_COMBOS:
-                _x, _y, _z = combo
-                x_txt = self.board_labels[_x]['text']
-                y_txt = self.board_labels[_y]['text']
-                z_txt = self.board_labels[_z]['text']
+            self.play_rudiments(turn_number, P2_MARK, pvpc=True)
 
-                if x_txt == y_txt == P2_MARK and z_txt == ' ':
-                    self.board_labels[_z]['text'] = P2_MARK
-                    self.color_pc_mark(_z)
-                    break
-                if y_txt == z_txt == P2_MARK and x_txt == ' ':
-                    self.board_labels[_x]['text'] = P2_MARK
-                    self.color_pc_mark(_x)
-                    break
-                if x_txt == z_txt == P2_MARK and y_txt == ' ':
-                    self.board_labels[_y]['text'] = P2_MARK
-                    self.color_pc_mark(_y)
-                    break
-
-        # Play to block:
-        #  Note: Need this separate 'if', not elif or continuation of
-        #  preceding 'if', to prioritize winning over blocking.
-        if turn_number == self.turn_number():
-            for combo in WINNING_COMBOS:
-                _x, _y, _z = combo
-                x_txt = self.board_labels[_x]['text']
-                y_txt = self.board_labels[_y]['text']
-                z_txt = self.board_labels[_z]['text']
-
-                if x_txt == y_txt == P1_MARK and z_txt == ' ':
-                    self.board_labels[_z]['text'] = P2_MARK
-                    self.color_pc_mark(_z)
-                    break
-                if y_txt == z_txt == P1_MARK and x_txt == ' ':
-                    self.board_labels[_x]['text'] = P2_MARK
-                    self.color_pc_mark(_x)
-                    break
-                if x_txt == z_txt == P1_MARK and y_txt == ' ':
-                    self.board_labels[_y]['text'] = P2_MARK
-                    self.color_pc_mark(_y)
-                    break
-
-        # Preference: play a set of strategy rules for defense over offense.
+        # Strategy preference: play a set of rules for defense.
         if self.choose_pc_pref.get() == 'PC plays strategy':
             if turn_number == self.turn_number():
-                self.pc_defense(turn_number)
+                self.play_defense(turn_number, P2_MARK, pvpc=True)
+
+            # Fill in available corners to play offense.
             if turn_number == self.turn_number():
-                # Fill in available corners.
-                for i in const.CORNERS:
-                    c_txt = self.board_labels[i]['text']
-                    if turn_number == self.turn_number() and c_txt == ' ':
-                        self.board_labels[i]['text'] = const.P2_MARK
-                        self.color_pc_mark(i)
-                        print('PC played corner strategy,'
-                              f' T{turn_number + 1}:G{self.prev_game_num.get() + 1}')
-                        break
+                self.play_corners(turn_number, P2_MARK, pvpc=True)
 
         # No preferred plays are available, so play random.
         if turn_number == self.turn_number():
-            print('PC plays random,'
-                  f' T{turn_number + 1}:G{self.prev_game_num.get() + 1}')
+            print('PC played randomly, '
+                  f'G{self.prev_game_num.get() + 1}:T{turn_number + 1}')
             self.play_random(turn_number, P2_MARK)
 
         if self.turn_number() >= 5:
@@ -862,81 +808,169 @@ class TicTacToeGUI(tk.Tk):
 
         app.update_idletasks()
 
-    def pc_defense(self, turn_number: int) -> None:
+    def play_rudiments(self, turn_number: int, mark: str, pvpc=False) -> None:
         """
-        A defensive response to human's (P1) turns in PvPC mode.
-        Purpose is to minimize PC losses.
+        The rules engine for basic play, look for a win or block.
+
+        :param turn_number: Current turn count from turn_number().
+        :param mark: The played mark string character.
+        :param pvpc: Use when called from a P v PC mode (default, False).
+        :returns: None
+        """
+
+        random.shuffle(WINNING_COMBOS)
+        opponent = P2_MARK if mark == P1_MARK else P1_MARK
+
+        for combo in WINNING_COMBOS:
+            _x, _y, _z = combo
+            x_txt = self.board_labels[_x]['text']
+            y_txt = self.board_labels[_y]['text']
+            z_txt = self.board_labels[_z]['text']
+
+            # Play to win.
+            if x_txt == y_txt == mark and z_txt == ' ':
+                self.board_labels[_z]['text'] = mark
+                if pvpc:
+                    self.color_pc_mark(_z)
+                break
+            if y_txt == z_txt == mark and x_txt == ' ':
+                self.board_labels[_x]['text'] = mark
+                if pvpc:
+                    self.color_pc_mark(_x)
+                break
+            if x_txt == z_txt == mark and y_txt == ' ':
+                self.board_labels[_y]['text'] = mark
+                if pvpc:
+                    self.color_pc_mark(_y)
+                break
+
+        # No win available, so play to block.
+        if turn_number == self.turn_number():
+            for combo in WINNING_COMBOS:
+                _x, _y, _z = combo
+                x_txt = self.board_labels[_x]['text']
+                y_txt = self.board_labels[_y]['text']
+                z_txt = self.board_labels[_z]['text']
+
+                if x_txt == y_txt == opponent and z_txt == ' ':
+                    self.board_labels[_z]['text'] = mark
+                    if pvpc:
+                        self.color_pc_mark(_z)
+                    break
+                if y_txt == z_txt == opponent and x_txt == ' ':
+                    self.board_labels[_x]['text'] = mark
+                    if pvpc:
+                        self.color_pc_mark(_x)
+                    break
+                if x_txt == z_txt == opponent and y_txt == ' ':
+                    self.board_labels[_y]['text'] = mark
+                    if pvpc:
+                        self.color_pc_mark(_y)
+                    break
+
+    def play_defense(self, turn_number: int, mark: str, pvpc=True) -> None:
+        """
+        A rules-based set of defensive responses to minimize PC losses.
 
         :param turn_number: The current turn number, from turn_number().
+        :param mark: The played mark character, as string.
+        :param pvpc: Use when called from a P v PC mode (default, False).
+
         :return: None
         """
+        opponent = P2_MARK if mark == P1_MARK else P1_MARK
 
         # Create list of indices of opponent's played squares.
-        human_positions = []
+        oppo_positions = []
         for i in range(9):
-            if self.board_labels[i]['text'] == P1_MARK:
-                human_positions.append(i)
+            if self.board_labels[i]['text'] == opponent:
+                oppo_positions.append(i)
 
-        # Always defend center, if available, in response to human's 1st turn.
+        # Always defend center, if available, in response to opponent's 1st turn.
         if turn_number == 1:
             if self.board_labels[4]['text'] == ' ':
-                self.board_labels[4]['text'] = P2_MARK
-                self.color_pc_mark(4)
-                print('PC grabbed the center,'
-                      f' T{turn_number + 1}:G{self.prev_game_num.get() + 1}')
+                self.board_labels[4]['text'] = mark
+                if pvpc:
+                    self.color_pc_mark(4)
+                    print('PC grabbed the center, '
+                          f'G{self.prev_game_num.get() + 1}:T{turn_number + 1}')
 
-        # When human plays a side square, play the open center to reduce
+        # When opponent plays a side square, play the open center to reduce
         #   possibility of a loss.
         if turn_number == self.turn_number():
             for i in SIDES:
-                if self.board_labels[i]['text'] == P1_MARK:
+                if self.board_labels[i]['text'] == opponent:
                     if self.board_labels[4]['text'] == ' ':
-                        self.board_labels[4]['text'] = P2_MARK
-                        self.color_pc_mark(4)
-                        print('PC played center defense,'
-                              f' T{turn_number + 1}:G{self.prev_game_num.get() + 1}')
+                        self.board_labels[4]['text'] = mark
+                        if pvpc:
+                            self.color_pc_mark(4)
+                            print('PC played center defense, '
+                                  f'G{self.prev_game_num.get() + 1}:T{turn_number + 1}')
                         break
 
-        # When human is on two adjacent side squares, defend with play
-        #   to the common corner.
-        # Need SIDES in ascending order, so sort() in case
-        #   random.shuffle was previously used on SIDES.
+        # When opponent is on two adjacent side squares, defend with play
+        #   to the shared (nearest) corner.
+        # Need SIDES in ascending order, so sort() in case random.shuffle
+        #   was previously used on SIDES.
         if turn_number == self.turn_number():
             SIDES.sort()
 
             # Have PC play the appropriate corner to defend.
             for key, val in const.ORTHO_SIDES.items():
-                if self.board_labels[key]['text'] == ' ' and human_positions == val:
-                    self.board_labels[key]['text'] = P2_MARK
-                    self.color_pc_mark(key)
-                    print('PC played corner for orthogonal sides defense,'
-                          f' T{turn_number + 1}:G{self.prev_game_num.get() + 1}')
+                if self.board_labels[key]['text'] == ' ' and oppo_positions == val:
+                    self.board_labels[key]['text'] = mark
+                    if pvpc:
+                        self.color_pc_mark(key)
+                        print('PC played corner for orthogonal sides defense, '
+                              f'G{self.prev_game_num.get() + 1}:T{turn_number + 1}')
                     break
 
-        # When human has played a corner and a non-adjacent side, defend with
-        #   play to human's orthogonal corner.
+        # When opponent has played a corner and a non-adjacent side, defend with
+        #   play to opponent's shared (nearest) corner.
         if turn_number == self.turn_number():
             for key, val in const.META_POSITIONS.items():
-                if self.board_labels[key]['text'] == ' ' and human_positions == val:
-                    self.board_labels[key]['text'] = P2_MARK
-                    self.color_pc_mark(key)
-                    print('PC played corner for meta-positional defense,'
-                          f' T{turn_number + 1}:G{self.prev_game_num.get() + 1}')
+                if self.board_labels[key]['text'] == ' ' and oppo_positions == val:
+                    self.board_labels[key]['text'] = mark
+                    if pvpc:
+                        self.color_pc_mark(key)
+                        print('PC played corner for meta-positional defense, '
+                              f'G{self.prev_game_num.get() + 1}:T{turn_number + 1}')
                     break
 
-        # When human has played to opposite corners, defend with play to
+        # When opponent has played to opposite corners, defend with play to
         #   any side.
         if turn_number == self.turn_number():
             random.shuffle(SIDES)
             side2play = SIDES[0]
 
             for i in const.PARA_CORNERS:
-                if i == human_positions:
-                    self.board_labels[side2play]['text'] = P2_MARK
-                    self.color_pc_mark(side2play)
-                    print('PC played a side for para-corners defense,'
-                          f' T{turn_number + 1}:G{self.prev_game_num.get() + 1}')
+                if i == oppo_positions:
+                    self.board_labels[side2play]['text'] = mark
+                    if pvpc:
+                        self.color_pc_mark(side2play)
+                        print('PC played a side for para-corners defense, '
+                              f'G{self.prev_game_num.get() + 1}:T{turn_number + 1}')
                     break
+
+    def play_corners(self, turn_number: int, mark: str, pvpc=False) -> None:
+        """
+        Fill in available corners to increase probability of a win.
+
+        :param turn_number: The current turn number, from turn_number().
+        :param mark: The played mark character, as string.
+        :param pvpc: Use when called from a P v PC mode (default, False).
+
+        :return: None
+        """
+        for i in const.CORNERS:
+            c_txt = self.board_labels[i]['text']
+            if turn_number == self.turn_number() and c_txt == ' ':
+                self.board_labels[i]['text'] = mark
+                if pvpc:
+                    self.color_pc_mark(i)
+                    print('PC played corner strategy, '
+                          f'G{self.prev_game_num.get() + 1}:T{turn_number + 1}')
+                break
 
     def play_random(self, turn_number: int, mark: str) -> None:
         """ Play *mark* in a random position of board_labels index.
@@ -950,7 +984,8 @@ class TicTacToeGUI(tk.Tk):
             random_idx = random.randrange(0, 9)
             if self.board_labels[random_idx]['text'] == ' ':
                 self.board_labels[random_idx]['text'] = mark
-                self.color_pc_mark(random_idx)
+                if not self.autoplay_on.get():
+                    self.color_pc_mark(random_idx)
 
     def turn_number(self) -> int:
         """
@@ -1002,7 +1037,7 @@ class TicTacToeGUI(tk.Tk):
                     self.flash_win(combo)
                     self.display_result(f'{mark} WINS!')
                     if self.choose_pc_pref.get() in 'PC plays center, PC plays strategy':
-                        print('PC wins.') if mark == P2_MARK else print('Human wins.')
+                        print('PC won.') if mark == P2_MARK else print('Human won.')
                     break
 
         if self.turn_number() == 9 and not self.winner_found:
@@ -1193,8 +1228,7 @@ class TicTacToeGUI(tk.Tk):
 
         return: None
         """
-        self.quit_button.config(state=tk.NORMAL,
-                                command=lambda: utils.quit_game(mainloop=app))
+        self.quit_button.config(state=tk.NORMAL)
 
         # Make font invisible (bg color) to remove from view.
         self.auto_turns_header.config(fg=COLOR['tk_white'])
@@ -1359,7 +1393,7 @@ class TicTacToeGUI(tk.Tk):
         #   and when an autoplay option is set to always begin with p1_mark.
         self.auto_marks = ''.join(map(lambda m1, m2: m1 + m2, MARKS1, MARKS2))
 
-    def autostart_set_who(self) -> None:
+    def autostart_who(self) -> None:
         """
         Toggle who_autostarts Button text.
         Text content used for conditions in auto_setup().
@@ -1425,91 +1459,15 @@ class TicTacToeGUI(tk.Tk):
         else:
             self.auto_stop('ended')
 
-    def autoengine(self, turn_number: int, mark: str) -> None:
-        """
-        The rules engine for autoplay option. Plays, in decreasing
-        priority: win, block, defend center, defend corner, random.
-        Each turn is played on a timed interval set by the
-        autospeed_control() used in the after_id caller; so, one turn
-        is played per call.
-        Called from autoplay_strategy() and autoplay_center().
-
-        :param turn_number: Current turn count from turn_number().
-        :param mark: The played mark character, as str.
-        :returns: None
-        """
-
-        random.shuffle(WINNING_COMBOS)
-        opponent = P2_MARK if mark == P1_MARK else P1_MARK
-
-        for combo in WINNING_COMBOS:
-            _x, _y, _z = combo
-            x_txt = self.board_labels[_x]['text']
-            y_txt = self.board_labels[_y]['text']
-            z_txt = self.board_labels[_z]['text']
-
-            # Play to win.
-            if x_txt == y_txt == mark and z_txt == ' ':
-                self.board_labels[_z]['text'] = mark
-                break
-            if y_txt == z_txt == mark and x_txt == ' ':
-                self.board_labels[_x]['text'] = mark
-                break
-            if x_txt == z_txt == mark and y_txt == ' ':
-                self.board_labels[_y]['text'] = mark
-                break
-
-            # No win available, so play to block.
-            if x_txt == y_txt == opponent and z_txt == ' ':
-                self.board_labels[_z]['text'] = mark
-                break
-            if y_txt == z_txt == opponent and x_txt == ' ':
-                self.board_labels[_x]['text'] = mark
-                break
-            if x_txt == z_txt == opponent and y_txt == ' ':
-                self.board_labels[_y]['text'] = mark
-                break
-
-        # A play to center early is a defensive move when opponent has
-        #   played a side; increases TIEs. Is not relevant when mode is
-        #   "Autoplay center".
-        if self.mode_selection.get() == 'Autoplay strategy':
-            if turn_number == self.turn_number():
-                for i in SIDES:
-                    if self.board_labels[i]['text'] == opponent:
-                        if self.board_labels[4]['text'] == ' ':
-                            self.board_labels[4]['text'] = mark
-                            break
-
-            # When opponent is on two adjacent side squares, defend with play
-            #   to the common corner; increases TIEs.
-            # With Autoplay strategy and defensive center, get ~ 75% ties.
-            # With Autoplay center, results in ~85% ties.
-            # Need SIDES in ascending order, so sort() in case random.shuffle is used.
-            SIDES.sort()
-            if turn_number == self.turn_number():
-                sides_played = []
-                # Create list of indices of opponent's played square.
-                for i in SIDES:
-                    if self.board_labels[i]['text'] == opponent:
-                        sides_played.append(i)
-
-                # Have current player play the appropriate corner.
-                for key, val in const.ORTHO_SIDES.items():
-                    if self.board_labels[key]['text'] == ' ' and sides_played == val:
-                        self.board_labels[key]['text'] = mark
-
-        # No preferred play available, so play random.
-        if turn_number == self.turn_number():
-            self.play_random(turn_number, mark)
-
     def autoplay_strategy(self) -> None:
         """
         Automatically play computer vs. computer for 1000 turns
         (~120 games) or until stopped by user. Each turn is played on a
         timed interval set by the self.autospeed_control() time used in the
-        after_id caller, so one turn per call. First play is at a
-        random position, subsequent plays follow win or block rules.
+        after_id caller, so one turn per call.
+
+        Play strategy, in decreasing priority: win, block, defend center,
+        defend corners, random.
 
         :return: None
         """
@@ -1521,8 +1479,18 @@ class TicTacToeGUI(tk.Tk):
         if len(self.auto_marks) > 0:
             mark = self.auto_marks[0]
 
-            while turn_number == self.turn_number():
-                self.autoengine(turn_number, mark)
+            # Look for a winning or blocking play.
+            self.play_rudiments(turn_number, mark)
+
+            if turn_number == self.turn_number():
+                self.play_defense(turn_number, mark)
+
+            if turn_number == self.turn_number():
+                self.play_corners(turn_number, mark)
+
+            # No preferred play available, so play random.
+            if turn_number == self.turn_number():
+                self.play_random(turn_number, mark)
 
             if self.turn_number() >= 5:
                 self.check_winner(mark)
@@ -1557,11 +1525,17 @@ class TicTacToeGUI(tk.Tk):
         if len(self.auto_marks) > 0:
             mark = self.auto_marks[0]
 
-            while turn_number == self.turn_number():
-                if self.board_labels[4]['text'] == ' ':
-                    self.board_labels[4]['text'] = mark
+            # Fill in the available center.
+            if self.board_labels[4]['text'] == ' ':
+                self.board_labels[4]['text'] = mark
 
-                self.autoengine(turn_number, mark)
+            # Look for a winning or blocking play.
+            if turn_number == self.turn_number():
+                self.play_rudiments(turn_number, mark)
+
+            # No preferred play available, so play random.
+            if turn_number == self.turn_number():
+                self.play_random(turn_number, mark)
 
             if self.turn_number() >= 5:
                 self.check_winner(mark)
