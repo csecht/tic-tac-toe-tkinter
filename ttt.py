@@ -868,7 +868,7 @@ class TicTacToeGUI(tk.Tk):
                         self.color_pc_mark(_y)
                     break
 
-    def play_defense(self, turn_number: int, mark: str, pvpc=True) -> None:
+    def play_defense(self, turn_number: int, mark: str, pvpc=False) -> None:
         """
         A rules-based set of defensive responses to minimize PC losses.
 
