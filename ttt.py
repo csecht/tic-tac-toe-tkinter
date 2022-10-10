@@ -57,8 +57,8 @@ class TicTacToeGUI(tk.Tk):
     reset_game_and_score, setup_game_board, turn_number,
     unbind_game_board, window_geometry, your_turn_player1
     """
-    # Using __slots__ for Class attributes gives slight reduction of memory
-    #   usage and possible performance improvement.
+    # Using __slots__ for all Class attributes gives slight reduction of
+    #   memory usage and maybe improved performance.
     __slots__ = (
         'after_id', 'auto_erase', 'auto_marks',
         'auto_go_stop_radiobtn', 'auto_go_stop_txt',
@@ -164,19 +164,16 @@ class TicTacToeGUI(tk.Tk):
                                          font=FONT['condensed'])
         self.prev_game_num_lbl.config(textvariable=self.prev_game_num,
                                       font=FONT['condensed'])
-        self.whose_turn_lbl.config(textvariable=self.whose_turn, height=4,
-                                   font=FONT['who'])
-
+        self.whose_turn_lbl.config(textvariable=self.whose_turn,
+                                   font=FONT['who'],
+                                   height=4)
         self.your_turn_player1()  # Starting prompt for Player1 to begin play.
-
         self.auto_turns_header.config(text='Turns to go',
                                       font=FONT['condensed'],
-                                      fg=COLOR['tk_white'],  # make invisible.
-                                      )
+                                      fg=COLOR['tk_white'])  # match default bg.
         self.auto_turns_lbl.config(textvariable=self.auto_turns_remaining,
                                    font=FONT['condensed'],
-                                   fg=COLOR['tk_white'], # make invisible.
-                                   )
+                                   fg=COLOR['tk_white'])  # match default bg.
 
         # Players' scores widgets:
         # ︴squiggle symbol from https://coolsymbol.com/line-symbols.html
@@ -296,8 +293,52 @@ class TicTacToeGUI(tk.Tk):
                                 text='Quit', width=4,
                                 command=lambda: utils.quit_game(mainloop=app))
 
+        self.keybindings()
+
         # Configure game board playing squares (Labels):
         self.setup_game_board()
+
+    def keybindings(self) -> None:
+        """
+        Key bindings for quit function and to play game board squares.
+        Game board key actions can be an alternative to mouse clicks.
+        The idea here is for use in 2-person Player v Player mode.
+
+        :return: None
+        """
+
+        self.bind('Control-q', lambda _: utils.quit_game(app))
+        self.bind('<Escape>', lambda _: utils.quit_game(app))
+
+        # Keyboard positional 3x3 layout on either keypad or main board.
+        self.bind('<KeyPress-KP_7>',
+                  lambda _: self.human_turn(self.board_labels[0]))
+        self.bind('<KeyPress-KP_8>',
+                  lambda _: self.human_turn(self.board_labels[1]))
+        self.bind('<KeyPress-KP_9>',
+                  lambda _: self.human_turn(self.board_labels[2]))
+        self.bind('<KeyPress-KP_4>',
+                  lambda _: self.human_turn(self.board_labels[3]))
+        self.bind('<KeyPress-KP_5>',
+                  lambda _: self.human_turn(self.board_labels[4]))
+        self.bind('<KeyPress-KP_6>',
+                  lambda _: self.human_turn(self.board_labels[5]))
+        self.bind('<KeyPress-KP_1>',
+                  lambda _: self.human_turn(self.board_labels[6]))
+        self.bind('<KeyPress-KP_2>',
+                  lambda _: self.human_turn(self.board_labels[7]))
+        self.bind('<KeyPress-KP_3>',
+                  lambda _: self.human_turn(self.board_labels[8]))
+
+        self.bind('q', lambda _: self.human_turn(self.board_labels[0]))
+        self.bind('w', lambda _: self.human_turn(self.board_labels[1]))
+        self.bind('e', lambda _: self.human_turn(self.board_labels[2]))
+        self.bind('a', lambda _: self.human_turn(self.board_labels[3]))
+        self.bind('s', lambda _: self.human_turn(self.board_labels[4]))
+        self.bind('d', lambda _: self.human_turn(self.board_labels[5]))
+        self.bind('z', lambda _: self.human_turn(self.board_labels[6]))
+        self.bind('x', lambda _: self.human_turn(self.board_labels[7]))
+        self.bind('c', lambda _: self.human_turn(self.board_labels[8]))
 
     def grid_widgets(self) -> None:
         """Position app window widgets."""
@@ -642,7 +683,7 @@ class TicTacToeGUI(tk.Tk):
         :return: None
         """
 
-        # At app start, Previous game # = 0, then increments after a win/tie.
+        # At start, Previous game # = 0, then increments after a win/tie.
         #  At start of a new game, turn # = 0.
         #  On even PvPC games, pc will have already played 1st turn.
         def h_plays_p1():
