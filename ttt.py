@@ -73,7 +73,7 @@ class TicTacToeGUI(tk.Tk):
         'player2_header', 'player2_score_lbl',
         'prev_game_num', 'prev_game_num_header', 'prev_game_num_lbl',
         'pvp_mode', 'pvpc_mode', 'quit_button',
-        'status_calls', 'status_window', 'resultwin_geometry',
+        'status_calls', 'status_window', 'statuswin_geometry',
         'score_header', 'separator', 'ties_header', 'ties_lbl',
         'ties_num', 'titlebar_offset', 'who_autostarts', 'whose_turn',
         'whose_turn_lbl', 'winner_found',
@@ -136,8 +136,8 @@ class TicTacToeGUI(tk.Tk):
         self.curr_pmode = ''  # Used to evaluate mode state.
         self.status_window = None  # Will be a toplevel in display_status().
         self.status_calls = 0  # Allows recording of initial Status window position.
-        self.resultwin_geometry = ''  # Used to remember Result window position.
-        self.titlebar_offset = 0  # Used for accurate positioning of Result win.
+        self.statuswin_geometry = ''  # Used to remember Status window position.
+        self.titlebar_offset = 0  # Used for accurate positioning of Status win.
         self.winner_found = False  # Used for game flow control.
         self.quit_button = ttk.Button()
 
@@ -638,10 +638,10 @@ class TicTacToeGUI(tk.Tk):
                 self.your_turn_player1()
 
             # Need this to deactivate the auto_go_stop_radiobtn which
-            #   would otherwise open a duplicate Result window (a
+            #   would otherwise open a duplicate Status window (a
             #   'started' auto game would be instantly 'canceled' b/c the
             #   game board wasn't reset). So force user to click
-            #   'New Game' or 'Quit' in Result window BEFORE starting an
+            #   'New Game' or 'Quit' in Status window BEFORE starting an
             #   autoplay mode with the auto_go_stop_radiobtn.
             try:
                 if self.status_window.winfo_exists():
@@ -662,7 +662,7 @@ class TicTacToeGUI(tk.Tk):
         else:
             self.whose_turn.set(f'{const.PLAYER1} plays {P1_MARK}')
 
-        self.whose_turn_lbl.config(bg=COLOR['result_bg'])
+        self.whose_turn_lbl.config(bg=COLOR['status_bg'])
 
     def human_turn(self, played_lbl: tk) -> None:
         """
@@ -763,7 +763,7 @@ class TicTacToeGUI(tk.Tk):
         turn_number = self.turn_number()
 
         # Delay play for a better feel, but not when PC starts a game b/c
-        #   that just delays closing the Result toplevel for a new game.
+        #   that just delays closing the Status toplevel for a new game.
         if turn_number > 0:
             app.after(const.PLAY_AFTER)
 
@@ -1094,7 +1094,7 @@ class TicTacToeGUI(tk.Tk):
         """
         Set the xy geometry of a *toplevel* window near top-left corner
         of app window. If it was moved, then put it at the new geometry
-        determined by the resultwin_geometry coordinates string.
+        determined by the statuswin_geometry coordinates string.
         Calculate the height of the system's window title bar to use as
         a y-offset for the *toplevel* xy geometry.
 
@@ -1102,8 +1102,8 @@ class TicTacToeGUI(tk.Tk):
         :return: None
         """
 
-        if self.resultwin_geometry:
-            toplevel.geometry(self.resultwin_geometry)
+        if self.statuswin_geometry:
+            toplevel.geometry(self.statuswin_geometry)
         else:
             toplevel.geometry(f'+{app.winfo_x()}+{app.winfo_y()}')
 
@@ -1117,20 +1117,20 @@ class TicTacToeGUI(tk.Tk):
             app.update_idletasks()
             self.titlebar_offset = toplevel.winfo_y() - app.winfo_y()
 
-    def display_status(self, result_msg: str) -> None:
+    def display_status(self, status_msg: str) -> None:
         """
-        Pop-up a game result window to announce winner or tie with
+        Pop-up a game status window to announce winner or tie with
         PvP and PvPC modes, or with a canceled autoplay.
         Provide option Buttons to play again or quit app.
         Play again option can be invoked with Return or Enter.
         Display tally of players' wins within a single play mode.
 
-        :param result_msg: The result string to display in result window.
+        :param status_msg: The status string to display in status window.
         :return: None
         """
 
         self.status_window = tk.Toplevel(self,
-                                         bg=COLOR['result_bg'],
+                                         bg=COLOR['status_bg'],
                                          borderwidth=4,
                                          relief='raised')
         self.status_window.title('Game Status')
@@ -1159,10 +1159,10 @@ class TicTacToeGUI(tk.Tk):
         self.status_window.attributes('-topmost', True)
         self.status_window.focus_force()
 
-        result_lbl = tk.Label(self.status_window,
-                              text=result_msg,
-                              font=FONT['report'],
-                              bg=COLOR['result_bg'])
+        status_lbl = tk.Label(self.status_window,
+                              text=status_msg,
+                              font=FONT['status'],
+                              bg=COLOR['status_bg'])
 
         self.block_player_action()
         self.whose_turn.set('Game pending...')
@@ -1189,9 +1189,9 @@ class TicTacToeGUI(tk.Tk):
             :return: None
             """
 
-            # Need to retain screen position of results window between games in case
+            # Need to retain screen position of status window between games in case
             #   user has moved it from default position.
-            self.resultwin_geometry = (
+            self.statuswin_geometry = (
                 f'+{self.status_window.winfo_x()}'
                 f'+{self.status_window.winfo_y() - self.titlebar_offset}'
             )
@@ -1210,7 +1210,7 @@ class TicTacToeGUI(tk.Tk):
         self.status_window.bind('<Return>', lambda _: restart_game())
         self.status_window.bind('<KP_Enter>', lambda _: restart_game())
 
-        result_lbl.pack(pady=3, padx=3)
+        status_lbl.pack(pady=3, padx=3)
         again.pack(pady=(0, 0))
         not_again.pack(pady=5)
 
@@ -1342,8 +1342,8 @@ class TicTacToeGUI(tk.Tk):
 
     def auto_stop(self, stop_msg: str) -> None:
         """
-        Stop autoplay method and call Result popup window.
-        Disable player game actions (resets when Result window closes).
+        Stop autoplay method and call Status popup window.
+        Disable player game actions (resets when Status window closes).
 
         :param stop_msg: Information on type of auto_stop call; e.g.,
             "ended", "cancelled", etc.

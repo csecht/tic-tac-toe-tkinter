@@ -61,7 +61,7 @@ AUTO_SHOW = 1  # Necessary for proper auto_flash_win() operation.
 
 # Foreground and background colors.
 COLOR = {'score_fg': 'DodgerBlue4',
-         'result_bg': 'yellow3',
+         'status_bg': 'yellow3',
          'disabled_fg': 'grey65',
          'tk_white': '',  # defined in ttt.configure_widgets()
          'mark_fg': 'yellow2',
@@ -84,7 +84,7 @@ FONT = {
     'who': ('TkHeadingFont', 7, 'italic bold'),
     'button': ('TkHeadingFont', 8, 'bold'),
     'scores': ('TkHeadingFont', 9),
-    'report': ('TkHeadingFont', 9, 'italic bold'),
+    'status': ('TkHeadingFont', 9, 'italic bold'),
     'condensed': ('TkTooltipFont', 8),
     'mark': ('TkFixedFont', 50),
 }
