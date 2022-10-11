@@ -277,14 +277,12 @@ class TicTacToeGUI(tk.Tk):
         style.configure('My.TButton', font=FONT['sm_button'])
         self.who_autostarts.configure(style="My.TButton",
                                       text='Player 1 starts', width=14,
+                                      takefocus=True,
                                       state=tk.DISABLED,
-                                      takefocus=False,
                                       command=self.autostart_who)
-        # TODO: Activate Quit and who_autostarts Button with Return key
-        #  when it has focus (via Tab), like Radiobuttons do.
+
         self.quit_button.config(style="My.TButton",
                                 text='Quit', width=4,
-                                takefocus=False,
                                 command=lambda: utils.quit_game(mainloop=app))
 
         self.keybindings()
@@ -362,8 +360,9 @@ class TicTacToeGUI(tk.Tk):
 
         # Squeeze everything in with pretty spanning, padding, and stickies.
         #  Grid statements are sorted by row, then column.
-        self.whose_turn_lbl.grid(  # padx matches that of board_labels.
-            row=0, column=0, padx=0, pady=(5, 0))
+
+        # Value of padx here should match that for board_labels.
+        self.whose_turn_lbl.grid(row=0, column=0, padx=pad, pady=(5, 0))
 
         if MY_OS in 'lin, dar':
             self.prev_game_num_header.grid(
@@ -402,21 +401,17 @@ class TicTacToeGUI(tk.Tk):
 
         if MY_OS in 'lin, dar':
             self.player1_score_lbl.grid(
-                row=0, column=1,
-                rowspan=2, columnspan=2,
+                row=0, column=1, rowspan=2, columnspan=2,
                 padx=(112, 0), pady=(0, 35), sticky=tk.W)
             self.player2_score_lbl.grid(
-                row=0, column=1,
-                rowspan=2, columnspan=2,
+                row=0, column=1, rowspan=2, columnspan=2,
                 padx=(112, 0), pady=(20, 10), sticky=tk.W)
         else:  # is Windows
             self.player1_score_lbl.grid(
-                row=0, column=2,
-                rowspan=2,
+                row=0, column=2, rowspan=2,
                 padx=0, pady=(0, 50), sticky=tk.W)
             self.player2_score_lbl.grid(
-                row=0, column=2,
-                rowspan=2,
+                row=0, column=2, rowspan=2,
                 padx=0, pady=(30, 10), sticky=tk.W)
 
         self.auto_turns_lbl.grid(
@@ -501,7 +496,7 @@ class TicTacToeGUI(tk.Tk):
         self.who_autostarts.grid(
             row=11, column=0, padx=(10, 0), pady=5, sticky=tk.W)
         self.quit_button.grid(
-            row=11, column=2, padx=5, pady=(0, 5), sticky=tk.E)
+            row=11, column=2, padx=5, pady=5, sticky=tk.E)
 
     def setup_game_board(self) -> None:
         """
