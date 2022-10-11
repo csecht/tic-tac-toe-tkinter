@@ -285,7 +285,7 @@ class TicTacToeGUI(tk.Tk):
                                 text='Quit', width=4,
                                 command=lambda: utils.quit_game(mainloop=app))
 
-        # self.keybindings()
+        self.keybindings()
 
         # Configure game board playing squares (Labels):
         self.setup_game_board()
