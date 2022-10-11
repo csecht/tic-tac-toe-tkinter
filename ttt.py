@@ -472,15 +472,27 @@ class TicTacToeGUI(tk.Tk):
 
         self.auto_go_stop_radiobtn.grid(
             row=8, column=1, rowspan=2, padx=(16, 0), pady=(6, 0), sticky=tk.W)
-        self.autospeed_lbl.grid(
-            row=8, column=1, rowspan=2, columnspan=2,
-            padx=(0, 54), pady=(6, 0), sticky=tk.E)
-        self.autospeed_fast.grid(
-            row=9, column=1, columnspan=2,
-            padx=(0, 100), pady=(16, 0), sticky=tk.E)
-        self.autospeed_slow.grid(
-            row=9, column=1, columnspan=2,
-            padx=(0, 40), pady=(16, 0), sticky=tk.E)
+
+        if MY_OS in 'lin, dar':
+            self.autospeed_lbl.grid(
+                row=8, column=1, rowspan=2, columnspan=2,
+                padx=(0, 54), pady=(6, 0), sticky=tk.E)
+            self.autospeed_fast.grid(
+                row=9, column=1, columnspan=2,
+                padx=(0, 100), pady=(16, 0), sticky=tk.E)
+            self.autospeed_slow.grid(
+                row=9, column=1, columnspan=2,
+                padx=(0, 40), pady=(16, 0), sticky=tk.E)
+        else:  # is Windows
+            self.autospeed_lbl.grid(
+                row=8, column=2, rowspan=2,
+                padx=(0, 0), pady=(6, 0), sticky=tk.W)
+            self.autospeed_fast.grid(
+                row=9, column=1, columnspan=2,
+                padx=(150, 0), pady=(16, 0), sticky=tk.W)
+            self.autospeed_slow.grid(
+                row=9, column=1, columnspan=2,
+                padx=(0, 40), pady=(16, 0), sticky=tk.E)
 
         if MY_OS in 'win, dar':
             padx = (5, 0)
