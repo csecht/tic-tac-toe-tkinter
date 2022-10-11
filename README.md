@@ -50,5 +50,15 @@ Autoplay game in progress with strategy mode, with PC players alternating start 
 
 ![autoplay-game](images/autoplay.png)
 
+### Keyboard navigation
+
+All actions that are done with the mouse can also be done with the keys. To play marks in squares, use either the numeric keypad or the nine letter keys on the left side of the keyboard. In both cases, the top row of keys corresponds to the top row of squares, following with the middle and bottom rows.
+
+For example, with two people competing in Player v Player mode, one can use the mouse while the other uses the keyboard.
+
+Modes and buttons can be selected by cycling through with the Tab key. Activate the desired mode by pressing Enter. The 'Player 1 starts' button in the lower left becomes selectable only when an Autoplay mode is active; toggle between 'Player 1 starts' and 'Players alternate' with the space bar.
+
+Similarly, the space bar activates the Quit button once it has selection focus.
+
 ### Known Issues
 Waiting for feedback...
