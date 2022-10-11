@@ -285,7 +285,7 @@ class TicTacToeGUI(tk.Tk):
                                 text='Quit', width=4,
                                 command=lambda: utils.quit_game(mainloop=app))
 
-        self.keybindings()
+        # self.keybindings()
 
         # Configure game board playing squares (Labels):
         self.setup_game_board()
@@ -361,8 +361,7 @@ class TicTacToeGUI(tk.Tk):
         # Squeeze everything in with pretty spanning, padding, and stickies.
         #  Grid statements are sorted by row, then column.
 
-        # Value of padx here should match that for board_labels.
-        self.whose_turn_lbl.grid(row=0, column=0, padx=pad, pady=(5, 0))
+        self.whose_turn_lbl.grid(row=0, column=0, padx=0, pady=(5, 0))
 
         if MY_OS in 'lin, dar':
             self.prev_game_num_header.grid(
@@ -473,7 +472,17 @@ class TicTacToeGUI(tk.Tk):
         self.auto_go_stop_radiobtn.grid(
             row=8, column=1, rowspan=2, padx=(16, 0), pady=(6, 0), sticky=tk.W)
 
-        if MY_OS in 'lin, dar':
+        if MY_OS == 'dar':
+            self.autospeed_lbl.grid(
+                row=8, column=1, rowspan=2, columnspan=2,
+                padx=(0, 50), pady=(6, 0), sticky=tk.E)
+            self.autospeed_fast.grid(
+                row=9, column=1, columnspan=2,
+                padx=(0, 90), pady=(16, 0), sticky=tk.E)
+            self.autospeed_slow.grid(
+                row=9, column=1, columnspan=2,
+                padx=(0, 30), pady=(16, 0), sticky=tk.E)
+        elif MY_OS == 'lin':
             self.autospeed_lbl.grid(
                 row=8, column=1, rowspan=2, columnspan=2,
                 padx=(0, 54), pady=(6, 0), sticky=tk.E)
@@ -496,7 +505,7 @@ class TicTacToeGUI(tk.Tk):
 
         if MY_OS in 'win, dar':
             padx = (5, 0)
-        else:
+        else:  # is Linux
             padx = 0
         self.auto_random_mode.grid(
             row=8, column=0, padx=padx, pady=(4, 0), sticky=tk.W)
