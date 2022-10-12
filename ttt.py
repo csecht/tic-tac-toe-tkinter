@@ -340,10 +340,12 @@ class TicTacToeGUI(tk.Tk):
         #   nothing is gridded in row index 1, the top row uses rowspan=2
         #   to center widgets vertically; hence, board_labels begin on
         #   row index 2.
+        # Grid parameters of board_labels determine the height and width
+        #   of the app window.
         _row = 2
         _col = 0
 
-        # Set platform-specific padding between play Labels (squares).
+        # Set platform-specific padding between board squares (board_labels).
         if MY_OS == 'dar':  # macOS
             pad = 6
         elif MY_OS == 'lin':  # Linux
@@ -1109,8 +1111,8 @@ class TicTacToeGUI(tk.Tk):
     def window_geometry(self, toplevel: tk) -> None:
         """
         Set the xy geometry of a *toplevel* window near top-left corner
-        of app window. If it was moved, then put it at the new geometry
-        determined by the statuswin_geometry coordinates string.
+        of app window. If it is moved, then draw it at the new position
+        determined by its screen pixel xy coordinates.
         Calculate the height of the system's window title bar to use as
         a y-offset for the *toplevel* xy geometry.
 
