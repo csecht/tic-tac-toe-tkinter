@@ -363,7 +363,14 @@ class TicTacToeGUI(tk.Tk):
         # Squeeze everything in with pretty spanning, padding, and stickies.
         #  Grid statements are sorted by row, then column.
 
-        self.whose_turn_lbl.grid(row=0, column=0, padx=0, pady=(5, 0))
+        # Adjust gridding of whose_turn_lbl to avoid shifting when text changes.
+        if MY_OS == 'lin':
+            self.whose_turn_lbl.grid(row=0, column=0,
+                                     padx=(12, 0), pady=(5, 0),
+                                     sticky=tk.W)
+        else: # macOS or Windows
+            self.whose_turn_lbl.grid(row=0, column=0,
+                                     padx=0, pady=(5, 0))
 
         if MY_OS in 'lin, dar':
             self.prev_game_num_header.grid(
