@@ -91,13 +91,13 @@ FONT = {
 
 # Need to apply OS-specific font adjustments.
 if platform_check.MY_OS == 'lin':
-    FONT['report'] = ('TkHeadingFont', 10, 'italic bold')
+    FONT['status'] = ('TkHeadingFont', 10, 'italic bold')
 elif platform_check.MY_OS == 'dar':
     FONT['sm_button'] = ('TkHeadingFont', 10)
     FONT['who'] = ('TkHeadingFont', 11, 'italic bold')
     FONT['button'] = ('TkHeadingFont', 11, 'bold')
     FONT['scores'] = ('TkHeadingFont', 12)
-    FONT['report'] = ('TkHeadingFont', 13, 'italic bold')
+    FONT['status'] = ('TkHeadingFont', 13, 'italic bold')
     FONT['condensed'] = ('TkTooltipFont', 10)
 
 # TIES (32) and WINS (1884) are all possible end-game board configurations,
