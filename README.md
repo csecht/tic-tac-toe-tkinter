@@ -16,7 +16,7 @@ Recent Python packages can be downloaded from https://www.python.org/downloads/.
 
 ### Usage: 
 From a command line:
-Open the Terminal or Command Prompt from within the tic-tac-toe-tk-main folder and enter one of these command lines, depending on which is appropriate for your system:
+Open the Terminal or Command Prompt from within the tic-tac-toe-tk-master folder and enter one of these command lines, depending on which is appropriate for your system:
 
             python3 -m plot_jobs (recommended for all systems)
             py plot_jobs.py (Windows)
