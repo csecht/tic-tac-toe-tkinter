@@ -1036,6 +1036,8 @@ class TicTacToeGUI(tk.Tk):
         :return: None
         """
 
+        pc_pref = self.choose_pc_pref.get()
+
         def award_points(winning_mark):
             if winning_mark == P1_MARK:
                 self.p1_points += 1
@@ -1058,6 +1060,9 @@ class TicTacToeGUI(tk.Tk):
                 # with open('wins', 'a') as file:
                 #     file.write(winlist)
 
+                game = self.prev_game_num.get()  # Is current game number.
+                turn = self.turn_number()
+
                 if 'Autoplay' in self.mode_selection.get():
                     award_points(mark)
                     self.auto_flash_win(combo, mark)
@@ -1066,12 +1071,16 @@ class TicTacToeGUI(tk.Tk):
                     award_points(mark)
                     self.flash_win(combo)
                     self.display_status(f'{mark} WINS!')
-                    # Here, print is not needed for 'PC plays random'.
-                    if self.choose_pc_pref.get() in 'PC plays center, PC plays strategy':
-                        print('PC won.') if mark == P2_MARK else print('Human won.')
+                    # Print is not needed here for 'PC plays random'.
+                    # The last two Combobox values should be for center and strategy prefs.
+                    if pc_pref in self.choose_pc_pref['values'][-2:]:
+                        if mark == P2_MARK:
+                            print(f'PC won "{pc_pref}", G{game}:T{turn}.')
+                        else:
+                            print(f'Human won "{pc_pref}", G{game}:T{turn}.')
                     break
 
-        if self.turn_number() == 9 and not self.winner_found:
+        if self.turn_number() == 9 and not self.winner_found:  # Is a tie.
             self.winner_found = True
             self.prev_game_num.set(self.prev_game_num.get() + 1)
 
@@ -1090,8 +1099,9 @@ class TicTacToeGUI(tk.Tk):
             else:  # Mode selection is pvp or pvpc.
                 self.flash_tie()
                 self.display_status('IT IS A TIE!')
-                # Here, print is not needed for 'PC plays random'.
-                if self.choose_pc_pref.get() in 'PC plays center, PC plays strategy':
+                # Print is not needed here for 'PC plays random'.
+                # The last two Combobox values should be for center and strategy prefs.
+                if pc_pref in self.choose_pc_pref['values'][-2:]:
                     print('-Tie-')
 
     def flash_win(self, combo) -> None:
