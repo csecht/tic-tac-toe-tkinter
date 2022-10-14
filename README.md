@@ -16,7 +16,7 @@ Recent Python packages can be downloaded from https://www.python.org/downloads/.
 
 ### Usage: 
 From a command line:
-From within the tic-tac-toe-tk-main folder, from a Terminal or Command Prompt, depending on your system environment:
+Open the Terminal or Command Prompt from within the tic-tac-toe-tk-main folder and enter one of these command lines, depending on which is appropriate for your system:
 
             python3 -m plot_jobs (recommended for all systems)
             py plot_jobs.py (Windows)
@@ -24,19 +24,19 @@ From within the tic-tac-toe-tk-main folder, from a Terminal or Command Prompt, d
             ./plot_jobs.py (Linux, Mac)
 
 ### Play action
-There are four play modes:
+There are five play modes:
 - Player vs Player
 - Player vs PC (computer)
 - Autoplay, random: Computer plays itself randomly.
 - Autoplay, center: Prefers the center, then plays for win, then block, then random.
-- Autoplay, strategy: A rules-based game of defensive and offensive moves, with minimal use of random play. The priority of PC play is win, block, defend using adaptive strategies, play a corner, play random (usually on the last move for a Tie).
+- Autoplay, strategy: A game of defensive and offensive moves, with minimal use of random play. The priority of PC play is win, block, defend with rule-based strategies, play a corner, play random (usually on the last move for a Tie).
 
-In Player v PC game mode, the Human can choose among options for the PC to play as described for the corresponding autoplay modes.
-- PC plays random
+In Player v PC game mode, the human Player can choose among options for the PC to play, as described above for the corresponding autoplay modes.
+- PC plays random; easiest to beat
 - PC plays center
-- PC plays strategy; hardest to beat.
+- PC plays strategy; hardest to beat
 
-Wins, ties, and mode-specific PC moves are recorded in the Terminal window with "center" and "strategy" PC modes; this may help the human player to improve their game.
+Wins, ties, and mode-specific PC moves are recorded in the Terminal window when "center" or "strategy" PC modes are selected. This output may help the human improve their game. Good luck!
 
 In Autoplay mode, the PC plays itself. You can choose to have Player 1 (X) start every game or have the PC Players 1 & 2 alternate game starts. 1000 turns are played. Fast mode is at a rate of about 10 turns per second, slow is one turn per second. Scores are updated in realtime through the turn series, giving about 110 to 130 games. Studying autoplay results in different play modes can be instructive for improving your game strategies!
 
