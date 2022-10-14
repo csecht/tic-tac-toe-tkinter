@@ -35,11 +35,12 @@ except (ImportError, ModuleNotFoundError) as error:
           f'See also: https://tkdocs.com/tutorial/install.html \n{error}')
 
 # Local program imports:
-from ttt_utils import const, utils
-from ttt_utils.const import (P1_MARK, P2_MARK,
-                             MARKS1, MARKS2,
-                             COLOR, FONT,
-                             SIDES, WINNING_COMBOS)
+from ttt_utils import utils, constants as cst
+from ttt_utils.constants import (PLAYER1, PLAYER2,
+                                 P1_MARK, P2_MARK,
+                                 MARKS1, MARKS2,
+                                 COLOR, FONT,
+                                 SIDES, WINNING_COMBOS)
 from ttt_utils.platform_check import MY_OS
 
 
@@ -683,9 +684,9 @@ class TicTacToeGUI(tk.Tk):
         # Need to inform player when it's their turn after PC has played.
         if self.mode_selection.get() == 'pvpc' and self.turn_number() == 1:
             self.whose_turn.set(f'PC played {P2_MARK}\n'
-                                f'Your turn {const.PLAYER1}')
+                                f'Your turn {PLAYER1}')
         else:
-            self.whose_turn.set(f'{const.PLAYER1} plays {P1_MARK}')
+            self.whose_turn.set(f'{PLAYER1} plays {P1_MARK}')
 
         self.whose_turn_lbl.config(bg=COLOR['status_bg'])
 
@@ -708,7 +709,7 @@ class TicTacToeGUI(tk.Tk):
         #  On even PvPC games, pc will have already played 1st turn.
         def h_plays_p1():
             played_lbl['text'] = P1_MARK
-            self.whose_turn.set(f'{const.PLAYER2} plays {P2_MARK}')
+            self.whose_turn.set(f'{PLAYER2} plays {P2_MARK}')
             self.whose_turn_lbl.config(bg=COLOR['tk_white'])
 
         def h_plays_p2():
@@ -790,12 +791,12 @@ class TicTacToeGUI(tk.Tk):
         # Delay play for a better feel, but not when PC starts a game b/c
         #   that just delays closing the Status toplevel for a new game.
         if turn_number > 0:
-            app.after(const.PLAY_AFTER)
+            app.after(cst.PLAY_AFTER)
 
         # Need to re-order winner and corner lists so Human doesn't detect
         #   a pattern of where PC will play.
         random.shuffle(WINNING_COMBOS)
-        random.shuffle(const.CORNERS)
+        random.shuffle(cst.CORNERS)
 
         # Preference: all PC moves are random.
         if self.choose_pc_pref.get() == 'PC plays random':
@@ -941,7 +942,7 @@ class TicTacToeGUI(tk.Tk):
             SIDES.sort()
 
             # Have PC play the appropriate corner to defend.
-            for key, val in const.ORTHO_SIDES.items():
+            for key, val in cst.ORTHO_SIDES.items():
                 if self.board_labels[key]['text'] == ' ' and oppo_positions == val:
                     self.board_labels[key]['text'] = mark
                     if pvpc:
@@ -953,7 +954,7 @@ class TicTacToeGUI(tk.Tk):
         # When opponent has played a corner and a non-adjacent side, defend with
         #   play to opponent's shared (nearest) corner.
         if turn_number == self.turn_number():
-            for key, val in const.META_POSITIONS.items():
+            for key, val in cst.META_POSITIONS.items():
                 if self.board_labels[key]['text'] == ' ' and oppo_positions == val:
                     self.board_labels[key]['text'] = mark
                     if pvpc:
@@ -968,7 +969,7 @@ class TicTacToeGUI(tk.Tk):
             random.shuffle(SIDES)
             side2play = SIDES[0]
 
-            for i in const.PARA_CORNERS:
+            for i in cst.PARA_CORNERS:
                 if i == oppo_positions:
                     self.board_labels[side2play]['text'] = mark
                     if pvpc:
@@ -988,7 +989,7 @@ class TicTacToeGUI(tk.Tk):
 
         :return: None
         """
-        for i in const.CORNERS:
+        for i in cst.CORNERS:
             c_txt = self.board_labels[i]['text']
             if turn_number == self.turn_number() and c_txt == ' ':
                 self.board_labels[i]['text'] = mark
@@ -1269,7 +1270,7 @@ class TicTacToeGUI(tk.Tk):
             if self.prev_game_num.get() % 2 == 0:
                 self.your_turn_player1()
             else:
-                self.whose_turn.set(f'{const.PLAYER2} plays {P2_MARK}')
+                self.whose_turn.set(f'{PLAYER2} plays {P2_MARK}')
                 self.whose_turn_lbl.config(bg=COLOR['tk_white'])
 
         elif self.mode_selection.get() == 'pvpc':
@@ -1412,7 +1413,7 @@ class TicTacToeGUI(tk.Tk):
     def auto_turns_limit(self) -> None:
         """
         Provide for alternating pc player marks in autoplay turns;
-        If 500 marks per player (values set by const.MARKS*),
+        If 500 marks per player (values set by cst.MARKS*),
         then 1000 turns yields about 110 games.
 
         :return: None
@@ -1444,9 +1445,9 @@ class TicTacToeGUI(tk.Tk):
         """
 
         if self.autospeed_selection.get() == 'fast':
-            auto_after = const.AUTO_FAST
+            auto_after = cst.AUTO_FAST
         else:
-            auto_after = const.AUTO_SLOW
+            auto_after = cst.AUTO_SLOW
 
         # Note: Erase time needs to be less than auto_after time for
         #   proper display of game board winner/result flash.
@@ -1603,7 +1604,7 @@ class TicTacToeGUI(tk.Tk):
             self.board_labels[_z].config(text=' ', bg=COLOR['sq_not_won'])
 
         self.autospeed_control()  # Set auto_erase time.
-        app.after(const.AUTO_SHOW, winner_show)
+        app.after(cst.AUTO_SHOW, winner_show)
         app.after(self.auto_erase, winner_erase)
 
         # Need to allow idle time for auto_setup to complete given
