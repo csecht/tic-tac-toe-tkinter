@@ -793,10 +793,10 @@ class TicTacToeGUI(tk.Tk):
         if turn_number > 0:
             app.after(cst.PLAY_AFTER)
 
-        # Need to re-order winner and corner lists so Human doesn't detect
-        #   a pattern of where PC will play.
+        # Need to re-order winner list so Human doesn't detect a pattern
+        #   of where PC will play.
+        #   CORNERS list is shuffled in play_corners().
         random.shuffle(WINNING_COMBOS)
-        random.shuffle(cst.CORNERS)
 
         # Preference: all PC moves are random.
         if self.choose_pc_pref.get() == 'PC plays random':
@@ -989,6 +989,9 @@ class TicTacToeGUI(tk.Tk):
 
         :return: None
         """
+
+        random.shuffle(cst.CORNERS)
+
         for i in cst.CORNERS:
             c_txt = self.board_labels[i]['text']
             if turn_number == self.turn_number() and c_txt == ' ':
@@ -1508,8 +1511,14 @@ class TicTacToeGUI(tk.Tk):
         if len(self.auto_marks) > 0:
             mark = self.auto_marks[0]
 
+            # Need to randomize starting play so games don't always
+            #  start with a corner play.
+            if turn_number == 0:
+                self.play_random(turn_number, mark)
+
             # Look for a winning or blocking play.
-            self.play_rudiments(turn_number, mark)
+            if turn_number == self.turn_number():
+                self.play_rudiments(turn_number, mark)
 
             if turn_number == self.turn_number():
                 self.play_defense(turn_number, mark)
