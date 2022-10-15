@@ -812,12 +812,12 @@ class TicTacToeGUI(tk.Tk):
         if turn_number == self.turn_number():
             self.play_rudiments(turn_number, P2_MARK, pvpc=True)
 
-        # Strategy preference: play a set of rules for defense.
+        # Strategy preference: now play a set of rules for defense.
         if self.choose_pc_pref.get() == 'PC plays strategy':
             if turn_number == self.turn_number():
                 self.play_defense(turn_number, P2_MARK, pvpc=True)
 
-            # Fill in available corners to play offense.
+            # Fill in available corners to play for advantage.
             if turn_number == self.turn_number():
                 self.play_corners(turn_number, P2_MARK, pvpc=True)
 
@@ -897,6 +897,7 @@ class TicTacToeGUI(tk.Tk):
     def play_defense(self, turn_number: int, mark: str, pvpc=False) -> None:
         """
         A rules-based set of defensive responses to minimize PC losses.
+        Strategy in decreasing priority: defend center, sides, corners.
 
         :param turn_number: The current turn number, from turn_number().
         :param mark: The played mark character, as string.
@@ -1506,10 +1507,10 @@ class TicTacToeGUI(tk.Tk):
         Automatically play computer vs. computer for 1000 turns
         (~120 games) or until stopped by user. Each turn is played on a
         timed interval set by the self.autospeed_control() time used in the
-        after_id caller, so one turn per call.
+        after_id caller, one play per call.
 
-        Play strategy, in decreasing priority: win, block, defend center,
-        defend corners, random.
+        Strategy, in decreasing play priority: win, block, defend
+        against opponent advantage, play corners for advantage, random.
 
         :return: None
         """

@@ -52,7 +52,6 @@ META_POSITIONS = {
     8: [5, 6]
 }
 
-
 # Milliseconds, used in after() calls.
 PLAY_AFTER = 600  # PC response time for PvPC mode.
 AUTO_FAST = 100  # Fast cycle time for all autoplay modes.
