@@ -98,7 +98,6 @@ class TicTacToeGUI(tk.Tk):
         self.auto_turns_header = tk.Label()
         self.auto_turns_lbl = tk.Label()
         self.auto_turns_remaining = tk.IntVar()
-        # auto_turns_remaining is set to length of autoplay_marks string.
 
         # Players' scores widgets.
         self.score_header = tk.Label()
@@ -1176,24 +1175,24 @@ class TicTacToeGUI(tk.Tk):
 
         if MY_OS == 'win':  # Windows
             size = '420x150'
-            minw = 270
-            minh = 150
+            min_w = 270
+            min_h = 150
         elif MY_OS == 'dar':  # macOS
             size = '200x90'
-            minw = 150
-            minh = 90
+            min_w = 150
+            min_h = 90
         else:  # Linux
             size = '230x100'
-            minw = 180
-            minh = 100
+            min_w = 180
+            min_h = 100
 
         self.status_window.geometry(size)
-        self.status_window.minsize(minw, minh)
+        self.status_window.minsize(min_w, min_h)
 
         self.status_calls += 1
         self.window_geometry(self.status_window)
 
-        # Need prevent focus shifting to app window which would cover up
+        # Need to prevent focus shifting to app window which would cover
         #  the Report window.
         self.status_window.attributes('-topmost', True)
         self.status_window.focus_force()
@@ -1428,11 +1427,13 @@ class TicTacToeGUI(tk.Tk):
         Provide for alternating pc player marks in autoplay turns;
         If 500 marks per player (values set by cst.MARKS*),
         then 1000 turns yields about 110 games.
+        The string of player marks is shortened one character per turn
+        in the autoplay_ methods, and in auto_setup() depending on the
+        who_autostarts option.
 
         :return: None
         """
-        # String of player marks is shortened one character per turn played
-        #   and when an autoplay option is set to always begin with P1_MARK.
+
         self.auto_marks = ''.join(map(lambda m1, m2: m1 + m2, MARKS1, MARKS2))
 
     def autostart_who(self) -> None:
