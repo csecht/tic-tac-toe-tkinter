@@ -27,9 +27,9 @@ Open the Terminal or Command Prompt from within the tic-tac-toe-tk-master folder
 There are five play modes:
 - Player vs Player
 - Player vs PC (computer)
-- Autoplay, random: Computer plays itself randomly.
-- Autoplay, center: Prefers the center, then plays for win, then block, then random.
-- Autoplay, strategy: A game of defensive and offensive moves, with minimal use of random play. The priority of PC play is win, block, defend with rule-based strategies, play a corner, play random (usually on the last move for a Tie).
+- Autoplay, random: Computer plays itself randomly; about 15% end in ties.
+- Autoplay, center: Prefers the center, then plays for win, then block, then random; ~60% tie games.
+- Autoplay, strategy: A game of defensive and offensive moves, with minimal use of random play. The priority of PC play is win, block, defend against opponent advantage, play a corner for advantage, play random; ~98% tie games.
 
 In Player v PC game mode, the human Player can choose among options for the PC to play, as described above for the corresponding autoplay modes.
 - PC plays random; easiest to beat
