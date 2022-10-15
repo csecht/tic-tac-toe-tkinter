@@ -1448,7 +1448,7 @@ class TicTacToeGUI(tk.Tk):
         else:
             self.who_autostarts['text'] = 'Player 1 starts'
 
-    def autospeed_control(self, after_type: str) -> int:
+    def autospeed_control(self, after_type='game') -> int:
         """
         Set after() times used in auto_flash_game() and autoplay modes.
         Called as Radiobutton command from self.autospeed_fast and
@@ -1456,7 +1456,8 @@ class TicTacToeGUI(tk.Tk):
         Called from auto_flash_game() to set time for erasing flash color
         and from each autoplay_* method to set time between game restarts.
         
-        :param after_type: What is to be paused; either "game" or "flash".
+        :param after_type: What is to be paused; either "game" (default)
+                           or "flash".
         :return: Milliseconds to use in after() calls.
         """
 
@@ -1471,16 +1472,18 @@ class TicTacToeGUI(tk.Tk):
         
         if after_type == 'flash':
             return erase_after
-        elif after_type == 'game':
-            return auto_after
+
+        return auto_after
 
     def autoplay_random(self) -> None:
         """
         Automatically play computer vs. computer for 1000 turns
         (~130 games) or until stopped by user. All play positions are
-        random. Each turn is played on a timed interval set by the
-        autospeed_control() used in the after_id caller; so, one turn
-        is played per call.
+        random.
+        Turns are played on a timed interval set by the
+        autospeed_control() time used in the after_id caller, one turn
+        per call.
+        Yields ~15% tie games.
         Is called from auto_start().
 
         :return: None
@@ -1513,9 +1516,13 @@ class TicTacToeGUI(tk.Tk):
         (~120 games) or until stopped by user. Each turn is played on a
         timed interval set by the self.autospeed_control() time used in the
         after_id caller, one play per call.
-
         Strategy, in decreasing play priority: win, block, defend
         against opponent advantage, play corners for advantage, random.
+        Turns are played on a timed interval set by the
+        autospeed_control() time used in the after_id caller, one turn
+        per call.
+        Yields ~99% tie games.
+        Is called from auto_start().
 
         :return: None
         """
@@ -1563,11 +1570,13 @@ class TicTacToeGUI(tk.Tk):
         """
         Automatically play computer vs. computer for 1000 turns
         (~120 games) or until stopped by user.
-        Each turn is played on a timed interval set by the
-        autospeed_control() time used in the after_id caller, so, one
-        turn per call. First play is at the center position, subsequent
+        First play is at the center position, subsequent
         plays follow win,block,random preference play order.
-        About 75% tie games.
+        Turns are played on a timed interval set by the
+        autospeed_control() time used in the after_id caller, one turn
+        per call.
+        Yields ~60% tie games.
+        Is called from auto_start().
 
         :return: None
         """
