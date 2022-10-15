@@ -49,7 +49,7 @@ class TicTacToeGUI(tk.Tk):
     Display the tkinter GUI playing board and its control buttons.
     Provide multiple modes of play action, with scoring.
     Methods: auto_command, auto_flash_game, auto_setup, auto_start,
-    auto_stop, auto_turns_limit, play_rudiments, autoplay_center,
+    auto_stop, play_rudiments, autoplay_center,
     autoplay_random, autoplay_strategy, autospeed_control,
     autostart_who, block_player_action, check_winner,
     color_pc_mark, configure_widgets, display_status, flash_tie,
@@ -355,6 +355,7 @@ class TicTacToeGUI(tk.Tk):
         for lbl in self.board_labels:
             lbl.grid(row=_row, column=_col, pady=pad, padx=pad, ipady=6, ipadx=10)
             _col += 1
+            # Grid three columns in a row, then move to next row and repeat.
             if _col > 2:
                 _row += 1
                 _col = 0
@@ -1120,7 +1121,9 @@ class TicTacToeGUI(tk.Tk):
 
     def flash_tie(self) -> None:
         """
-        Make entire game board blue (COLOR['sq_won']) on a tie game.
+        Make entire game board blue (COLOR['sq_won']) on a tie game, so
+        not really a flash. Board square stay blue until Status window
+        "New Game" is selected.
 
         :return: None
         """
@@ -1366,7 +1369,14 @@ class TicTacToeGUI(tk.Tk):
         self.auto_go_stop_radiobtn.config(state=tk.NORMAL)
         self.who_autostarts.config(state=tk.DISABLED)
 
-        self.auto_turns_limit()
+        # Provide alternating pc player marks in autoplay turns;
+        #   If 500 marks per player (values set by cst.MARKS*), then 1000
+        #   turns yields about 110 games.
+        #   The marks string is shortened one character per turn in the
+        #   autoplay_ methods, and in auto_setup() depending on the
+        #   who_autostarts option.
+        self.auto_marks = ''.join(map(lambda m1, m2: m1 + m2, MARKS1, MARKS2))
+
         self.auto_setup()
 
         # Start repeating calls to one of the autoplay methods;
@@ -1422,20 +1432,6 @@ class TicTacToeGUI(tk.Tk):
         self.setup_game_board()
         self.unbind_game_board()
 
-    def auto_turns_limit(self) -> None:
-        """
-        Provide for alternating pc player marks in autoplay turns;
-        If 500 marks per player (values set by cst.MARKS*),
-        then 1000 turns yields about 110 games.
-        The string of player marks is shortened one character per turn
-        in the autoplay_ methods, and in auto_setup() depending on the
-        who_autostarts option.
-
-        :return: None
-        """
-
-        self.auto_marks = ''.join(map(lambda m1, m2: m1 + m2, MARKS1, MARKS2))
-
     def autostart_who(self) -> None:
         """
         Toggle who_autostarts Button text.
@@ -1451,13 +1447,12 @@ class TicTacToeGUI(tk.Tk):
     def autospeed_control(self, after_type='game') -> int:
         """
         Set after() times used in auto_flash_game() and autoplay modes.
-        Called as Radiobutton command from self.autospeed_fast and
-        self.autospeed_slow.
-        Called from auto_flash_game() to set time for erasing flash color
-        and from each autoplay_* method to set time between game restarts.
+        Called from autospeed_fast and autospeed_slow Radiobuttons;
+        from auto_flash_game() to set time for erasing flash color;
+        from each autoplay_* method to set time between game restarts.
         
-        :param after_type: What is to be paused; either "game" (default)
-                           or "flash".
+        :param after_type: function type to be paused;
+                           either "game" (default) or "flash".
         :return: Milliseconds to use in after() calls.
         """
 
