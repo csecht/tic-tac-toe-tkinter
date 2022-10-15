@@ -56,7 +56,7 @@ META_POSITIONS = {
 PLAY_AFTER = 600  # PC response time for PvPC mode.
 AUTO_FAST = 100  # Fast cycle time for all autoplay modes.
 AUTO_SLOW = 1000  # Slow cycle time for all autoplay modes.
-AUTO_SHOW = 1  # Necessary for proper auto_flash_win() operation.
+AUTO_SHOW = 1  # Necessary for proper auto_flash_game() operation.
 
 # Foreground and background colors.
 COLOR = {'score_fg': 'DodgerBlue4',
