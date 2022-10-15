@@ -61,14 +61,14 @@ class TicTacToeGUI(tk.Tk):
     # Using __slots__ for all Class attributes gives slight reduction of
     #   memory usage and maybe improved performance.
     __slots__ = (
-        'after_id', 'auto_erase', 'auto_marks',
+        'after_id', 'auto_marks',
         'auto_go_stop_radiobtn', 'auto_go_stop_txt',
         'auto_random_mode', 'auto_strategy_mode', 'auto_center_mode',
         'auto_turns_header', 'auto_turns_lbl', 'auto_turns_remaining',
         'autoplay_on', 'autospeed_fast', 'autospeed_lbl',
-        'autospeed_selection', 'autospeed_slow', 'board_labels',
-        'choose_pc_pref', 'curr_pmode', 'display_automode',
-        'mode_selection',
+        'autospeed_selection', 'autospeed_slow',
+        'board_labels', 'choose_pc_pref', 'curr_pmode',
+        'display_automode', 'mode_selection',
         'p1_points', 'p1_score', 'p2_points', 'p2_score',
         'player1_header', 'player1_score_lbl',
         'player2_header', 'player2_score_lbl',
@@ -127,7 +127,6 @@ class TicTacToeGUI(tk.Tk):
         self.autospeed_selection = tk.StringVar()
         self.autospeed_fast = tk.Radiobutton()
         self.autospeed_slow = tk.Radiobutton()
-        self.auto_erase = 0
 
         # Additional widgets.
         self.separator = ttk.Separator()
@@ -1448,13 +1447,15 @@ class TicTacToeGUI(tk.Tk):
         else:
             self.who_autostarts['text'] = 'Player 1 starts'
 
-    def autospeed_control(self) -> int:
+    def autospeed_control(self, after_type: str) -> int:
         """
         Set after() times used in auto_flash_game() and autoplay modes.
         Called as Radiobutton command from self.autospeed_fast and
         self.autospeed_slow.
-        Called from auto_flash_game() to set time for auto_erase.
-
+        Called from auto_flash_game() to set time for erasing flash color
+        and from each autoplay_* method to set time between game restarts.
+        
+        :param after_type: What is to be paused; either "game" or "flash".
         :return: Milliseconds to use in after() calls.
         """
 
@@ -1464,10 +1465,13 @@ class TicTacToeGUI(tk.Tk):
             auto_after = cst.AUTO_SLOW
 
         # Note: Erase time needs to be less than auto_after time for
-        #   proper display of game board winner/result flash.
-        self.auto_erase = int(auto_after * 0.9)
-
-        return auto_after
+        #   proper display of game board winner/tie flash.
+        erase_after = int(auto_after * 0.9)
+        
+        if after_type == 'flash':
+            return erase_after
+        elif after_type == 'game':
+            return auto_after
 
     def autoplay_random(self) -> None:
         """
@@ -1497,7 +1501,7 @@ class TicTacToeGUI(tk.Tk):
 
             # Need a pause so user can see what plays were made; allows
             #   auto_stop() to break the call cycle.
-            self.after_id = app.after(self.autospeed_control(),
+            self.after_id = app.after(self.autospeed_control('game'),
                                       self.autoplay_random)
         else:
             self.auto_stop('ended')
@@ -1549,7 +1553,7 @@ class TicTacToeGUI(tk.Tk):
 
             # Need a pause so user can see what play was made and also
             #   allow auto_stop() to break the call cycle.
-            self.after_id = app.after(self.autospeed_control(),
+            self.after_id = app.after(self.autospeed_control('game'),
                                       self.autoplay_strategy)
         else:
             self.auto_stop('ended')
@@ -1594,7 +1598,7 @@ class TicTacToeGUI(tk.Tk):
 
             # Need a pause so user can see what plays were made and also
             #   allow auto_stop() to break the call cycle.
-            self.after_id = app.after(self.autospeed_control(),
+            self.after_id = app.after(self.autospeed_control('game'),
                                       self.autoplay_center)
         else:
             self.auto_stop('ended')
@@ -1625,9 +1629,8 @@ class TicTacToeGUI(tk.Tk):
             self.board_labels[_y].config(text=' ', bg=COLOR['sq_not_won'])
             self.board_labels[_z].config(text=' ', bg=COLOR['sq_not_won'])
 
-        self.autospeed_control()  # Set auto_erase time.
         app.after(cst.AUTO_SHOW, winner_show)
-        app.after(self.auto_erase, winner_erase)
+        app.after(self.autospeed_control('flash'), winner_erase)
 
         # Need to allow idle time for auto_setup to complete given
         #   autospeed_control() time; keeps auto_marks in correct register.
