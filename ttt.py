@@ -48,7 +48,7 @@ class TicTacToeGUI(tk.Tk):
     """
     Display the tkinter GUI playing board and its control buttons.
     Provide multiple modes of play action, with scoring.
-    Methods: auto_command, auto_flash_win, auto_setup, auto_start,
+    Methods: auto_command, auto_flash_game, auto_setup, auto_start,
     auto_stop, auto_turns_limit, play_rudiments, autoplay_center,
     autoplay_random, autoplay_strategy, autospeed_control,
     autostart_who, block_player_action, check_winner,
@@ -138,7 +138,7 @@ class TicTacToeGUI(tk.Tk):
         self.status_window = None  # Will be a toplevel in display_status().
         self.status_calls = 0  # Allows recording of initial Status window position.
         self.statuswin_geometry = ''  # Used to remember Status window position.
-        self.titlebar_offset = 0  # Used for accurate positioning of Status win.
+        self.titlebar_offset = 0  # Used for accurate positioning of Status window.
         self.winner_found = False  # Used for game flow control.
         self.quit_button = ttk.Button()
 
@@ -1066,7 +1066,7 @@ class TicTacToeGUI(tk.Tk):
 
                 if 'Autoplay' in self.mode_selection.get():
                     award_points(mark)
-                    self.auto_flash_win(combo, mark)
+                    self.auto_flash_game(combo, mark)
                     break
                 else:  # Mode selection is pvp or pvpc.
                     award_points(mark)
@@ -1096,7 +1096,7 @@ class TicTacToeGUI(tk.Tk):
             self.ties_num.set(self.ties_num.get() + 1)
 
             if 'Autoplay' in self.mode_selection.get():
-                self.auto_flash_win((4, 4, 4), 'TIE')
+                self.auto_flash_game((4, 4, 4), 'TIE')
             else:  # Mode selection is pvp or pvpc.
                 self.flash_tie()
                 self.display_status('IT IS A TIE!')
@@ -1402,7 +1402,7 @@ class TicTacToeGUI(tk.Tk):
         """
         Run at the start of every new autoplay game. Update cumulative
         scores in the app window. Clear all marks from the board.
-        Called from auto_start() and auto_flash_win().
+        Called from auto_start() and auto_flash_game().
 
         :return: None
         """
@@ -1412,10 +1412,10 @@ class TicTacToeGUI(tk.Tk):
         self.winner_found = False
         if len(self.auto_marks) > 0:
             if self.who_autostarts['text'] == 'Player 1 starts':
-                # All games start with p1_mark.
+                # All games start with P1_MARK.
                 self.auto_marks = self.auto_marks.lstrip(P2_MARK)
             else:
-                # Games alternate starts between p1_mark and p2_mark.
+                # Games alternate starts between P1_MARK and P2_MARK.
                 if self.prev_game_num.get() % 2 == 0:
                     self.auto_marks = self.auto_marks.lstrip(P2_MARK)
                 else:
@@ -1433,7 +1433,7 @@ class TicTacToeGUI(tk.Tk):
         :return: None
         """
         # String of player marks is shortened one character per turn played
-        #   and when an autoplay option is set to always begin with p1_mark.
+        #   and when an autoplay option is set to always begin with P1_MARK.
         self.auto_marks = ''.join(map(lambda m1, m2: m1 + m2, MARKS1, MARKS2))
 
     def autostart_who(self) -> None:
@@ -1450,10 +1450,10 @@ class TicTacToeGUI(tk.Tk):
 
     def autospeed_control(self) -> int:
         """
-        Set after() times used in auto_flash_win() and autoplay modes.
+        Set after() times used in auto_flash_game() and autoplay modes.
         Called as Radiobutton command from self.autospeed_fast and
         self.autospeed_slow.
-        Called from auto_flash_win() to set time for auto_erase.
+        Called from auto_flash_game() to set time for auto_erase.
 
         :return: Milliseconds to use in after() calls.
         """
@@ -1599,12 +1599,14 @@ class TicTacToeGUI(tk.Tk):
         else:
             self.auto_stop('ended')
 
-    def auto_flash_win(self, combo: tuple, mark: str) -> None:
+    def auto_flash_game(self, combo: tuple, mark: str) -> None:
         """
-        For each auto_play win, flashes the winning marks. Flashes the
-        center square only on a tie (using combo = (4, 4, 4)), then
-        calls auto_setup() for the next auto_play() game. Note that on
-        a tie, the last played mark does not show on the game board.
+        For each auto_play game, flashes the winning or tying marks.
+        On ties, flashes only the enter square (*combo* = (4, 4, 4);
+        *mark* = 'TIE'). On wins, flashes the winning marks.
+        Calls auto_setup() for the next auto_play() game.
+        Note that on a tie, the last played mark does not show on the
+        game board before the flash.
 
         :param combo: The tuple index values for the winning squares on
                       the board.
