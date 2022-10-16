@@ -23,6 +23,7 @@ https://gist.github.com/riya1620/72c2b668ef29da061c44d97a82318572
 # Standard library imports:
 import random
 import sys
+from typing import Callable
 
 try:
     import tkinter as tk
@@ -1485,9 +1486,8 @@ class TicTacToeGUI(tk.Tk):
         Automatically play computer vs. computer for 1000 turns
         (~130 games) or until stopped by user. All play positions are
         random.
-        Turns are played on a timed interval set by the
-        autospeed_control() time used in the after_id caller, one turn
-        per call.
+        Turns are played on a timed interval controlled through
+        auto_repeat().
         Yields ~15% tie games.
         Is called from auto_start().
 
@@ -1502,16 +1502,8 @@ class TicTacToeGUI(tk.Tk):
 
             self.play_random(turn_number, mark)
 
-            if self.turn_number() >= 5:
-                self.check_winner(mark)
+            self.auto_repeat(mark, self.autoplay_random)
 
-            # Need to move to next player's mark for next turn.
-            self.auto_marks = self.auto_marks.lstrip(mark)
-
-            # Need a pause so user can see what plays were made; allows
-            #   auto_stop() to break the call cycle.
-            self.after_id = app.after(self.autospeed_control('game'),
-                                      self.autoplay_random)
         else:
             self.auto_stop('ended')
 
@@ -1523,9 +1515,8 @@ class TicTacToeGUI(tk.Tk):
         after_id caller, one play per call.
         Strategy, in decreasing play priority: win, block, defend
         against opponent advantage, play corners for advantage, random.
-        Turns are played on a timed interval set by the
-        autospeed_control() time used in the after_id caller, one turn
-        per call.
+        Turns are played on a timed interval controlled through
+        auto_repeat().
         Yields ~99% tie games.
         Is called from auto_start().
 
@@ -1558,16 +1549,8 @@ class TicTacToeGUI(tk.Tk):
             if turn_number == self.turn_number():
                 self.play_random(turn_number, mark)
 
-            if self.turn_number() >= 5:
-                self.check_winner(mark)
+            self.auto_repeat(mark, self.autoplay_strategy)
 
-            # Need to move to next mark for next turn.
-            self.auto_marks = self.auto_marks.lstrip(mark)
-
-            # Need a pause so user can see what play was made and also
-            #   allow auto_stop() to break the call cycle.
-            self.after_id = app.after(self.autospeed_control('game'),
-                                      self.autoplay_strategy)
         else:
             self.auto_stop('ended')
 
@@ -1577,9 +1560,8 @@ class TicTacToeGUI(tk.Tk):
         (~120 games) or until stopped by user.
         First play is at the center position, subsequent
         plays follow win,block,random preference play order.
-        Turns are played on a timed interval set by the
-        autospeed_control() time used in the after_id caller, one turn
-        per call.
+        Turns are played on a timed interval controlled through
+        auto_repeat().
         Yields ~60% tie games.
         Is called from auto_start().
 
@@ -1605,18 +1587,31 @@ class TicTacToeGUI(tk.Tk):
             if turn_number == self.turn_number():
                 self.play_random(turn_number, mark)
 
-            if self.turn_number() >= 5:
-                self.check_winner(mark)
+            self.auto_repeat(mark, self.autoplay_center)
 
-            # Need to move to next mark for next turn.
-            self.auto_marks = self.auto_marks.lstrip(mark)
-
-            # Need a pause so user can see what plays were made and also
-            #   allow auto_stop() to break the call cycle.
-            self.after_id = app.after(self.autospeed_control('game'),
-                                      self.autoplay_center)
         else:
             self.auto_stop('ended')
+
+    def auto_repeat(self, mark: str, auto_method: Callable) -> None:
+        """
+        Statements used to complete and repeat an autoplay turn.
+        Checks for winner, advances to the next player's *mark*, and
+        applies after() to delay and repeat the *auto_method*.
+
+        :param mark: The current played mark character.
+        :param auto_method: The calling autoplay_* method.
+        :return: None
+        """
+
+        if self.turn_number() >= 5:
+            self.check_winner(mark)
+
+        # Need to the advance the mark for next turn.
+        self.auto_marks = self.auto_marks.lstrip(mark)
+
+        # Need a pause so user can see what play was made and also
+        #   allow auto_stop() to break the call cycle.
+        self.after_id = app.after(self.autospeed_control('game'), auto_method)
 
     def auto_flash_game(self, combo: tuple, mark: str) -> None:
         """
