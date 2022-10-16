@@ -1275,6 +1275,7 @@ class TicTacToeGUI(tk.Tk):
         self.auto_strategy_mode.config(state=tk.NORMAL)
         self.pvp_mode.config(state=tk.NORMAL)
         self.pvpc_mode.config(state=tk.NORMAL)
+        self.choose_pc_pref.config(state=tk.NORMAL)
 
         # Make font invisible (bg color) to remove from view.
         self.auto_turns_header.config(fg=COLOR['tk_white'])
