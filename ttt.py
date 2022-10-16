@@ -645,23 +645,6 @@ class TicTacToeGUI(tk.Tk):
                 self.curr_automode = mode
                 self.whose_turn_lbl.config(bg=COLOR['tk_white'])
 
-            # Need this to deactivate the auto_go_stop_radiobtn which
-            #   would otherwise open a duplicate Status window (a
-            #   'started' auto game would be instantly 'canceled' b/c the
-            #   game board wasn't reset). So force user to click
-            #   'New Game' or 'Quit' in Status window BEFORE starting an
-            #   autoplay mode with the auto_go_stop_radiobtn.
-            try:
-                if self.status_window.winfo_exists():
-                    self.auto_go_stop_radiobtn.config(state=tk.DISABLED)
-            except AttributeError:
-                pass
-
-            if self.winner_found:
-                msg = 'Click "New Game" or "Quit" in Status window.'
-                messagebox.showinfo(title='Mode is unavailable now',
-                                    detail=msg)
-
             self.reset_game_and_score()
 
     def your_turn_player1(self) -> None:
@@ -1176,6 +1159,16 @@ class TicTacToeGUI(tk.Tk):
         :return: None
         """
 
+        # Game result needs to be displayed, but first freeze game actions.
+        self.block_player_action()
+        self.whose_turn.set('Game pending...')
+        self.whose_turn_lbl.config(bg=COLOR['tk_white'])
+
+        # Need to update players' cumulative wins in the app window.
+        self.p1_score.set(self.p1_points)
+        self.p2_score.set(self.p2_points)
+
+        # Now set up the status window and its actions:
         self.status_window = tk.Toplevel(self,
                                          bg=COLOR['status_bg'],
                                          borderwidth=4,
@@ -1210,14 +1203,6 @@ class TicTacToeGUI(tk.Tk):
                               text=status_msg,
                               font=FONT['status'],
                               bg=COLOR['status_bg'])
-
-        self.block_player_action()
-        self.whose_turn.set('Game pending...')
-        self.whose_turn_lbl.config(bg=COLOR['tk_white'])
-
-        # Need to update players' cumulative wins in the app window.
-        self.p1_score.set(self.p1_points)
-        self.p2_score.set(self.p2_points)
 
         def no_exit_on_x():
             messagebox.showinfo(
@@ -1271,6 +1256,12 @@ class TicTacToeGUI(tk.Tk):
         self.unbind_game_board()
         self.quit_button.config(state=tk.DISABLED)
         self.auto_go_stop_radiobtn.config(state=tk.DISABLED)
+        self.auto_random_mode.config(state=tk.DISABLED)
+        self.auto_center_mode.config(state=tk.DISABLED)
+        self.auto_strategy_mode.config(state=tk.DISABLED)
+        self.pvp_mode.config(state=tk.DISABLED)
+        self.pvpc_mode.config(state=tk.DISABLED)
+        self.choose_pc_pref.config(state=tk.DISABLED)
 
     def new_game(self) -> None:
         """
@@ -1279,7 +1270,6 @@ class TicTacToeGUI(tk.Tk):
         return: None
         """
         self.quit_button.config(state=tk.NORMAL)
-
         self.auto_random_mode.config(state=tk.NORMAL)
         self.auto_center_mode.config(state=tk.NORMAL)
         self.auto_strategy_mode.config(state=tk.NORMAL)
