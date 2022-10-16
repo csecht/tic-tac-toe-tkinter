@@ -68,7 +68,7 @@ class TicTacToeGUI(tk.Tk):
         'autoplay_on', 'autospeed_fast', 'autospeed_lbl',
         'autospeed_selection', 'autospeed_slow',
         'board_labels', 'choose_pc_pref', 'curr_pmode',
-        'display_automode', 'mode_selection',
+        'curr_automode', 'mode_selection',
         'p1_points', 'p1_score', 'p2_points', 'p2_score',
         'player1_header', 'player1_score_lbl',
         'player2_header', 'player2_score_lbl',
@@ -131,7 +131,7 @@ class TicTacToeGUI(tk.Tk):
         self.separator = ttk.Separator()
         self.after_id = None  # A handler for after() and after_cancel() calls.
         self.auto_marks = ''  # Used to dole out autoplay marks in proper register.
-        self.display_automode = ''  # Used to display whose_turn.
+        self.curr_automode = ''  # Used to display whose_turn.
         self.curr_pmode = ''  # Used to evaluate mode state.
         self.status_window = None  # Will be a toplevel in display_status().
         self.status_calls = 0  # Allows recording of initial Status window position.
@@ -602,23 +602,12 @@ class TicTacToeGUI(tk.Tk):
         :return: None
         """
         mode = self.mode_selection.get()
-        # If a game is in progress, ignore any mode selections & post msg.
-        if self.turn_number() > 0:
-            if self.autoplay_on.get():
-                if mode == 'Autoplay random':
-                    self.auto_random_mode.deselect()
-                elif mode == 'Autoplay strategy':
-                    self.auto_strategy_mode.deselect()
-                elif mode == 'Autoplay center':
-                    self.auto_center_mode.deselect()
-                elif mode == 'pvp':
-                    self.pvp_mode.deselect()
-                elif mode == 'pvpc':
-                    self.pvpc_mode.deselect()
 
-                detail = ('Wait for autoplay to finish,\n'
-                          'or click "Stop auto" button.')
-                self.whose_turn.set(self.display_automode)
+        # If a game is in progress, ignore any mode selections & post msg.
+        if self.turn_number() > 0 and not self.winner_found:
+            if self.autoplay_on.get():
+                msg = ('Wait for autoplay to finish,\n'
+                       'or click "Stop auto" button.')
 
             else:  # Mode is PvP or PvPC.
                 if self.curr_pmode == 'pvp':
@@ -632,16 +621,14 @@ class TicTacToeGUI(tk.Tk):
                 self.auto_random_mode.deselect()
                 self.auto_strategy_mode.deselect()
                 self.auto_center_mode.deselect()
-                self.display_automode = ''
+                # self.curr_automode = ''
 
-                detail = 'Finish the current game,\nthen change mode.'
+                msg = 'Finish the current game,\nthen change mode.'
 
             messagebox.showinfo(title='Mode is unavailable now',
-                                detail=detail)
+                                detail=msg)
 
         else:  # No game in progress.
-            self.reset_game_and_score()
-
             if mode == 'pvpc':
                 self.choose_pc_pref.config(state='readonly')
             else:
@@ -654,13 +641,9 @@ class TicTacToeGUI(tk.Tk):
             else:  # One of the auto modes.
                 self.auto_go_stop_radiobtn.config(state=tk.NORMAL)
                 self.who_autostarts.configure(state=tk.NORMAL)
-
-            if 'Autoplay' in mode:
                 self.whose_turn.set(mode)
-                self.display_automode = mode
+                self.curr_automode = mode
                 self.whose_turn_lbl.config(bg=COLOR['tk_white'])
-            else:
-                self.your_turn_player1()
 
             # Need this to deactivate the auto_go_stop_radiobtn which
             #   would otherwise open a duplicate Status window (a
@@ -673,6 +656,13 @@ class TicTacToeGUI(tk.Tk):
                     self.auto_go_stop_radiobtn.config(state=tk.DISABLED)
             except AttributeError:
                 pass
+
+            if self.winner_found:
+                msg = 'Click "New Game" or "Quit" in Status window.'
+                messagebox.showinfo(title='Mode is unavailable now',
+                                    detail=msg)
+
+            self.reset_game_and_score()
 
     def your_turn_player1(self) -> None:
         """
@@ -718,8 +708,8 @@ class TicTacToeGUI(tk.Tk):
 
         def h_plays_p1_v_pc():
             played_lbl['text'] = P1_MARK
-            self.whose_turn_lbl.config(bg=COLOR['tk_white'])
             self.whose_turn.set(f'PC plays {P2_MARK}')
+            self.whose_turn_lbl.config(bg=COLOR['tk_white'])
 
         if played_lbl['text'] == ' ':
             if self.mode_selection.get() == 'pvp':
@@ -829,7 +819,8 @@ class TicTacToeGUI(tk.Tk):
         if self.turn_number() >= 5:
             self.check_winner(P2_MARK)
 
-        self.your_turn_player1()
+        if not self.winner_found:
+            self.your_turn_player1()
 
         app.update_idletasks()
 
@@ -1037,6 +1028,7 @@ class TicTacToeGUI(tk.Tk):
         """
 
         pc_pref = self.choose_pc_pref.get()
+        mode = self.mode_selection.get()
 
         def award_points(winning_mark):
             if winning_mark == P1_MARK:
@@ -1063,14 +1055,21 @@ class TicTacToeGUI(tk.Tk):
                 game = self.prev_game_num.get()  # Is current game number.
                 turn = self.turn_number()
 
-                if 'Autoplay' in self.mode_selection.get():
+                if 'Autoplay' in mode:
                     award_points(mark)
                     self.auto_flash_game(combo, mark)
                     break
-                else:  # Mode selection is pvp or pvpc.
+                elif mode == 'pvpc':
                     award_points(mark)
                     self.flash_win(combo)
-                    self.display_status(f'{mark} WINS!')
+                    self.whose_turn.set('Game pending...')
+                    self.whose_turn_lbl.config(bg=COLOR['tk_white'])
+
+                    if mark == P2_MARK:
+                        self.display_status('PC WINS!')
+                    else:
+                        self.display_status('You WIN!')
+
                     # Print is not needed here for 'PC plays random'.
                     # The last two Combobox values should be for center and strategy prefs.
                     if pc_pref in self.choose_pc_pref['values'][-2:]:
@@ -1079,6 +1078,10 @@ class TicTacToeGUI(tk.Tk):
                         else:
                             print(f'Human won "{pc_pref}", G{game}:T{turn}.')
                     break
+                else:  # Mode selection is pvp.
+                    award_points(mark)
+                    self.flash_win(combo)
+                    self.display_status(f'{mark} WINS!')
 
         if self.turn_number() == 9 and not self.winner_found:  # Is a tie.
             self.winner_found = True
@@ -1094,11 +1097,14 @@ class TicTacToeGUI(tk.Tk):
 
             self.ties_num.set(self.ties_num.get() + 1)
 
-            if 'Autoplay' in self.mode_selection.get():
+            if 'Autoplay' in mode:
                 self.auto_flash_game((4, 4, 4), 'TIE')
             else:  # Mode selection is pvp or pvpc.
                 self.flash_tie()
                 self.display_status('IT IS A TIE!')
+                self.whose_turn.set('Game pending...')
+                self.whose_turn_lbl.config(bg=COLOR['tk_white'])
+
                 # Print is not needed here for 'PC plays random'.
                 # The last two Combobox values should be for center and strategy prefs.
                 if pc_pref in self.choose_pc_pref['values'][-2:]:
@@ -1274,6 +1280,12 @@ class TicTacToeGUI(tk.Tk):
         """
         self.quit_button.config(state=tk.NORMAL)
 
+        self.auto_random_mode.config(state=tk.NORMAL)
+        self.auto_center_mode.config(state=tk.NORMAL)
+        self.auto_strategy_mode.config(state=tk.NORMAL)
+        self.pvp_mode.config(state=tk.NORMAL)
+        self.pvpc_mode.config(state=tk.NORMAL)
+
         # Make font invisible (bg color) to remove from view.
         self.auto_turns_header.config(fg=COLOR['tk_white'])
         self.auto_turns_lbl.config(fg=COLOR['tk_white'])
@@ -1302,7 +1314,7 @@ class TicTacToeGUI(tk.Tk):
         if ('Autoplay' in self.mode_selection.get() or
                 self.auto_turns_remaining.get() > 0):
             self.reset_game_and_score()
-            self.whose_turn.set(self.display_automode)
+            self.whose_turn.set(self.curr_automode)
             self.whose_turn_lbl.config(bg=COLOR['tk_white'])
             self.auto_turns_remaining.set(0)
             self.auto_marks = ''
@@ -1324,7 +1336,6 @@ class TicTacToeGUI(tk.Tk):
         self.p1_points = 0
         self.p2_points = 0
         self.ties_num.set(0)
-        self.your_turn_player1()
         self.setup_game_board()
 
     def auto_command(self) -> None:
@@ -1359,7 +1370,7 @@ class TicTacToeGUI(tk.Tk):
         """
         self.setup_game_board()
         self.reset_game_and_score()
-        self.whose_turn.set(self.mode_selection.get())
+        self.whose_turn.set(self.curr_automode)
         self.whose_turn_lbl.config(bg=COLOR['tk_white'])
 
         # Change font from invisible (bg color) to default color to view.
@@ -1388,6 +1399,14 @@ class TicTacToeGUI(tk.Tk):
         elif self.mode_selection.get() == 'Autoplay center':
             self.autoplay_center()
 
+        # Do not allow mode selection while autoplay is in progress.
+        #   Reset all to NORMAL in new_game().
+        self.auto_random_mode.config(state=tk.DISABLED)
+        self.auto_center_mode.config(state=tk.DISABLED)
+        self.auto_strategy_mode.config(state=tk.DISABLED)
+        self.pvp_mode.config(state=tk.DISABLED)
+        self.pvpc_mode.config(state=tk.DISABLED)
+
     def auto_stop(self, stop_msg: str) -> None:
         """
         Stop autoplay method and call Status popup window.
@@ -1404,7 +1423,7 @@ class TicTacToeGUI(tk.Tk):
         self.who_autostarts.config(state=tk.NORMAL)
 
         self.setup_game_board()
-        self.display_status(f'{self.display_automode}, {stop_msg}')
+        self.display_status(f'{self.curr_automode}, {stop_msg}')
 
     def auto_setup(self) -> None:
         """
@@ -1483,7 +1502,7 @@ class TicTacToeGUI(tk.Tk):
 
         :return: None
         """
-        self.display_automode = 'Autoplay random'
+        self.curr_automode = 'Autoplay random'
         self.auto_turns_remaining.set(len(self.auto_marks))
         turn_number = self.turn_number()
 
@@ -1521,7 +1540,7 @@ class TicTacToeGUI(tk.Tk):
 
         :return: None
         """
-        self.display_automode = 'Autoplay strategy'
+        self.curr_automode = 'Autoplay strategy'
 
         self.auto_turns_remaining.set(len(self.auto_marks))
         turn_number = self.turn_number()
@@ -1575,7 +1594,7 @@ class TicTacToeGUI(tk.Tk):
 
         :return: None
         """
-        self.display_automode = 'Autoplay center'
+        self.curr_automode = 'Autoplay center'
 
         self.auto_turns_remaining.set(len(self.auto_marks))
         turn_number = self.turn_number()
