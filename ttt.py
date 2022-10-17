@@ -68,8 +68,8 @@ class TicTacToeGUI(tk.Tk):
         'auto_turns_header', 'auto_turns_lbl', 'auto_turns_remaining',
         'autoplay_on', 'autospeed_fast', 'autospeed_lbl',
         'autospeed_selection', 'autospeed_slow',
-        'board_labels', 'choose_pc_pref', 'curr_pmode',
-        'curr_automode', 'mode_clicked',
+        'board_labels', 'choose_pc_pref', 'pc_pref',
+        'curr_pmode', 'curr_automode', 'mode_clicked',
         'p1_points', 'p1_score', 'p2_points', 'p2_score',
         'player1_header', 'player1_score_lbl',
         'player2_header', 'player2_score_lbl',
@@ -116,6 +116,7 @@ class TicTacToeGUI(tk.Tk):
         self.pvp_mode = tk.Radiobutton()
         self.pvpc_mode = tk.Radiobutton()
         self.choose_pc_pref = ttk.Combobox()
+        self.pc_pref = tk.StringVar()
         self.auto_random_mode = tk.Radiobutton()
         self.auto_strategy_mode = tk.Radiobutton()
         self.auto_center_mode = tk.Radiobutton()
@@ -213,6 +214,7 @@ class TicTacToeGUI(tk.Tk):
                                    values=('PC plays random',
                                            'PC plays center',
                                            'PC plays strategy'),
+                                   textvariable=self.pc_pref,
                                    state=tk.DISABLED)
         self.option_add("*TCombobox*Font", FONT['condensed'])
         if MY_OS == 'dar':
@@ -621,7 +623,10 @@ class TicTacToeGUI(tk.Tk):
                     self.pvpc_mode.deselect()
                 elif self.curr_pmode == 'pvpc':
                     self.pvpc_mode.select()
-                    self.choose_pc_pref.config(state='readonly')
+                    # Only allow changing pc prefs on Human (P1) turn;
+                    #   forces completion of Human-PC two-turn game cycle.
+                    if self.prev_game_num.get() % 2 == 0:
+                        self.choose_pc_pref.config(state='readonly')
                     self.pvp_mode.deselect()
 
                 msg = 'Finish the current game,\nthen change mode.'
@@ -1062,8 +1067,7 @@ class TicTacToeGUI(tk.Tk):
                         self.display_status('You WIN!')
 
                     # Print is not needed here for 'PC plays random'.
-                    # The last two Combobox values should be for center and strategy prefs.
-                    if pc_pref in self.choose_pc_pref['values'][-2:]:
+                    if self.pc_pref.get() in 'PC plays strategy, PC plays center':
                         if mark == P2_MARK:
                             print(f'PC won "{pc_pref}", G{game}:T{turn}.')
                         else:
@@ -1097,8 +1101,7 @@ class TicTacToeGUI(tk.Tk):
                 self.whose_turn_lbl.config(bg=COLOR['tk_white'])
 
                 # Print is not needed here for 'PC plays random'.
-                # The last two Combobox values should be for center and strategy prefs.
-                if pc_pref in self.choose_pc_pref['values'][-2:]:
+                if self.pc_pref.get() in 'PC plays strategy, PC plays center':
                     print('-Tie-')
 
     def flash_win(self, combo) -> None:
