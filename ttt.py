@@ -369,7 +369,7 @@ class TicTacToeGUI(tk.Tk):
             self.whose_turn_lbl.grid(row=0, column=0,
                                      padx=(12, 0), pady=(5, 0),
                                      sticky=tk.W)
-        else: # macOS or Windows
+        else:  # macOS or Windows
             self.whose_turn_lbl.grid(row=0, column=0,
                                      padx=0, pady=(5, 0))
 
@@ -611,6 +611,10 @@ class TicTacToeGUI(tk.Tk):
                        'or click "Stop auto" button.')
 
             else:  # Mode is PvP or PvPC.
+                self.auto_random_mode.config(state=tk.DISABLED)
+                self.auto_center_mode.config(state=tk.DISABLED)
+                self.auto_strategy_mode.config(state=tk.DISABLED)
+
                 if self.curr_pmode == 'pvp':
                     self.pvp_mode.select()
                     self.choose_pc_pref.config(state=tk.DISABLED)
@@ -673,9 +677,6 @@ class TicTacToeGUI(tk.Tk):
         :return: None
         """
 
-        # At start, Previous game # = 0, then increments after a win/tie.
-        #  At start of a new game, turn # = 0.
-        #  On even PvPC games, pc will have already played 1st turn.
         def h_plays_p1():
             played_lbl['text'] = P1_MARK
             self.whose_turn.set(f'{PLAYER2} plays {P2_MARK}')
@@ -691,7 +692,16 @@ class TicTacToeGUI(tk.Tk):
             self.whose_turn.set(f'PC plays {P2_MARK}')
             self.whose_turn_lbl.config(bg=COLOR['tk_white'])
 
+        # At start, Previous game # = 0, then increments after a win/tie.
+        #  At start of a new game, turn # = 0.
+        #  On even PvPC games, pc will have already played 1st turn.
+
         if played_lbl['text'] == ' ':
+            self.choose_pc_pref.config(state=tk.DISABLED)
+            self.auto_random_mode.config(state=tk.DISABLED)
+            self.auto_center_mode.config(state=tk.DISABLED)
+            self.auto_strategy_mode.config(state=tk.DISABLED)
+
             if self.mode_clicked.get() == 'pvp':
                 self.curr_pmode = 'pvp'
                 if self.prev_game_num.get() % 2 == 0:
@@ -761,6 +771,7 @@ class TicTacToeGUI(tk.Tk):
         #   that just delays closing the Status toplevel for a new game.
         if turn_number > 0:
             app.after(cst.PLAY_AFTER)
+            self.choose_pc_pref.config(state=tk.DISABLED)
 
         # Need to re-order winner list so Human doesn't detect a pattern
         #   of where PC will play.
@@ -1287,11 +1298,13 @@ class TicTacToeGUI(tk.Tk):
             else:
                 self.whose_turn.set(f'{PLAYER2} plays {P2_MARK}')
                 self.whose_turn_lbl.config(bg=COLOR['tk_white'])
+                self.choose_pc_pref.config(state=tk.DISABLED)
 
         elif self.mode_clicked.get() == 'pvpc':
             if self.prev_game_num.get() % 2 != 0:
                 self.whose_turn.set(f'PC plays {P2_MARK}')
                 self.whose_turn_lbl.config(bg=COLOR['tk_white'])
+                self.choose_pc_pref.config(state=tk.DISABLED)
 
                 self.pc_turn()
             else:
@@ -1325,6 +1338,9 @@ class TicTacToeGUI(tk.Tk):
         self.p2_points = 0
         self.ties_num.set(0)
         self.setup_game_board()
+
+        if self.curr_pmode in 'pvp, pvpc':
+            self.your_turn_player1()
 
     def auto_command(self) -> None:
         """
@@ -1457,7 +1473,7 @@ class TicTacToeGUI(tk.Tk):
         Called from autospeed_fast and autospeed_slow Radiobuttons;
         from auto_flash_game() to set time for erasing flash color;
         from each autoplay_* method to set time between game restarts.
-        
+
         :param after_type: function type to be paused;
                            either "game" (default) or "flash".
         :return: Milliseconds to use in after() calls.
@@ -1471,7 +1487,7 @@ class TicTacToeGUI(tk.Tk):
         # Note: Erase time needs to be less than auto_after time for
         #   proper display of game board winner/tie flash.
         erase_after = int(auto_after * 0.9)
-        
+
         if after_type == 'flash':
             return erase_after
 
