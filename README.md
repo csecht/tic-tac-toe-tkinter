@@ -42,7 +42,7 @@ In Autoplay mode, the PC plays itself. You can choose to have Player 1 (X) start
 
 ### Screenshots
 
-Human (Player 1, X) wins 19th game in "PC plays center" mode. A Result pop-up window prompts user to play again or quit the program. The pop-up window can be repositioned.
+Human (Player 1, X) wins 9th game in "PC plays center" mode. A Game Status pop-up window prompts user to play again or quit the program. The pop-up window can be repositioned.
 
 ![pvpc-game](images/X_wins_PvPC.png)
 
