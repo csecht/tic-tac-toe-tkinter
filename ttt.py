@@ -57,7 +57,7 @@ class TicTacToeGUI(tk.Tk):
     flash_win, grid_widgets, human_turn, mode_control, new_game,
     on_enter, on_leave, play_defense, pc_turn, play_random,
     reset_game_and_score, setup_game_board, turn_number,
-    unbind_game_board, window_geometry, your_turn_player1
+    unbind_game_board, window_geometry, ready_player_one
     """
     # Using __slots__ for all Class attributes gives slight reduction of
     #   memory usage and maybe improved performance.
@@ -160,7 +160,7 @@ class TicTacToeGUI(tk.Tk):
         self.whose_turn_lbl.config(textvariable=self.whose_turn,
                                    font=FONT['who'],
                                    height=4)
-        self.your_turn_player1()  # Starting prompt for Player1 to begin play.
+        self.ready_player_one()  # Starting prompt for Player1 to begin play.
         self.auto_turns_header.config(text='Turns to go',
                                       font=FONT['condensed'],
                                       fg=COLOR['tk_white'])  # match default bg.
@@ -595,6 +595,40 @@ class TicTacToeGUI(tk.Tk):
         elif label['bg'] == COLOR['sq_won']:
             label['bg'] = COLOR['sq_won']
 
+    def disable(self, *group: str) -> None:
+        """
+        Groups of related statements to disable widget activity.
+
+        :param group: The group(s) to disable. Use 'pmodes' (pvp and pvpc),
+                     'all_modes', and/or 'all_auto'.
+        :return: None
+        """
+
+        if 'pmodes' in group:
+            self.pvp_mode.config(state=tk.DISABLED)
+            self.pvpc_mode.config(state=tk.DISABLED)
+            self.choose_pc_pref.config(state=tk.DISABLED)
+
+        if 'all_modes' in group:
+            self.auto_random_mode.config(state=tk.DISABLED)
+            self.auto_center_mode.config(state=tk.DISABLED)
+            self.auto_strategy_mode.config(state=tk.DISABLED)
+            self.autospeed_fast.config(state=tk.DISABLED)
+            self.autospeed_slow.config(state=tk.DISABLED)
+
+            self.pvp_mode.config(state=tk.DISABLED)
+            self.pvpc_mode.config(state=tk.DISABLED)
+            self.choose_pc_pref.config(state=tk.DISABLED)
+
+        if 'all_auto' in group:
+            self.auto_go_stop_radiobtn.config(state=tk.DISABLED)
+            self.who_autostarts.configure(state=tk.DISABLED)
+            self.auto_random_mode.config(state=tk.DISABLED)
+            self.auto_center_mode.config(state=tk.DISABLED)
+            self.auto_strategy_mode.config(state=tk.DISABLED)
+            self.autospeed_fast.config(state=tk.DISABLED)
+            self.autospeed_slow.config(state=tk.DISABLED)
+
     def mode_control(self) -> None:
         """
         Block any mode change if in the middle of a game or in autoplay.
@@ -604,7 +638,7 @@ class TicTacToeGUI(tk.Tk):
 
         :return: None
         """
-        mode = self.mode_clicked.get()
+        mode_clicked = self.mode_clicked.get()
 
         # If a game is in progress, ignore any mode selections & post msg.
         if self.turn_number() > 0 and not self.winner_found:
@@ -612,19 +646,18 @@ class TicTacToeGUI(tk.Tk):
                 msg = ('Wait for autoplay to finish,\n'
                        'or click "Stop auto" button.')
 
-            else:  # Mode is PvP or PvPC.
-                self.auto_random_mode.config(state=tk.DISABLED)
-                self.auto_center_mode.config(state=tk.DISABLED)
-                self.auto_strategy_mode.config(state=tk.DISABLED)
+            else:  # PvP or PvPC was clicked.
+                self.disable('all_auto')
 
                 if self.curr_pmode == 'pvp':
                     self.pvp_mode.select()
-                    self.choose_pc_pref.config(state=tk.DISABLED)
+                    self.pvpc_mode.config(state=tk.DISABLED)
                     self.pvpc_mode.deselect()
                 elif self.curr_pmode == 'pvpc':
                     self.pvpc_mode.select()
+                    self.pvp_mode.config(state=tk.DISABLED)
                     # Only allow changing pc prefs on Human (P1) turn;
-                    #   forces completion of Human-PC two-turn game cycle.
+                    #   forces completion of a two-turn game cycle.
                     if self.prev_game_num.get() % 2 == 0:
                         self.choose_pc_pref.config(state='readonly')
                     self.pvp_mode.deselect()
@@ -635,31 +668,31 @@ class TicTacToeGUI(tk.Tk):
                                 detail=msg)
 
         else:  # No game in progress.
-            if mode == 'pvpc':
+            if mode_clicked == 'pvpc':
                 self.choose_pc_pref.config(state='readonly')
             else:
                 self.choose_pc_pref.config(state=tk.DISABLED)
 
-            if mode in 'pvp, pvpc':
+            if mode_clicked in 'pvp, pvpc':
                 self.auto_go_stop_radiobtn.config(state=tk.DISABLED)
                 self.who_autostarts.configure(state=tk.DISABLED)
-                self.your_turn_player1()
-            else:  # One of the auto modes.
+                self.ready_player_one()
+            else:  # One of the auto modes was clicked.
                 self.auto_go_stop_radiobtn.config(state=tk.NORMAL)
                 self.who_autostarts.configure(state=tk.NORMAL)
-                self.whose_turn.set(mode)
-                self.curr_automode = mode
+                self.whose_turn.set(mode_clicked)
+                self.curr_automode = mode_clicked
                 self.whose_turn_lbl.config(bg=COLOR['tk_white'])
 
             self.reset_game_and_score()
 
-    def your_turn_player1(self) -> None:
+    def ready_player_one(self) -> None:
         """
-        Display when it is Player 1's turn to play.
+        Display when it is Human's (Player 1) turn after PC has played.
+        Shout out to Steven Spielberg.
 
         :return: None
         """
-        # Need to inform player when it's their turn after PC has played.
         if self.mode_clicked.get() == 'pvpc' and self.turn_number() == 1:
             self.whose_turn.set(f'PC played {P2_MARK}\n'
                                 f'Your turn {PLAYER1}')
@@ -690,7 +723,7 @@ class TicTacToeGUI(tk.Tk):
         def h_plays_p2():
             played_lbl['text'] = P2_MARK
             played_lbl.config(fg=COLOR['tk_white'])
-            self.your_turn_player1()
+            self.ready_player_one()
 
         def h_plays_p1_v_pc():
             played_lbl['text'] = P1_MARK
@@ -703,9 +736,7 @@ class TicTacToeGUI(tk.Tk):
 
         if played_lbl['text'] == ' ':
             self.choose_pc_pref.config(state=tk.DISABLED)
-            self.auto_random_mode.config(state=tk.DISABLED)
-            self.auto_center_mode.config(state=tk.DISABLED)
-            self.auto_strategy_mode.config(state=tk.DISABLED)
+            self.disable('all_auto')
 
             if self.mode_clicked.get() == 'pvp':
                 self.curr_pmode = 'pvp'
@@ -723,7 +754,7 @@ class TicTacToeGUI(tk.Tk):
                 if self.turn_number() >= 5:
                     self.check_winner(played_lbl.cget('text'))
 
-            elif self.mode_clicked.get() == 'pvpc':
+            else:  # The PvPC mode was clicked.
                 self.curr_pmode = 'pvpc'
                 if (self.turn_number() % 2 == 0 and
                         self.prev_game_num.get() % 2 == 0):
@@ -741,6 +772,12 @@ class TicTacToeGUI(tk.Tk):
 
                 if self.turn_number() < 9 and not self.winner_found:
                     self.pc_turn()
+
+            # Disable the Player v... mode that is not in play.
+            if self.curr_pmode == 'pvp':
+                self.pvpc_mode.config(state=tk.DISABLED)
+            else:
+                self.pvp_mode.config(state=tk.DISABLED)
         else:
             messagebox.showerror('Oops!', 'This square was already played!')
 
@@ -754,8 +791,7 @@ class TicTacToeGUI(tk.Tk):
         :return: None
         """
 
-        if self.mode_clicked.get() == 'pvpc':
-            self.board_labels[_id].config(fg=COLOR['tk_white'])
+        self.board_labels[_id].config(fg=COLOR['tk_white'])
 
     def pc_turn(self) -> None:
         """
@@ -816,7 +852,7 @@ class TicTacToeGUI(tk.Tk):
             self.check_winner(P2_MARK)
 
         if not self.winner_found:
-            self.your_turn_player1()
+            self.ready_player_one()
 
         app.update_idletasks()
 
@@ -1266,13 +1302,7 @@ class TicTacToeGUI(tk.Tk):
         """
         self.unbind_game_board()
         self.quit_button.config(state=tk.DISABLED)
-        self.auto_go_stop_radiobtn.config(state=tk.DISABLED)
-        self.auto_random_mode.config(state=tk.DISABLED)
-        self.auto_center_mode.config(state=tk.DISABLED)
-        self.auto_strategy_mode.config(state=tk.DISABLED)
-        self.pvp_mode.config(state=tk.DISABLED)
-        self.pvpc_mode.config(state=tk.DISABLED)
-        self.choose_pc_pref.config(state=tk.DISABLED)
+        self.disable('all-auto', 'pmodes')
 
     def new_game(self) -> None:
         """
@@ -1297,7 +1327,7 @@ class TicTacToeGUI(tk.Tk):
 
         if self.mode_clicked.get() == 'pvp':
             if self.prev_game_num.get() % 2 == 0:
-                self.your_turn_player1()
+                self.ready_player_one()
             else:
                 self.whose_turn.set(f'{PLAYER2} plays {P2_MARK}')
                 self.whose_turn_lbl.config(bg=COLOR['tk_white'])
@@ -1311,7 +1341,7 @@ class TicTacToeGUI(tk.Tk):
 
                 self.pc_turn()
             else:
-                self.your_turn_player1()
+                self.ready_player_one()
 
         # At the end of an autoplay series or when stopped by user, need
         #   to clear auto scores and games.
@@ -1343,7 +1373,7 @@ class TicTacToeGUI(tk.Tk):
         self.setup_game_board()
 
         if self.curr_pmode in 'pvp, pvpc':
-            self.your_turn_player1()
+            self.ready_player_one()
 
     def auto_command(self) -> None:
         """
@@ -1407,12 +1437,8 @@ class TicTacToeGUI(tk.Tk):
             self.autoplay_center()
 
         # Do not allow mode selection while autoplay is in progress.
-        #   Reset all to NORMAL in new_game().
-        self.auto_random_mode.config(state=tk.DISABLED)
-        self.auto_center_mode.config(state=tk.DISABLED)
-        self.auto_strategy_mode.config(state=tk.DISABLED)
-        self.pvp_mode.config(state=tk.DISABLED)
-        self.pvpc_mode.config(state=tk.DISABLED)
+        #   Reset all to NORMAL or 'readonly' in new_game().
+        self.disable('all_modes')
 
     def auto_stop(self, stop_msg: str) -> None:
         """
