@@ -1304,9 +1304,13 @@ class TicTacToeGUI(tk.Tk):
         return: None
         """
         self.quit_button.config(state=tk.NORMAL)
+
         self.auto_random_mode.config(state=tk.NORMAL)
         self.auto_center_mode.config(state=tk.NORMAL)
         self.auto_strategy_mode.config(state=tk.NORMAL)
+        self.autospeed_fast.config(state=tk.NORMAL)
+        self.autospeed_slow.config(state=tk.NORMAL)
+
         self.pvp_mode.config(state=tk.NORMAL)
         self.pvpc_mode.config(state=tk.NORMAL)
         self.choose_pc_pref.config(state='readonly')
