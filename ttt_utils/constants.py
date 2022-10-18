@@ -12,8 +12,8 @@ TIES, WINS: (unused) tuples of board end-game configurations, in index order.
 from ttt_utils import platform_check  # need MY_OS
 
 # Used only for display of player ID.
-PLAYER1 = 'PLAYER 1'
-PLAYER2 = 'PLAYER 2'
+PLAYER1 = 'Player 1'
+PLAYER2 = 'Player 2'
 
 # Can use any utf-8 character for play marks.
 P1_MARK = 'X'

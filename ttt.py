@@ -169,15 +169,15 @@ class TicTacToeGUI(tk.Tk):
                                    fg=COLOR['tk_white'])  # match default bg.
 
         # Players' scores widgets:
-        # ︴squiggle symbol from https://coolsymbol.com/line-symbols.html
+        # Squiggle symbol, ︴, from https://coolsymbol.com/line-symbols.html
         self.score_header.config(
             text='Score ︴', font=FONT['scores'],
             fg=COLOR['score_fg'])
         self.player1_header.config(
-            text='Player 1:', font=FONT['scores'],
+            text=f'{PLAYER1}:', font=FONT['scores'],
             fg=COLOR['score_fg'])
         self.player2_header.config(
-            text='Player 2:', font=FONT['scores'],
+            text=f'{PLAYER2}:', font=FONT['scores'],
             fg=COLOR['score_fg'])
         self.player1_score_lbl.config(
             textvariable=self.p1_score, font=FONT['scores'],
@@ -661,8 +661,10 @@ class TicTacToeGUI(tk.Tk):
         else:  # No game in progress.
             if mode_clicked == 'pvpc':
                 self.choose_pc_pref.config(state='readonly')
+                self.player2_header.config(text='PC:')
             else:
                 self.choose_pc_pref.config(state=tk.DISABLED)
+                self.player2_header.config(text=f'{PLAYER2}:')
 
             if mode_clicked in 'pvp, pvpc':
                 self.disable('auto_controls')
