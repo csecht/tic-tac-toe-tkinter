@@ -698,10 +698,9 @@ class TicTacToeGUI(tk.Tk):
         Check whether *played_lbl* (game board square Label) selected by
         player was already played. If not, assign player's mark to the
         text value of the selected label.
-        In Player v Player mode, player's alternate who plays first in
+        Players' marks (X or O) alternate who has first the turn in
         consecutive games.
-        In Player v PC mode, Player 1 (human) always has the first turn.
-        Evaluate played squares for a win after the 5th turn.
+        Played squares are evaluated for a win after the 5th turn.
 
         :param played_lbl: The tk.Label object that was clicked.
         :return: None
