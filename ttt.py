@@ -160,6 +160,11 @@ class TicTacToeGUI(tk.Tk):
         self.whose_turn_lbl.config(textvariable=self.whose_turn,
                                    font=FONT['who'],
                                    height=4)
+        if MY_OS in 'lin, win':  # is Linux or Windows
+            self.whose_turn_lbl.config(width=14)
+        else:  # is macOS
+            self.whose_turn_lbl.config(width=13)
+
         self.ready_player_one()  # Starting prompt for Player1 to begin play.
         self.auto_turns_header.config(text='Turns to go',
                                       font=FONT['condensed'],
@@ -773,6 +778,9 @@ class TicTacToeGUI(tk.Tk):
                 self.pvp_mode.config(state=tk.DISABLED)
         else:
             messagebox.showerror('Oops!', 'This square was already played!')
+            # macOS requires focus_force(), not focus_set(), to return focus
+            #  to main window after the "Oops!" messagebox is closed.
+            app.focus_force()
 
     def color_pc_mark(self, _id: int) -> None:
         """
@@ -1216,8 +1224,8 @@ class TicTacToeGUI(tk.Tk):
         self.status_window.title('Game Status')
 
         if MY_OS == 'win':  # Windows
-            size = '420x150'
-            min_w = 270
+            size = '500x150'
+            min_w = 300
             min_h = 150
         elif MY_OS == 'dar':  # macOS
             size = '200x90'
