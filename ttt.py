@@ -599,33 +599,24 @@ class TicTacToeGUI(tk.Tk):
         """
         Groups of related statements to disable widget activity.
 
-        :param group: The group(s) to disable. Use 'pmodes' (pvp and pvpc),
-                     'all_modes', and/or 'all_auto'.
+        :param group: The group(s) to disable. Use any or all: 
+                'player_modes', 'auto_modes', 'auto_controls'.
         :return: None
         """
 
-        if 'pmodes' in group:
+        if 'player_modes' in group:
             self.pvp_mode.config(state=tk.DISABLED)
             self.pvpc_mode.config(state=tk.DISABLED)
             self.choose_pc_pref.config(state=tk.DISABLED)
 
-        if 'all_modes' in group:
+        if 'auto_modes' in group:
             self.auto_random_mode.config(state=tk.DISABLED)
             self.auto_center_mode.config(state=tk.DISABLED)
             self.auto_strategy_mode.config(state=tk.DISABLED)
-            self.autospeed_fast.config(state=tk.DISABLED)
-            self.autospeed_slow.config(state=tk.DISABLED)
 
-            self.pvp_mode.config(state=tk.DISABLED)
-            self.pvpc_mode.config(state=tk.DISABLED)
-            self.choose_pc_pref.config(state=tk.DISABLED)
-
-        if 'all_auto' in group:
+        if 'auto_controls' in group:
             self.auto_go_stop_radiobtn.config(state=tk.DISABLED)
             self.who_autostarts.configure(state=tk.DISABLED)
-            self.auto_random_mode.config(state=tk.DISABLED)
-            self.auto_center_mode.config(state=tk.DISABLED)
-            self.auto_strategy_mode.config(state=tk.DISABLED)
             self.autospeed_fast.config(state=tk.DISABLED)
             self.autospeed_slow.config(state=tk.DISABLED)
 
@@ -647,7 +638,7 @@ class TicTacToeGUI(tk.Tk):
                        'or click "Stop auto" button.')
 
             else:  # PvP or PvPC was clicked.
-                self.disable('all_auto')
+                self.disable('auto_modes', 'auto_controls')
 
                 if self.curr_pmode == 'pvp':
                     self.pvp_mode.select()
@@ -674,12 +665,13 @@ class TicTacToeGUI(tk.Tk):
                 self.choose_pc_pref.config(state=tk.DISABLED)
 
             if mode_clicked in 'pvp, pvpc':
-                self.auto_go_stop_radiobtn.config(state=tk.DISABLED)
-                self.who_autostarts.configure(state=tk.DISABLED)
+                self.disable('auto_controls')
                 self.ready_player_one()
             else:  # One of the auto modes was clicked.
                 self.auto_go_stop_radiobtn.config(state=tk.NORMAL)
                 self.who_autostarts.configure(state=tk.NORMAL)
+                self.autospeed_fast.config(state=tk.NORMAL)
+                self.autospeed_slow.config(state=tk.NORMAL)
                 self.whose_turn.set(mode_clicked)
                 self.curr_automode = mode_clicked
                 self.whose_turn_lbl.config(bg=COLOR['tk_white'])
@@ -736,7 +728,7 @@ class TicTacToeGUI(tk.Tk):
 
         if played_lbl['text'] == ' ':
             self.choose_pc_pref.config(state=tk.DISABLED)
-            self.disable('all_auto')
+            self.disable('auto_modes', 'auto_controls')
 
             if self.mode_clicked.get() == 'pvp':
                 self.curr_pmode = 'pvp'
@@ -1302,7 +1294,7 @@ class TicTacToeGUI(tk.Tk):
         """
         self.unbind_game_board()
         self.quit_button.config(state=tk.DISABLED)
-        self.disable('all-auto', 'pmodes')
+        self.disable('player_modes', 'auto_modes', 'auto_controls')
 
     def new_game(self) -> None:
         """
@@ -1438,7 +1430,7 @@ class TicTacToeGUI(tk.Tk):
 
         # Do not allow mode selection while autoplay is in progress.
         #   Reset all to NORMAL or 'readonly' in new_game().
-        self.disable('all_modes')
+        self.disable('player_modes', 'auto_modes')
 
     def auto_stop(self, stop_msg: str) -> None:
         """
