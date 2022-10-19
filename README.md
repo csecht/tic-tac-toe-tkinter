@@ -56,7 +56,7 @@ All actions done with the mouse can also be done with keys. To place marks in sq
 
 When two people are competing in Player v Player mode, one can use the mouse while the other uses the keyboard.
 
-Modes and buttons can be selected by cycling focus through them with the Tab key. The direction of the cycle is reversed with Shift-Tab. A mode or option that has focus is activated by pressing Enter. The 'Player 1 starts' button in the lower left becomes selectable only when an Autoplay mode is active; toggle between 'Player 1 starts' and 'Players alternate' with the space bar.
+Modes and buttons can be selected by cycling focus through them with the Tab key. The direction of the cycle is reversed with Shift-Tab. A mode or option that has focus is activated by pressing Enter or the space bar. The 'Player 1 starts' button in the lower left becomes selectable only when an Autoplay mode is active; toggle between 'Player 1 starts' and 'Players alternate' with the space bar.
 
 The space bar similarly activates the Quit button once it has selection focus.
 
