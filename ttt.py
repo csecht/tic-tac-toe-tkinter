@@ -330,26 +330,14 @@ class TicTacToeGUI(tk.Tk):
         self.bind('<KeyPress-KP_3>',
                   lambda _: self.human_turn(self.board_labels[8]))
 
-        self.bind('q', lambda _: self.human_turn(self.board_labels[0]))
-        self.bind('w', lambda _: self.human_turn(self.board_labels[1]))
-        self.bind('e', lambda _: self.human_turn(self.board_labels[2]))
-        self.bind('a', lambda _: self.human_turn(self.board_labels[3]))
-        self.bind('s', lambda _: self.human_turn(self.board_labels[4]))
-        self.bind('d', lambda _: self.human_turn(self.board_labels[5]))
-        self.bind('z', lambda _: self.human_turn(self.board_labels[6]))
-        self.bind('x', lambda _: self.human_turn(self.board_labels[7]))
-        self.bind('c', lambda _: self.human_turn(self.board_labels[8]))
+        lc_keys = 'qweasdzxc'
+        # Include uppercase in case Caps Lock is on.
+        uc_keys = 'QWEASDZXC'
 
-        # In case Caps Lock is on...
-        self.bind('Q', lambda _: self.human_turn(self.board_labels[0]))
-        self.bind('W', lambda _: self.human_turn(self.board_labels[1]))
-        self.bind('E', lambda _: self.human_turn(self.board_labels[2]))
-        self.bind('A', lambda _: self.human_turn(self.board_labels[3]))
-        self.bind('S', lambda _: self.human_turn(self.board_labels[4]))
-        self.bind('D', lambda _: self.human_turn(self.board_labels[5]))
-        self.bind('Z', lambda _: self.human_turn(self.board_labels[6]))
-        self.bind('X', lambda _: self.human_turn(self.board_labels[7]))
-        self.bind('C', lambda _: self.human_turn(self.board_labels[8]))
+        for i, _key, in enumerate(lc_keys, start=0):
+            self.bind(_key, lambda _, indx=i: self.human_turn(self.board_labels[indx]))
+        for i, _key, in enumerate(uc_keys, start=0):
+            self.bind(_key, lambda _, indx=i: self.human_turn(self.board_labels[indx]))
 
     def grid_widgets(self) -> None:
         """Position app window widgets."""
