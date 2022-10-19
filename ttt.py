@@ -340,6 +340,17 @@ class TicTacToeGUI(tk.Tk):
         self.bind('x', lambda _: self.human_turn(self.board_labels[7]))
         self.bind('c', lambda _: self.human_turn(self.board_labels[8]))
 
+        # In case Caps Lock is on...
+        self.bind('Q', lambda _: self.human_turn(self.board_labels[0]))
+        self.bind('W', lambda _: self.human_turn(self.board_labels[1]))
+        self.bind('E', lambda _: self.human_turn(self.board_labels[2]))
+        self.bind('A', lambda _: self.human_turn(self.board_labels[3]))
+        self.bind('S', lambda _: self.human_turn(self.board_labels[4]))
+        self.bind('D', lambda _: self.human_turn(self.board_labels[5]))
+        self.bind('Z', lambda _: self.human_turn(self.board_labels[6]))
+        self.bind('X', lambda _: self.human_turn(self.board_labels[7]))
+        self.bind('C', lambda _: self.human_turn(self.board_labels[8]))
+
     def grid_widgets(self) -> None:
         """Position app window widgets."""
 
