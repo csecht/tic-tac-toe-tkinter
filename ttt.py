@@ -142,8 +142,10 @@ class TicTacToeGUI(tk.Tk):
         self.winner_found = False  # Used for game flow control.
         self.quit_button = ttk.Button()
 
-        self.configure_widgets()
+        self.keybindings()
         self.grid_widgets()
+        self.configure_widgets()
+        self.setup_game_board()
 
     def configure_widgets(self) -> None:
         """Initial configurations of app window widgets."""
@@ -291,11 +293,6 @@ class TicTacToeGUI(tk.Tk):
         self.quit_button.config(style="My.TButton",
                                 text='Quit', width=4,
                                 command=lambda: utils.quit_game(mainloop=app))
-
-        self.keybindings()
-
-        # Configure game board playing squares (Labels):
-        self.setup_game_board()
 
     def keybindings(self) -> None:
         """
