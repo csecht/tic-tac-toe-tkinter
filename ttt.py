@@ -158,9 +158,6 @@ class TicTacToeGUI(tk.Tk):
         :return: None
         """
 
-        self.bind('Control-q', lambda _: utils.quit_game(app))
-        self.bind('<Escape>', lambda _: utils.quit_game(app))
-
         # Keys in positional 3x3 layout on keypad and main board correspond
         #   with the 3x3 game board row-column layout and sorted Label index values.
         # Include uppercase in case Caps Lock is on.
@@ -169,6 +166,9 @@ class TicTacToeGUI(tk.Tk):
         uc_keys = 'QWEASDZXC'
 
         if state == 'bind':
+            self.bind('Control-q', lambda _: utils.quit_game(app))
+            self.bind('<Escape>', lambda _: utils.quit_game(app))
+
             for i, _n, in enumerate(num_string, start=0):
                 self.bind(f'<KeyPress-KP_{_n}>',
                           lambda _, indx=i: self.human_turn(self.board_labels[indx]))
@@ -184,6 +184,9 @@ class TicTacToeGUI(tk.Tk):
             for key_string in (lc_keys, uc_keys):
                 for _k in key_string:
                     self.unbind(f'{_k}')
+
+            for lbl in self.board_labels:
+                lbl.unbind('<Button-1>')
 
     def grid_widgets(self) -> None:
         """Position app window widgets."""
@@ -563,7 +566,7 @@ class TicTacToeGUI(tk.Tk):
             lbl.unbind('<Button-1>')
             lbl.unbind('<Enter>')
             lbl.unbind('<Leave>')
-            self.keybindings('unbind')
+        self.keybindings('unbind')
 
     @staticmethod
     def on_enter(label: tk) -> None:
@@ -676,7 +679,6 @@ class TicTacToeGUI(tk.Tk):
                 self.whose_turn.set(mode_clicked)
                 self.curr_automode = mode_clicked
                 self.whose_turn_lbl.config(bg=COLOR['tk_white'])
-                self.keybindings('unbind')
 
             self.reset_game_and_score()
 
@@ -1324,9 +1326,10 @@ class TicTacToeGUI(tk.Tk):
 
         self.winner_found = False
         self.setup_game_board()
-        self.keybindings('bind')
 
         if self.mode_clicked.get() == 'pvp':
+            self.keybindings('bind')
+
             if self.prev_game_num.get() % 2 == 0:
                 self.ready_player_one()
             else:
@@ -1335,11 +1338,12 @@ class TicTacToeGUI(tk.Tk):
                 self.choose_pc_pref.config(state=tk.DISABLED)
 
         elif self.mode_clicked.get() == 'pvpc':
+            self.keybindings('bind')
+
             if self.prev_game_num.get() % 2 != 0:
                 self.whose_turn.set(f'PC plays {P2_MARK}')
                 self.whose_turn_lbl.config(bg=COLOR['tk_white'])
                 self.choose_pc_pref.config(state=tk.DISABLED)
-
                 self.pc_turn()
             else:
                 self.ready_player_one()
@@ -1349,8 +1353,6 @@ class TicTacToeGUI(tk.Tk):
         if ('Autoplay' in self.mode_clicked.get() or
                 self.auto_turns_remaining.get() > 0):
             self.reset_game_and_score()
-            self.whose_turn.set(self.curr_automode)
-            self.whose_turn_lbl.config(bg=COLOR['tk_white'])
             self.auto_turns_remaining.set(0)
             self.auto_marks = ''
             self.auto_go_stop_txt.set('Start auto')
@@ -1485,7 +1487,6 @@ class TicTacToeGUI(tk.Tk):
 
         self.winner_found = False
         self.setup_game_board()
-        self.unbind_game_board()
 
     def autostart_who(self) -> None:
         """
