@@ -142,19 +142,19 @@ class TicTacToeGUI(tk.Tk):
         self.winner_found = False  # Used for game flow control.
         self.quit_button = ttk.Button()
 
-        self.keybindings()
+        self.keybindings('bind')
         self.grid_widgets()
         self.configure_widgets()
         self.setup_game_board()
 
-    def keybindings(self, state='bind') -> None:
+    def keybindings(self, state: str) -> None:
         """
         Key bindings for quit function and to play game board squares.
         Provides alternative play action to mouse clicks.
         Can use both key commands and the mouse when two people are
         playing Player v Player mode.
 
-        :param state: Either 'bind' (default) or 'unbind'.
+        :param state: Either 'bind' or 'unbind'.
         :return: None
         """
 
@@ -164,25 +164,25 @@ class TicTacToeGUI(tk.Tk):
         # Keys in positional 3x3 layout on keypad and main board correspond
         #   with the 3x3 game board row-column layout and sorted Label index values.
         # Include uppercase in case Caps Lock is on.
-        kp_num = '789456123'
+        num_string = '789456123'
         lc_keys = 'qweasdzxc'
         uc_keys = 'QWEASDZXC'
 
         if state == 'bind':
-            for i, _n, in enumerate(kp_num, start=0):
+            for i, _n, in enumerate(num_string, start=0):
                 self.bind(f'<KeyPress-KP_{_n}>',
                           lambda _, indx=i: self.human_turn(self.board_labels[indx]))
 
-            for keyset in (lc_keys, uc_keys):
-                for i, _k, in enumerate(keyset, start=0):
+            for key_string in (lc_keys, uc_keys):
+                for i, _k, in enumerate(key_string, start=0):
                     self.bind(_k,
                               lambda _, indx=i: self.human_turn(self.board_labels[indx]))
         else:  # state is 'unbind'
-            for _n in kp_num:
+            for _n in num_string:
                 self.unbind(f'<KeyPress-KP_{_n}>')
 
-            for keyset in (lc_keys, uc_keys):
-                for _k in keyset:
+            for key_string in (lc_keys, uc_keys):
+                for _k in key_string:
                     self.unbind(f'{_k}')
 
     def grid_widgets(self) -> None:
