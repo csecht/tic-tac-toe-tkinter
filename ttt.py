@@ -310,34 +310,24 @@ class TicTacToeGUI(tk.Tk):
         self.bind('Control-q', lambda _: utils.quit_game(app))
         self.bind('<Escape>', lambda _: utils.quit_game(app))
 
-        # Keys in positional 3x3 layout on keypad and main board.
-        self.bind('<KeyPress-KP_7>',
-                  lambda _: self.human_turn(self.board_labels[0]))
-        self.bind('<KeyPress-KP_8>',
-                  lambda _: self.human_turn(self.board_labels[1]))
-        self.bind('<KeyPress-KP_9>',
-                  lambda _: self.human_turn(self.board_labels[2]))
-        self.bind('<KeyPress-KP_4>',
-                  lambda _: self.human_turn(self.board_labels[3]))
-        self.bind('<KeyPress-KP_5>',
-                  lambda _: self.human_turn(self.board_labels[4]))
-        self.bind('<KeyPress-KP_6>',
-                  lambda _: self.human_turn(self.board_labels[5]))
-        self.bind('<KeyPress-KP_1>',
-                  lambda _: self.human_turn(self.board_labels[6]))
-        self.bind('<KeyPress-KP_2>',
-                  lambda _: self.human_turn(self.board_labels[7]))
-        self.bind('<KeyPress-KP_3>',
-                  lambda _: self.human_turn(self.board_labels[8]))
-
-        lc_keys = 'qweasdzxc'
+        # Keys in positional 3x3 layout on keypad and main board correspond
+        #   with the 3x3 game board row-column Label index values.
         # Include uppercase in case Caps Lock is on.
+        num = '789456123'
+        lc_keys = 'qweasdzxc'
         uc_keys = 'QWEASDZXC'
 
+        for i, num, in enumerate(num, start=0):
+            self.bind(f'<KeyPress-KP_{num}>',
+                      lambda _, indx=i: self.human_turn(self.board_labels[indx]))
+
         for i, _key, in enumerate(lc_keys, start=0):
-            self.bind(_key, lambda _, indx=i: self.human_turn(self.board_labels[indx]))
+            self.bind(_key,
+                      lambda _, indx=i: self.human_turn(self.board_labels[indx]))
+
         for i, _key, in enumerate(uc_keys, start=0):
-            self.bind(_key, lambda _, indx=i: self.human_turn(self.board_labels[indx]))
+            self.bind(_key,
+                      lambda _, indx=i: self.human_turn(self.board_labels[indx]))
 
     def grid_widgets(self) -> None:
         """Position app window widgets."""
