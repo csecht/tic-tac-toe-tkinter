@@ -147,153 +147,6 @@ class TicTacToeGUI(tk.Tk):
         self.configure_widgets()
         self.setup_game_board()
 
-    def configure_widgets(self) -> None:
-        """Initial configurations of app window widgets."""
-        ttk.Style().theme_use('alt')
-
-        self.prev_game_num.set(0)
-        self.ties_num.set(0)
-
-        # Player's turn widgets.
-        self.prev_game_num_header.config(text='Games played',
-                                         font=FONT['condensed'])
-        self.prev_game_num_lbl.config(textvariable=self.prev_game_num,
-                                      font=FONT['condensed'])
-        self.whose_turn_lbl.config(textvariable=self.whose_turn,
-                                   font=FONT['who'],
-                                   height=4)
-        if MY_OS in 'lin, win':  # is Linux or Windows
-            self.whose_turn_lbl.config(width=14)
-        else:  # is macOS
-            self.whose_turn_lbl.config(width=13)
-
-        self.ready_player_one()  # Starting prompt for Player1 to begin play.
-        self.auto_turns_header.config(text='Turns to go',
-                                      font=FONT['condensed'],
-                                      fg=COLOR['tk_white'])  # match default bg.
-        self.auto_turns_lbl.config(textvariable=self.auto_turns_remaining,
-                                   font=FONT['condensed'],
-                                   fg=COLOR['tk_white'])  # match default bg.
-
-        # Players' scores widgets:
-        # Squiggle symbol, ︴, from https://coolsymbol.com/line-symbols.html
-        self.score_header.config(
-            text='Score ︴', font=FONT['scores'],
-            fg=COLOR['score_fg'])
-        self.player1_header.config(
-            text=f'{PLAYER1}:', font=FONT['scores'],
-            fg=COLOR['score_fg'])
-        self.player2_header.config(
-            text=f'{PLAYER2}:', font=FONT['scores'],
-            fg=COLOR['score_fg'])
-        self.player1_score_lbl.config(
-            textvariable=self.p1_score, font=FONT['scores'],
-            fg=COLOR['score_fg'])
-        self.player2_score_lbl.config(
-            textvariable=self.p2_score, font=FONT['scores'],
-            fg=COLOR['score_fg'])
-        self.ties_header.config(
-            text='Ties:', font=FONT['scores'],
-            fg=COLOR['score_fg'])
-        self.ties_lbl.config(
-            textvariable=self.ties_num, font=FONT['scores'],
-            fg=COLOR['score_fg'])
-
-        # Play mode control widgets:
-        self.pvp_mode.config(text='Player v Player',
-                             font=FONT['condensed'],
-                             variable=self.mode_clicked,
-                             value='pvp',
-                             command=self.mode_control)
-        self.pvp_mode.select()  # Start default mode is Player v Player.
-
-        self.pvpc_mode.config(text='Player v PC',
-                              font=FONT['condensed'],
-                              variable=self.mode_clicked,
-                              value='pvpc',
-                              command=self.mode_control)
-
-        # choose_pc_pref is enabled as readonly when pvpc_mode is selected.
-        #   Set drop-down list font size to match displayed font size.
-        #   Set random, 1st in tuple, as the default.
-        self.choose_pc_pref.config(font=FONT['condensed'],
-                                   width=14,
-                                   values=('PC plays random',
-                                           'PC plays center',
-                                           'PC plays strategy'),
-                                   textvariable=self.pc_pref,
-                                   state=tk.DISABLED)
-        self.option_add("*TCombobox*Font", FONT['condensed'])
-        if MY_OS == 'dar':
-            self.choose_pc_pref.config(width=13)
-        self.choose_pc_pref.current(0)
-        self.choose_pc_pref.bind('<<ComboboxSelected>>',
-                                 lambda _: self.reset_game_and_score())
-
-        self.separator.configure(orient='horizontal')
-
-        self.auto_random_mode.config(text='Autoplay random',
-                                     font=FONT['condensed'],
-                                     variable=self.mode_clicked,
-                                     value='Autoplay random',
-                                     command=self.mode_control)
-        self.auto_center_mode.config(text='Autoplay center',
-                                     font=FONT['condensed'],
-                                     variable=self.mode_clicked,
-                                     value='Autoplay center',
-                                     command=self.mode_control)
-        self.auto_strategy_mode.config(text='Autoplay strategy',
-                                       font=FONT['condensed'],
-                                       variable=self.mode_clicked,
-                                       value='Autoplay strategy',
-                                       command=self.mode_control)
-        self.auto_go_stop_radiobtn.config(textvariable=self.auto_go_stop_txt,
-                                          font=FONT['button'],
-                                          variable=self.autoplay_on,
-                                          fg=COLOR['mark_fg'],
-                                          bg=COLOR['radiobtn_bg'],
-                                          borderwidth=2,
-                                          indicatoron=False,
-                                          command=self.auto_command)
-        self.autospeed_lbl.config(text='Auto-speed',
-                                  font=FONT['condensed'])
-        self.autospeed_fast.config(text='Fast',
-                                   font=FONT['condensed'],
-                                   variable=self.autospeed_selection,
-                                   value='fast',
-                                   command=self.autospeed_control)
-        self.autospeed_slow.config(text='Slow',
-                                   font=FONT['condensed'],
-                                   variable=self.autospeed_selection,
-                                   value='slow',
-                                   command=self.autospeed_control)
-        self.autospeed_slow.select()  # Set default auto-speed to 'slow'.
-
-        self.auto_go_stop_txt.set('Start auto')
-        self.auto_go_stop_radiobtn.config(state=tk.DISABLED)
-
-        # ttk.Buttons are used b/c tk.Buttons cannot be configured in macOS.
-        style = ttk.Style()
-        style.map('My.TButton',
-                  foreground=[('pressed', COLOR['disabled_fg']),
-                              ('active', COLOR['mark_fg']),
-                              ('disabled', COLOR['disabled_fg'],)
-                              ],
-                  background=[('pressed', COLOR['tk_white']),
-                              ('active', COLOR['radiobtn_bg'],)
-                              ],
-                  )
-        style.configure('My.TButton', font=FONT['sm_button'])
-        self.who_autostarts.configure(style="My.TButton",
-                                      text='Player 1 starts', width=14,
-                                      takefocus=True,
-                                      state=tk.DISABLED,
-                                      command=self.autostart_who)
-
-        self.quit_button.config(style="My.TButton",
-                                text='Quit', width=4,
-                                command=lambda: utils.quit_game(mainloop=app))
-
     def keybindings(self) -> None:
         """
         Key bindings for quit function and to play game board squares.
@@ -521,6 +374,153 @@ class TicTacToeGUI(tk.Tk):
             row=11, column=0, padx=(10, 0), pady=5, sticky=tk.W)
         self.quit_button.grid(
             row=11, column=2, padx=5, pady=5, sticky=tk.E)
+
+    def configure_widgets(self) -> None:
+        """Initial configurations of app window widgets."""
+        ttk.Style().theme_use('alt')
+
+        self.prev_game_num.set(0)
+        self.ties_num.set(0)
+
+        # Player's turn widgets.
+        self.prev_game_num_header.config(text='Games played',
+                                         font=FONT['condensed'])
+        self.prev_game_num_lbl.config(textvariable=self.prev_game_num,
+                                      font=FONT['condensed'])
+        self.whose_turn_lbl.config(textvariable=self.whose_turn,
+                                   font=FONT['who'],
+                                   height=4)
+        if MY_OS in 'lin, win':  # is Linux or Windows
+            self.whose_turn_lbl.config(width=14)
+        else:  # is macOS
+            self.whose_turn_lbl.config(width=13)
+
+        self.ready_player_one()  # Starting prompt for Player1 to begin play.
+        self.auto_turns_header.config(text='Turns to go',
+                                      font=FONT['condensed'],
+                                      fg=COLOR['tk_white'])  # match default bg.
+        self.auto_turns_lbl.config(textvariable=self.auto_turns_remaining,
+                                   font=FONT['condensed'],
+                                   fg=COLOR['tk_white'])  # match default bg.
+
+        # Players' scores widgets:
+        # Squiggle symbol, ︴, from https://coolsymbol.com/line-symbols.html
+        self.score_header.config(
+            text='Score ︴', font=FONT['scores'],
+            fg=COLOR['score_fg'])
+        self.player1_header.config(
+            text=f'{PLAYER1}:', font=FONT['scores'],
+            fg=COLOR['score_fg'])
+        self.player2_header.config(
+            text=f'{PLAYER2}:', font=FONT['scores'],
+            fg=COLOR['score_fg'])
+        self.player1_score_lbl.config(
+            textvariable=self.p1_score, font=FONT['scores'],
+            fg=COLOR['score_fg'])
+        self.player2_score_lbl.config(
+            textvariable=self.p2_score, font=FONT['scores'],
+            fg=COLOR['score_fg'])
+        self.ties_header.config(
+            text='Ties:', font=FONT['scores'],
+            fg=COLOR['score_fg'])
+        self.ties_lbl.config(
+            textvariable=self.ties_num, font=FONT['scores'],
+            fg=COLOR['score_fg'])
+
+        # Play mode control widgets:
+        self.pvp_mode.config(text='Player v Player',
+                             font=FONT['condensed'],
+                             variable=self.mode_clicked,
+                             value='pvp',
+                             command=self.mode_control)
+        self.pvp_mode.select()  # Start default mode is Player v Player.
+
+        self.pvpc_mode.config(text='Player v PC',
+                              font=FONT['condensed'],
+                              variable=self.mode_clicked,
+                              value='pvpc',
+                              command=self.mode_control)
+
+        # choose_pc_pref is enabled as readonly when pvpc_mode is selected.
+        #   Set drop-down list font size to match displayed font size.
+        #   Set random, 1st in tuple, as the default.
+        self.choose_pc_pref.config(font=FONT['condensed'],
+                                   width=14,
+                                   values=('PC plays random',
+                                           'PC plays center',
+                                           'PC plays strategy'),
+                                   textvariable=self.pc_pref,
+                                   state=tk.DISABLED)
+        self.option_add("*TCombobox*Font", FONT['condensed'])
+        if MY_OS == 'dar':
+            self.choose_pc_pref.config(width=13)
+        self.choose_pc_pref.current(0)
+        self.choose_pc_pref.bind('<<ComboboxSelected>>',
+                                 lambda _: self.reset_game_and_score())
+
+        self.separator.configure(orient='horizontal')
+
+        self.auto_random_mode.config(text='Autoplay random',
+                                     font=FONT['condensed'],
+                                     variable=self.mode_clicked,
+                                     value='Autoplay random',
+                                     command=self.mode_control)
+        self.auto_center_mode.config(text='Autoplay center',
+                                     font=FONT['condensed'],
+                                     variable=self.mode_clicked,
+                                     value='Autoplay center',
+                                     command=self.mode_control)
+        self.auto_strategy_mode.config(text='Autoplay strategy',
+                                       font=FONT['condensed'],
+                                       variable=self.mode_clicked,
+                                       value='Autoplay strategy',
+                                       command=self.mode_control)
+        self.auto_go_stop_radiobtn.config(textvariable=self.auto_go_stop_txt,
+                                          font=FONT['button'],
+                                          variable=self.autoplay_on,
+                                          fg=COLOR['mark_fg'],
+                                          bg=COLOR['radiobtn_bg'],
+                                          borderwidth=2,
+                                          indicatoron=False,
+                                          command=self.auto_command)
+        self.autospeed_lbl.config(text='Auto-speed',
+                                  font=FONT['condensed'])
+        self.autospeed_fast.config(text='Fast',
+                                   font=FONT['condensed'],
+                                   variable=self.autospeed_selection,
+                                   value='fast',
+                                   command=self.autospeed_control)
+        self.autospeed_slow.config(text='Slow',
+                                   font=FONT['condensed'],
+                                   variable=self.autospeed_selection,
+                                   value='slow',
+                                   command=self.autospeed_control)
+        self.autospeed_slow.select()  # Set default auto-speed to 'slow'.
+
+        self.auto_go_stop_txt.set('Start auto')
+        self.auto_go_stop_radiobtn.config(state=tk.DISABLED)
+
+        # ttk.Buttons are used b/c tk.Buttons cannot be configured in macOS.
+        style = ttk.Style()
+        style.map('My.TButton',
+                  foreground=[('pressed', COLOR['disabled_fg']),
+                              ('active', COLOR['mark_fg']),
+                              ('disabled', COLOR['disabled_fg'],)
+                              ],
+                  background=[('pressed', COLOR['tk_white']),
+                              ('active', COLOR['radiobtn_bg'],)
+                              ],
+                  )
+        style.configure('My.TButton', font=FONT['sm_button'])
+        self.who_autostarts.configure(style="My.TButton",
+                                      text='Player 1 starts', width=14,
+                                      takefocus=True,
+                                      state=tk.DISABLED,
+                                      command=self.autostart_who)
+
+        self.quit_button.config(style="My.TButton",
+                                text='Quit', width=4,
+                                command=lambda: utils.quit_game(mainloop=app))
 
     def setup_game_board(self) -> None:
         """
