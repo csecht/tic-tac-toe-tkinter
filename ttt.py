@@ -142,7 +142,6 @@ class TicTacToeGUI(tk.Tk):
         self.winner_found = False  # Used for game flow control.
         self.quit_button = ttk.Button()
 
-        self.keybindings('bind')
         self.grid_widgets()
         self.configure_widgets()
         self.setup_game_board()
@@ -154,7 +153,7 @@ class TicTacToeGUI(tk.Tk):
         Can use both key commands and the mouse when two people are
         playing Player v Player mode.
 
-        :param state: Either 'bind' or 'unbind'.
+        :param state: Either 'quit', 'bind_board' or 'unbind_board'.
         :return: None
         """
 
@@ -165,11 +164,12 @@ class TicTacToeGUI(tk.Tk):
         lc_keys = 'qweasdzxc'
         uc_keys = 'QWEASDZXC'
 
-        if state == 'bind':
-            # self.bind('Control-q', lambda _: utils.quit_game(app))
-            # TODO: fix preempting of 'Control-q' by 'q' key bind.
-            self.bind('<Escape>', lambda _: utils.quit_game(app))
+        if state == 'quit':
+            # self.bind_all('Control-q', lambda _: utils.quit_game(app))
+            # Note: need to fix preempting of 'Control-q' by 'q' key bind.
+            self.bind_all('<Escape>', lambda _: utils.quit_game(app))
 
+        elif state == 'bind_board':
             for i, _n, in enumerate(num_string, start=0):
                 self.bind(f'<KeyPress-KP_{_n}>',
                           lambda _, indx=i: self.human_turn(self.board_labels[indx]))
@@ -178,7 +178,7 @@ class TicTacToeGUI(tk.Tk):
                 for i, _k, in enumerate(key_string, start=0):
                     self.bind(_k,
                               lambda _, indx=i: self.human_turn(self.board_labels[indx]))
-        else:  # state is 'unbind'
+        else:  # state is 'unbind_board'
             for _n in num_string:
                 self.unbind(f'<KeyPress-KP_{_n}>')
 
@@ -385,6 +385,8 @@ class TicTacToeGUI(tk.Tk):
     def configure_widgets(self) -> None:
         """Initial configurations of app window widgets."""
         ttk.Style().theme_use('alt')
+        self.keybindings('bind_board')
+        self.keybindings('quit')
 
         self.prev_game_num.set(0)
         self.ties_num.set(0)
@@ -565,7 +567,7 @@ class TicTacToeGUI(tk.Tk):
             lbl.unbind('<Button-1>')
             lbl.unbind('<Enter>')
             lbl.unbind('<Leave>')
-        self.keybindings('unbind')
+        self.keybindings('unbind_board')
 
     @staticmethod
     def on_enter(label: tk) -> None:
@@ -599,7 +601,7 @@ class TicTacToeGUI(tk.Tk):
         """
         Groups of related statements to disable widget activity.
 
-        :param group: The group(s) to disable. Use any or all: 
+        :param group: The group(s) to disable. Use any or all:
                 'player_modes', 'auto_modes', 'auto_controls'.
         :return: None
         """
@@ -669,7 +671,7 @@ class TicTacToeGUI(tk.Tk):
             if mode_clicked in 'pvp, pvpc':
                 self.disable('auto_controls')
                 self.ready_player_one()
-                self.keybindings('bind')
+                self.keybindings('bind_board')
             else:  # One of the auto modes was clicked.
                 self.auto_go_stop_radiobtn.config(state=tk.NORMAL)
                 self.who_autostarts.configure(state=tk.NORMAL)
@@ -1327,7 +1329,7 @@ class TicTacToeGUI(tk.Tk):
         self.setup_game_board()
 
         if self.mode_clicked.get() == 'pvp':
-            self.keybindings('bind')
+            self.keybindings('bind_board')
 
             if self.prev_game_num.get() % 2 == 0:
                 self.ready_player_one()
@@ -1337,7 +1339,7 @@ class TicTacToeGUI(tk.Tk):
                 self.choose_pc_pref.config(state=tk.DISABLED)
 
         elif self.mode_clicked.get() == 'pvpc':
-            self.keybindings('bind')
+            self.keybindings('bind_board')
 
             if self.prev_game_num.get() % 2 != 0:
                 self.whose_turn.set(f'PC plays {P2_MARK}')
