@@ -159,13 +159,12 @@ class TicTacToeGUI(tk.Tk):
 
         # Keys in positional 3x3 layout on keypad and main board correspond
         #   with the 3x3 game board row-column layout and sorted Label index values.
-        # Include uppercase in case Caps Lock is on.
-        num_string = '789456123'
-        key_strings = ('qweasdzxc', 'QWEASDZXC')
+        keypad_nums = '789456123'
+        board_keys = 'qweasdzxc'
 
-        # Note: 'Control-q' works without being preempted by the 'q' bind
-        #  only when KeyRelease is used for the bind method with 'q'.
-        #  BUT, holding down any board action key for too long triggers
+        # Note: '<Control-q>' works without being preempted by the 'q' bind
+        #  only when KeyRelease is used to bind 'q' in key_strings.
+        #  BUT, holding down any KeyRelease key for too long triggers
         #  the system's autorepeat resulting in a call to the "Oops"
         #  messagebox() in human_turn().
         #  Need to figure out how to avoid the 'q' bind preemption.
@@ -174,22 +173,24 @@ class TicTacToeGUI(tk.Tk):
             self.bind_all('<Escape>', lambda _: utils.quit_game(app))
 
         elif state == 'bind_board':
-            for i, _n, in enumerate(num_string, start=0):
+            for i, _n, in enumerate(keypad_nums, start=0):
                 self.bind(f'<KeyPress-KP_{_n}>',
                           lambda _, indx=i: self.human_turn(self.board_labels[indx]))
 
-            for keys in key_strings:
-                for i, _k, in enumerate(keys, start=0):
-                    self.bind(f'<KeyRelease-{_k}>',
-                              lambda _, indx=i: self.human_turn(self.board_labels[indx]))
+            for i, _k, in enumerate(board_keys, start=0):
+                self.bind(f'<KeyRelease-{_k}>',
+                          lambda _, indx=i: self.human_turn(self.board_labels[indx]))
+                # Include uppercase in case Caps Lock is on.
+                self.bind(f'<KeyRelease-{_k.upper()}>',
+                          lambda _, indx=i: self.human_turn(self.board_labels[indx]))
 
         else:  # state is 'unbind_board'
-            for _n in num_string:
+            for _n in keypad_nums:
                 self.unbind(f'<KeyPress-KP_{_n}>')
 
-            for keys in key_strings:
-                for _k in keys:
-                    self.unbind(f'<KeyRelease-{_k}>')
+            for _k in board_keys:
+                self.unbind(f'<KeyRelease-{_k}>')
+                self.unbind(f'<KeyRelease-{_k.upper()}>')
 
     def grid_widgets(self) -> None:
         """Position app window widgets."""
