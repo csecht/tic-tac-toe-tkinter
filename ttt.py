@@ -166,7 +166,8 @@ class TicTacToeGUI(tk.Tk):
         uc_keys = 'QWEASDZXC'
 
         if state == 'bind':
-            self.bind('Control-q', lambda _: utils.quit_game(app))
+            # self.bind('Control-q', lambda _: utils.quit_game(app))
+            # TODO: fix preempting of 'Control-q' by 'q' key bind.
             self.bind('<Escape>', lambda _: utils.quit_game(app))
 
             for i, _n, in enumerate(num_string, start=0):
@@ -184,9 +185,6 @@ class TicTacToeGUI(tk.Tk):
             for key_string in (lc_keys, uc_keys):
                 for _k in key_string:
                     self.unbind(f'{_k}')
-
-            for lbl in self.board_labels:
-                lbl.unbind('<Button-1>')
 
     def grid_widgets(self) -> None:
         """Position app window widgets."""
@@ -549,12 +547,13 @@ class TicTacToeGUI(tk.Tk):
             else:  # is Linux or Windows.
                 lbl.config(highlightthickness=6)
 
-            lbl.bind('<Button-1>',
-                     lambda event, lbl_idx=i:
-                     self.human_turn(self.board_labels[lbl_idx])
-                     )
-            lbl.bind('<Enter>', lambda event, l=lbl: self.on_enter(l))
-            lbl.bind('<Leave>', lambda event, l=lbl: self.on_leave(l))
+            if not self.autoplay_on.get():
+                lbl.bind('<Button-1>',
+                         lambda event, lbl_idx=i:
+                         self.human_turn(self.board_labels[lbl_idx])
+                         )
+                lbl.bind('<Enter>', lambda event, l=lbl: self.on_enter(l))
+                lbl.bind('<Leave>', lambda event, l=lbl: self.on_leave(l))
 
     def unbind_game_board(self) -> None:
         """
@@ -1410,7 +1409,7 @@ class TicTacToeGUI(tk.Tk):
 
         :return: None
         """
-        self.setup_game_board()
+        self.auto_setup()
         self.reset_game_and_score()
         self.whose_turn.set(self.curr_automode)
         self.whose_turn_lbl.config(bg=COLOR['tk_white'])
@@ -1429,8 +1428,6 @@ class TicTacToeGUI(tk.Tk):
         #   autoplay_ methods, and in auto_setup() depending on the
         #   who_autostarts option.
         self.auto_marks = ''.join(map(lambda m1, m2: m1 + m2, MARKS1, MARKS2))
-
-        self.auto_setup()
 
         # Start repeating calls to one of the autoplay methods;
         #   calls are controlled by after_id.
