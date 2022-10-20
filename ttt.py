@@ -161,12 +161,16 @@ class TicTacToeGUI(tk.Tk):
         #   with the 3x3 game board row-column layout and sorted Label index values.
         # Include uppercase in case Caps Lock is on.
         num_string = '789456123'
-        lc_keys = 'qweasdzxc'
-        uc_keys = 'QWEASDZXC'
+        key_strings = ('qweasdzxc', 'QWEASDZXC')
 
+        # Note: 'Control-q' works without being preempted by the 'q' bind
+        #  only when KeyRelease is used for the bind method with 'q'.
+        #  BUT, holding down any board action key for too long triggers
+        #  the system's autorepeat resulting in a call to the "Oops"
+        #  messagebox() in human_turn().
+        #  Need to figure out how to avoid the 'q' bind preemption.
         if state == 'quit':
-            # self.bind_all('Control-q', lambda _: utils.quit_game(app))
-            # Note: need to fix preempting of 'Control-q' by 'q' key bind.
+            self.bind_all('<Control-q>', lambda _: utils.quit_game(app))
             self.bind_all('<Escape>', lambda _: utils.quit_game(app))
 
         elif state == 'bind_board':
@@ -174,17 +178,18 @@ class TicTacToeGUI(tk.Tk):
                 self.bind(f'<KeyPress-KP_{_n}>',
                           lambda _, indx=i: self.human_turn(self.board_labels[indx]))
 
-            for key_string in (lc_keys, uc_keys):
-                for i, _k, in enumerate(key_string, start=0):
-                    self.bind(_k,
+            for keys in key_strings:
+                for i, _k, in enumerate(keys, start=0):
+                    self.bind(f'<KeyRelease-{_k}>',
                               lambda _, indx=i: self.human_turn(self.board_labels[indx]))
+
         else:  # state is 'unbind_board'
             for _n in num_string:
                 self.unbind(f'<KeyPress-KP_{_n}>')
 
-            for key_string in (lc_keys, uc_keys):
-                for _k in key_string:
-                    self.unbind(f'{_k}')
+            for keys in key_strings:
+                for _k in keys:
+                    self.unbind(f'<KeyRelease-{_k}>')
 
     def grid_widgets(self) -> None:
         """Position app window widgets."""
