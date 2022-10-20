@@ -23,6 +23,12 @@ P2_MARK = 'O'
 MARKS1 = P1_MARK * 500
 MARKS2 = P2_MARK * 500
 
+# Keys in positional 3x3 layout on keypad and main board correspond
+#   with the 3x3 game board row-column layout and sorted
+#   board_labels index values.
+KEYPAD_NUMS = '789456123'
+BOARD_KEYS = 'qweasdzxc'
+
 # 3x3 game board indices for winning combinations and corners.
 WINNING_COMBOS = [
     (0, 1, 2), (3, 4, 5), (6, 7, 8),  # rows

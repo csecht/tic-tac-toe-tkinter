@@ -158,9 +158,8 @@ class TicTacToeGUI(tk.Tk):
         """
 
         # Keys in positional 3x3 layout on keypad and main board correspond
-        #   with the 3x3 game board row-column layout and sorted Label index values.
-        keypad_nums = '789456123'
-        board_keys = 'qweasdzxc'
+        #   with the 3x3 game board row-column layout and sorted
+        #   board_labels index values.
 
         # Note: '<Control-q>' works without being preempted by the 'q' bind
         #  only when KeyRelease is used to bind 'q' in key_strings.
@@ -173,11 +172,11 @@ class TicTacToeGUI(tk.Tk):
             self.bind_all('<Escape>', lambda _: utils.quit_game(app))
 
         elif state == 'bind_board':
-            for i, _n, in enumerate(keypad_nums, start=0):
+            for i, _n, in enumerate(cst.KEYPAD_NUMS, start=0):
                 self.bind(f'<KeyPress-KP_{_n}>',
                           lambda _, indx=i: self.human_turn(self.board_labels[indx]))
 
-            for i, _k, in enumerate(board_keys, start=0):
+            for i, _k, in enumerate(cst.BOARD_KEYS, start=0):
                 self.bind(f'<KeyRelease-{_k}>',
                           lambda _, indx=i: self.human_turn(self.board_labels[indx]))
                 # Include uppercase in case Caps Lock is on.
@@ -185,10 +184,10 @@ class TicTacToeGUI(tk.Tk):
                           lambda _, indx=i: self.human_turn(self.board_labels[indx]))
 
         else:  # state is 'unbind_board'
-            for _n in keypad_nums:
+            for _n in cst.KEYPAD_NUMS:
                 self.unbind(f'<KeyPress-KP_{_n}>')
 
-            for _k in board_keys:
+            for _k in cst.BOARD_KEYS:
                 self.unbind(f'<KeyRelease-{_k}>')
                 self.unbind(f'<KeyRelease-{_k.upper()}>')
 
@@ -391,8 +390,8 @@ class TicTacToeGUI(tk.Tk):
     def configure_widgets(self) -> None:
         """Initial configurations of app window widgets."""
         ttk.Style().theme_use('alt')
-        self.keybindings('bind_board')
         self.keybindings('quit')
+        self.keybindings('bind_board')
 
         self.prev_game_num.set(0)
         self.ties_num.set(0)
@@ -1396,7 +1395,7 @@ class TicTacToeGUI(tk.Tk):
 
         :return: None
         """
-        if 'Start' in self.auto_go_stop_txt.get():
+        if self.auto_go_stop_txt.get() == 'Start auto':
             if 'Autoplay' in self.mode_clicked.get():
                 self.auto_go_stop_txt.set('Stop auto')
                 self.autoplay_on.set(True)
@@ -1549,11 +1548,8 @@ class TicTacToeGUI(tk.Tk):
 
         if len(self.auto_marks) > 0:
             mark = self.auto_marks[0]
-
             self.play_random(turn_number, mark)
-
             self.auto_repeat(mark, self.autoplay_random)
-
         else:
             self.auto_stop('ended')
 
