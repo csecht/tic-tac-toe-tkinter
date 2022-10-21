@@ -71,7 +71,7 @@ COLOR = {'score_fg': 'DodgerBlue4',
          'status_bg': 'yellow3',
          'player_one': 'yellow3',
          'disabled_fg': 'grey65',
-         'tk_white': '',  # defined in ttt.configure_widgets()
+         'tk_white': '',
          'mark_fg': 'yellow2',
          'sq_won': 'blue',
          'sq_not_won': 'black',
