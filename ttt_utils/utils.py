@@ -61,8 +61,8 @@ def keybindings(parent, state: str) -> None:
             parent.unbind(f'<KeyPress-KP_{_n}>')
 
         for _k in KEYS2PLAY:
-            parent.unbind(f'KeyRelease-{_k}')
-            parent.unbind(f'KeyRelease-{_k.upper()}')
+            parent.unbind(f'<KeyRelease-{_k}>')
+            parent.unbind(f'<KeyRelease-{_k.upper()}>')
 
 
 def manage_args() -> None:

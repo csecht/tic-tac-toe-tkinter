@@ -345,7 +345,7 @@ class TicTacToeGUI(tk.Tk):
     def configure_widgets(self) -> None:
         """Initial configurations of app window widgets."""
         ttk.Style().theme_use('alt')
-        utils.keybindings(self, 'quit')
+        utils.keybindings(self, 'quit_keys')
         utils.keybindings(self, 'bind_board')
 
         self.prev_game_num.set(0)
