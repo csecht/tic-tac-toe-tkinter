@@ -178,7 +178,7 @@ class TicTacToeGUI(tk.Tk):
         #  Grid statements are sorted by row, then column.
 
         # Adjust gridding of whose_turn_lbl to avoid shifting when text changes.
-        if MY_OS == 'lin':
+        if MY_OS == 'lin':  # Linux
             self.whose_turn_lbl.grid(row=0, column=0,
                                      padx=(12, 0), pady=(5, 0),
                                      sticky=tk.W)
@@ -186,7 +186,7 @@ class TicTacToeGUI(tk.Tk):
             self.whose_turn_lbl.grid(row=0, column=0,
                                      padx=0, pady=(5, 0))
 
-        if MY_OS in 'lin, dar':
+        if MY_OS in 'lin, dar':  # Linux or macOS (darwin)
             self.prev_game_num_header.grid(
                 row=0, column=2, rowspan=2, padx=(0, 8), pady=(8, 0), sticky=tk.NE)
             self.prev_game_num_lbl.grid(
@@ -498,7 +498,8 @@ class TicTacToeGUI(tk.Tk):
         :return: None
         """
         for i, lbl in enumerate(self.board_labels):
-            lbl.config(text=' ', height=1, width=2,
+            lbl.config(text=' ',
+                       height=1, width=2,
                        bg=COLOR['sq_not_won'],
                        fg=COLOR['mark_fg'],
                        font=FONT['mark'],
@@ -509,7 +510,7 @@ class TicTacToeGUI(tk.Tk):
             else:  # is Linux or Windows.
                 lbl.config(highlightthickness=6)
 
-            if not self.autoplay_on.get():
+            if not self.autoplay_on.get():  # Is in PvP or PvPC mode.
                 lbl.bind('<Button-1>',
                          lambda event, lbl_idx=i:
                          self.human_turn(self.board_labels[lbl_idx])
@@ -537,10 +538,10 @@ class TicTacToeGUI(tk.Tk):
         :param label: The tk.Label object.
         :return: None
        """
-        if label['bg'] == COLOR['sq_not_won']:
+        if label['bg'] == COLOR['sq_not_won'] and label['text'] == ' ':
             label['bg'] = COLOR['sq_mouseover']
-        elif label['bg'] == COLOR['sq_won']:
-            label['bg'] = COLOR['sq_won']
+        else: # The square has already been played.
+            label['bg'] = COLOR['sq_not_won']
 
     @staticmethod
     def on_leave(label: tk):
@@ -554,8 +555,6 @@ class TicTacToeGUI(tk.Tk):
             label['bg'] = COLOR['sq_not_won']
         elif label['bg'] == COLOR['sq_not_won']:
             label['bg'] = COLOR['sq_not_won']
-        elif label['bg'] == COLOR['sq_won']:
-            label['bg'] = COLOR['sq_won']
 
     def disable(self, *group: str) -> None:
         """
