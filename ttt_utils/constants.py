@@ -5,7 +5,7 @@ P1_MARK, P2_MARK: 'X', 'O', respectively, but can be changed.
 MARKS1, MARKS2: strings of duplicate marks that determine number of auto turns.
 WINNING_COMBOS, CORNERS, SIDES, PARA_CORNERS, ORTHO_SIDES, META_POSITIONS:
     lists of game board indices.
-KEYPAD_NUMS, BOARD_KEYS: strings of ordered keys for bind() functions.
+KP2PLAY, KEYS2PLAY: strings of ordered keys for bind() functions.
 PLAY_AFTER, AUTO_FAST, AUTO_SLOW, AUTO_SHOW: ms integers for tk after() function.
 TIES, WINS: (unused) tuples of board end-game configurations, in index order.
 """
@@ -28,8 +28,8 @@ MARKS2 = P2_MARK * 500
 # Keys in positional 3x3 layout on keypad and main board correspond
 #   with the 3x3 game board row-column layout and sorted
 #   board_labels index values.
-KEYPAD_NUMS = '789456123'
-BOARD_KEYS = 'qweasdzxc'
+KP2PLAY = '789456123'
+KEYS2PLAY = 'qweasdzxc'
 
 # 3x3 game board indices for winning combinations and corners.
 WINNING_COMBOS = [
