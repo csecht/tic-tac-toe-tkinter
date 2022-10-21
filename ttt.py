@@ -146,51 +146,6 @@ class TicTacToeGUI(tk.Tk):
         self.configure_widgets()
         self.setup_game_board()
 
-    def keybindings(self, state: str) -> None:
-        """
-        Key bindings for quit function and to play game board squares.
-        Provides alternative play action to mouse clicks.
-        Can use both key commands and the mouse when two people are
-        playing Player v Player mode.
-
-        :param state: Either 'quit', 'bind_board' or 'unbind_board'.
-        :return: None
-        """
-
-        # Keys in positional 3x3 layout on keypad and main board correspond
-        #   with the 3x3 game board row-column layout and sorted
-        #   board_labels index values.
-
-        # Note: '<Control-q>' works without being preempted by the 'q' bind
-        #  only when KeyRelease is used to bind 'q' in key_strings.
-        #  BUT, holding down any KeyRelease key for too long triggers
-        #  the system's autorepeat resulting in a call to the "Oops"
-        #  messagebox() in human_turn().
-        #  Need to figure out how to avoid the 'q' bind preemption.
-        if state == 'quit':
-            self.bind_all('<Control-q>', lambda _: utils.quit_game(app))
-            self.bind_all('<Escape>', lambda _: utils.quit_game(app))
-
-        elif state == 'bind_board':
-            for i, _n, in enumerate(cst.KEYPAD_NUMS, start=0):
-                self.bind(f'<KeyPress-KP_{_n}>',
-                          lambda _, indx=i: self.human_turn(self.board_labels[indx]))
-
-            for i, _k, in enumerate(cst.BOARD_KEYS, start=0):
-                self.bind(f'<KeyRelease-{_k}>',
-                          lambda _, indx=i: self.human_turn(self.board_labels[indx]))
-                # Include uppercase in case Caps Lock is on.
-                self.bind(f'<KeyRelease-{_k.upper()}>',
-                          lambda _, indx=i: self.human_turn(self.board_labels[indx]))
-
-        else:  # state is 'unbind_board'
-            for _n in cst.KEYPAD_NUMS:
-                self.unbind(f'<KeyPress-KP_{_n}>')
-
-            for _k in cst.BOARD_KEYS:
-                self.unbind(f'<KeyRelease-{_k}>')
-                self.unbind(f'<KeyRelease-{_k.upper()}>')
-
     def grid_widgets(self) -> None:
         """Position app window widgets."""
 
@@ -390,8 +345,8 @@ class TicTacToeGUI(tk.Tk):
     def configure_widgets(self) -> None:
         """Initial configurations of app window widgets."""
         ttk.Style().theme_use('alt')
-        self.keybindings('quit')
-        self.keybindings('bind_board')
+        utils.keybindings(self, 'quit')
+        utils.keybindings(self, 'bind_board')
 
         self.prev_game_num.set(0)
         self.ties_num.set(0)
@@ -572,7 +527,7 @@ class TicTacToeGUI(tk.Tk):
             lbl.unbind('<Button-1>')
             lbl.unbind('<Enter>')
             lbl.unbind('<Leave>')
-        self.keybindings('unbind_board')
+        utils.keybindings(self, 'unbind_board')
 
     @staticmethod
     def on_enter(label: tk) -> None:
@@ -676,7 +631,7 @@ class TicTacToeGUI(tk.Tk):
             if mode_clicked in 'pvp, pvpc':
                 self.disable('auto_controls')
                 self.ready_player_one()
-                self.keybindings('bind_board')
+                utils.keybindings(self, 'bind_board')
             else:  # One of the auto modes was clicked.
                 self.auto_go_stop_radiobtn.config(state=tk.NORMAL)
                 self.who_autostarts.configure(state=tk.NORMAL)
@@ -1339,7 +1294,7 @@ class TicTacToeGUI(tk.Tk):
         self.setup_game_board()
 
         if self.mode_clicked.get() == 'pvp':
-            self.keybindings('bind_board')
+            utils.keybindings(self, 'bind_board')
 
             if self.prev_game_num.get() % 2 == 0:
                 self.ready_player_one()
@@ -1349,7 +1304,7 @@ class TicTacToeGUI(tk.Tk):
                 self.choose_pc_pref.config(state=tk.DISABLED)
 
         elif self.mode_clicked.get() == 'pvpc':
-            self.keybindings('bind_board')
+            utils.keybindings(self, 'bind_board')
 
             if self.prev_game_num.get() % 2 != 0:
                 self.whose_turn.set(f'PC plays {P2_MARK}')

@@ -13,7 +13,56 @@ from pathlib import Path
 
 # Local program imports:
 from __main__ import __doc__
-import ttt_utils
+import ttt_utils  # Needed for __init__.py custom dunders and constants.
+from ttt_utils.constants import KP2PLAY, KEYS2PLAY
+
+
+def keybindings(parent, state: str) -> None:
+    """
+    Key bindings for quit function and to play game board squares.
+    Provides alternative play action to mouse clicks.
+    Can use both key commands and the mouse when two people are
+    playing Player v Player mode.
+
+    :param parent: The parent tk widget or mainloop to bind to.
+    :param state: Either 'quit', 'bind_board' or 'unbind_board'.
+    :return: None
+    """
+
+    # KP2PLAY and  KEYS2PLAY are strings of keys corresponding to a
+    #   positional 3x3 layout on the keypad and main board. Character
+    #   order of each string corresponds with the 3x3 game board
+    #   row-column layout and sorted board_label index values.
+    # Note: '<Control-q>' works will not be preempted by the 'q' binding
+    #   when KeyRelease is used to bind 'q' in key_strings.
+    def bind2this(index):
+        parent.human_turn(parent.board_labels[index])
+
+    if state == 'quit_keys':
+        parent.bind_all('<Control-q>',
+                        lambda _: quit_game(parent))
+        parent.bind_all('<Escape>',
+                        lambda _: quit_game(parent))
+
+    elif state == 'bind_board':
+        for i, _n, in enumerate(KP2PLAY, start=0):
+            parent.bind(f'<KeyPress-KP_{_n}>',
+                        lambda _, indx=i: bind2this(indx))
+
+        for i, _k, in enumerate(KEYS2PLAY, start=0):
+            parent.bind(f'<KeyRelease-{_k}>',
+                        lambda _, indx=i: bind2this(indx))
+            # Include uppercase in case Caps Lock is on.
+            parent.bind(f'<KeyRelease-{_k.upper()}>',
+                        lambda _, indx=i: bind2this(indx))
+
+    else:  # state is 'unbind_board'
+        for _n in KP2PLAY:
+            parent.unbind(f'<KeyPress-KP_{_n}>')
+
+        for _k in KEYS2PLAY:
+            parent.unbind(f'KeyRelease-{_k}')
+            parent.unbind(f'KeyRelease-{_k.upper()}')
 
 
 def manage_args() -> None:
