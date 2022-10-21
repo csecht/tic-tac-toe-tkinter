@@ -701,7 +701,7 @@ class TicTacToeGUI(tk.Tk):
         else:
             self.whose_turn.set(f'{PLAYER1} plays {P1_MARK}')
 
-        self.whose_turn_lbl.config(bg=COLOR['status_bg'])
+        self.whose_turn_lbl.config(bg=COLOR['player_one'])
 
     def human_turn(self, played_lbl: tk) -> None:
         """
@@ -774,16 +774,21 @@ class TicTacToeGUI(tk.Tk):
                 if self.turn_number() < 9 and not self.winner_found:
                     self.pc_turn()
 
-            # Disable the Player v... mode that is not in play.
+            # Play is now underway so disable the Player v... mode that
+            #   is not in play.
             if self.curr_pmode == 'pvp':
                 self.pvpc_mode.config(state=tk.DISABLED)
             else:
                 self.pvp_mode.config(state=tk.DISABLED)
         else:
-            messagebox.showerror('Oops!', 'This square was already played!')
-            # macOS requires focus_force(), not focus_set(), to return focus
-            #  to main window after the "Oops!" messagebox is closed.
-            app.focus_force()
+            if PLAYER1 in self.whose_turn.get():
+                curr_player = PLAYER1
+                curr_mark = P1_MARK
+            else:
+                curr_player = PLAYER2
+                curr_mark = P2_MARK
+            self.whose_turn.set(f'That square is\ntaken {curr_player}\n'
+                                f'Put {curr_mark} elsewhere.')
 
     def color_pc_mark(self, _id: int) -> None:
         """
