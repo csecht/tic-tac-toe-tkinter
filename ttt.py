@@ -1323,6 +1323,7 @@ class TicTacToeGUI(tk.Tk):
             self.auto_marks = ''
             self.auto_go_stop_txt.set('Start auto')
             self.auto_go_stop_radiobtn.config(state=tk.NORMAL)
+            self.who_autostarts.configure(state=tk.NORMAL)
 
     def reset_game_and_score(self) -> None:
         """
@@ -1421,8 +1422,6 @@ class TicTacToeGUI(tk.Tk):
         if self.after_id:
             app.after_cancel(self.after_id)
             self.after_id = None
-
-        self.who_autostarts.config(state=tk.NORMAL)
 
         self.setup_game_board()
         self.display_status(f'{self.curr_automode}, {stop_msg}')
