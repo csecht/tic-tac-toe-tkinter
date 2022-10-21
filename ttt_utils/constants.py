@@ -1,9 +1,11 @@
 """
-Constants and configuration settings used in main script.
+Constants and configuration settings.
 PLAYER1, PLAYER2: the displayed player names.
 P1_MARK, P2_MARK: 'X', 'O', respectively, but can be changed.
 MARKS1, MARKS2: strings of duplicate marks that determine number of auto turns.
-WINNING_COMBOS, CORNERS, SIDES, PARA_CORNERS, ORTHO_SIDES, META_POSITIONS: lists of game board indices.
+WINNING_COMBOS, CORNERS, SIDES, PARA_CORNERS, ORTHO_SIDES, META_POSITIONS:
+    lists of game board indices.
+KEYPAD_NUMS, BOARD_KEYS: strings of ordered keys for bind() functions.
 PLAY_AFTER, AUTO_FAST, AUTO_SLOW, AUTO_SHOW: ms integers for tk after() function.
 TIES, WINS: (unused) tuples of board end-game configurations, in index order.
 """
@@ -67,6 +69,7 @@ AUTO_SHOW = 1  # Necessary for proper auto_flash_game() operation.
 # Foreground and background colors.
 COLOR = {'score_fg': 'DodgerBlue4',
          'status_bg': 'yellow3',
+         'player_one': 'yellow3',
          'disabled_fg': 'grey65',
          'tk_white': '',  # defined in ttt.configure_widgets()
          'mark_fg': 'yellow2',
