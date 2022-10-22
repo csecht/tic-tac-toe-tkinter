@@ -584,6 +584,7 @@ class TicTacToeGUI(tk.Tk):
     def mode_control(self) -> None:
         """
         Block any mode change if in the middle of a game or in autoplay.
+
         Disable and enable Radiobuttons as each mode requires.
         Cancel/ignore an errant or mistimed play mode selection.
         Is callback from the play mode Radiobuttons.
@@ -594,11 +595,7 @@ class TicTacToeGUI(tk.Tk):
 
         # If a game is in progress, ignore any mode selections & post msg.
         if self.turn_number() > 0 and not self.winner_found:
-            if self.autoplay_on.get():
-                msg = ('Wait for autoplay to finish,\n'
-                       'or click "Stop auto" button.')
-
-            else:  # PvP or PvPC was clicked.
+            if mode_clicked in 'pvp, pvpc':
                 self.disable('auto_modes', 'auto_controls')
 
                 if self.curr_pmode == 'pvp':
@@ -614,10 +611,9 @@ class TicTacToeGUI(tk.Tk):
                         self.choose_pc_pref.config(state='readonly')
                     self.pvp_mode.deselect()
 
-                msg = 'Finish the current game,\nthen change mode.'
-
-            messagebox.showinfo(title='Mode is unavailable now',
-                                detail=msg)
+                messagebox.showinfo(title='Mode is unavailable now',
+                                    detail='Finish the current game,\n'
+                                           'then change mode.')
 
         else:  # No game in progress.
             if mode_clicked == 'pvpc':
@@ -645,6 +641,7 @@ class TicTacToeGUI(tk.Tk):
     def ready_player_one(self) -> None:
         """
         Display when it is Human's (Player 1) turn after PC has played.
+
         Shout out to Steven Spielberg.
 
         :return: None
@@ -659,14 +656,16 @@ class TicTacToeGUI(tk.Tk):
 
     def human_turn(self, played_lbl: tk) -> None:
         """
-        Check whether *played_lbl* (game board square Label) selected by
-        player was already played. If not, assign player's mark to the
-        text value of the selected label.
+        Check whether *played_lbl* selected by player was already played.
+
+        If not, assign player's mark to the text value of the selected
+        label.
         Players' marks (X or O) alternate who has first the turn in
         consecutive games.
         Played squares are evaluated for a win after the 5th turn.
 
-        :param played_lbl: The tk.Label object that was clicked.
+        :param played_lbl: The tk.Label object (the board_label square)
+                           that was clicked.
         :return: None
         """
 
@@ -734,7 +733,7 @@ class TicTacToeGUI(tk.Tk):
                 self.pvpc_mode.config(state=tk.DISABLED)
             else:
                 self.pvp_mode.config(state=tk.DISABLED)
-        else:
+        else:  # That square/label has a player's mark as its text.
             if PLAYER1 in self.whose_turn.get():
                 curr_player = PLAYER1
                 curr_mark = P1_MARK
@@ -746,9 +745,10 @@ class TicTacToeGUI(tk.Tk):
 
     def color_pc_mark(self, _id: int) -> None:
         """
-        In PvPC mode, provide alternate color for Player1 and
-        Player2 marks. Default COLOR (COLOR['mark_fg']) is set in
-        setup_game_board(). This method changes that to an alternate fg.
+        In PvPC mode, display alternate fg color for PC's mark text.
+
+        Default color (COLOR['mark_fg']) for human (Player 1) is set in
+        setup_game_board(), so change that to a white fg.
 
         :param _id: The board_labels list index of the played square.
         :return: None
@@ -758,7 +758,8 @@ class TicTacToeGUI(tk.Tk):
 
     def pc_turn(self) -> None:
         """
-        Computer plays as Player2 (P2_MARK).
+        Conditions for PC to play as Player2 (P2_MARK).
+
         Precedence of PC play: selected pref option > play for a win >
         block P1 win > play to corner, if preferred > play random.
         Called from human_turn() and new_game().
@@ -882,6 +883,7 @@ class TicTacToeGUI(tk.Tk):
     def play_defense(self, turn_number: int, mark: str, pvpc=False) -> None:
         """
         A rules-based set of defensive responses to minimize PC losses.
+
         Strategy in decreasing priority: defend center, sides, corners.
 
         :param turn_number: The current turn number, from turn_number().
@@ -967,6 +969,7 @@ class TicTacToeGUI(tk.Tk):
     def play_corners(self, turn_number: int, mark: str, pvpc=False) -> None:
         """
         Fill in available corners to increase probability of a win.
+
         Used for 'strategy' play modes.
 
         :param turn_number: The current turn number, from turn_number().
@@ -1005,8 +1008,9 @@ class TicTacToeGUI(tk.Tk):
 
     def turn_number(self) -> int:
         """
-        Keep count of turns per game by counting play labels with
-        label text other than a space string.
+        Keep count of turns per game.
+
+        Count number of board_labels squares with text other than a space.
 
         :return: The number of turns played, as integer.
         """
@@ -1014,9 +1018,7 @@ class TicTacToeGUI(tk.Tk):
 
     def check_winner(self, mark: str) -> None:
         """
-        Check each player's played *mark* (board_labels's text value)
-        and evaluate whether played marks match a positional win in the
-        board matrix (based on board_labels index values).
+        Check board_labels text values for win or tie index combinations.
 
         :param mark: The played mark character to check for a win.
         :return: None
@@ -1106,6 +1108,7 @@ class TicTacToeGUI(tk.Tk):
     def flash_win(self, combo) -> None:
         """
         Flashes the three winning squares, in series.
+
         Based on Bryan Oakley's answer for
         how-to-make-a-button-flash-using-after-in-tkinter
         https://stackoverflow.com/a/57298778
@@ -1120,9 +1123,10 @@ class TicTacToeGUI(tk.Tk):
 
     def flash_tie(self) -> None:
         """
-        Make entire game board blue (COLOR['sq_won']) on a tie game, so
-        not really a flash. Board square stay blue until Status window
-        "New Game" is selected.
+        Make entire game board blue (COLOR['sq_won']) on a tie game.
+
+        (Is not really a flash.) All board squares show the color for a
+        tied game until new_game() is called from display_staus().
 
         :return: None
         """
@@ -1132,9 +1136,11 @@ class TicTacToeGUI(tk.Tk):
 
     def window_geometry(self, toplevel: tk) -> None:
         """
-        Set the xy geometry of a *toplevel* window near top-left corner
-        of app window. If it is moved, then draw it at the new position
-        determined by its screen pixel xy coordinates.
+        Set xy pixel coordinates of a window in relation to main tk window.
+
+        If toplevel is moved during a play session, then draw it at its
+        new xy position for subsequent calls; position is determined by
+        functions in display_status().
         Calculate the height of the system's window title bar to use as
         a y-offset for the *toplevel* xy geometry.
 
@@ -1225,8 +1231,9 @@ class TicTacToeGUI(tk.Tk):
 
         def restart_game():
             """
-            Record current xy geometry of Report window, reset game
-            board, then close window. Called from keybind and Button cmd.
+            Record current xy geometry of Report window, then reset game
+            board and close window.
+            Called from keybind and Button cmd.
 
             :return: None
             """
@@ -1258,8 +1265,9 @@ class TicTacToeGUI(tk.Tk):
 
     def block_player_action(self) -> None:
         """
-        Prevent user action in app window while Game Report window is
-        open. Called from display_status().
+        Prevent user action in app window while Game Status window is open.
+
+        Called from display_status().
 
         :return: None
         """
@@ -1327,6 +1335,7 @@ class TicTacToeGUI(tk.Tk):
     def reset_game_and_score(self) -> None:
         """
         Set game number and player points to zero.
+
         Called from mode_control() when user changes between PvP and
         PvPC or changes PvPC play mode, and from auto_start(),
         new_game(), and Combobox selection bindings.
@@ -1348,10 +1357,10 @@ class TicTacToeGUI(tk.Tk):
 
     def auto_command(self) -> None:
         """
-        Check that an autoplay mode is selected before calling
-        auto_start() when the auto_go_stop_radiobtn Radiobutton invoked.
+        Check that an autoplay mode is selected before calling auto_start().
+
         Toggles text displayed on auto_go_stop_radiobtn.
-        Called as the auto_go_stop_radiobtn command.
+        Called from auto_go_stop_radiobtn Radiobutton.
 
         :return: None
         """
@@ -1371,8 +1380,9 @@ class TicTacToeGUI(tk.Tk):
 
     def auto_start(self) -> None:
         """
-        Set starting values for autoplay and disable game modes when
-        autoplay is in progress. Display number of auto turns remaining.
+        Set starting values for autoplay; disable modes during autoplay.
+
+        Display number of auto turns remaining.
 
         :return: None
         """
@@ -1412,6 +1422,7 @@ class TicTacToeGUI(tk.Tk):
     def auto_stop(self, stop_msg: str) -> None:
         """
         Stop autoplay method and call Status popup window.
+
         Disable player game actions (resets when Status window closes).
 
         :param stop_msg: Information on type of auto_stop call; e.g.,
@@ -1427,8 +1438,9 @@ class TicTacToeGUI(tk.Tk):
 
     def auto_setup(self) -> None:
         """
-        Run at the start of every new autoplay game. Update cumulative
-        scores in the app window. Clear all marks from the board.
+        At start of new autoplay games, update scores in the app window.
+
+        Clear all marks from the board.
         Called from auto_start() and auto_flash_game().
 
         :return: None
@@ -1453,7 +1465,8 @@ class TicTacToeGUI(tk.Tk):
     def autostart_who(self) -> None:
         """
         Toggle who_autostarts Button text.
-        Text content used for conditions in auto_setup().
+
+        Button's text content is used for conditions in auto_setup().
 
         :return: None
         """
@@ -1465,6 +1478,7 @@ class TicTacToeGUI(tk.Tk):
     def autospeed_control(self, after_type='game') -> int:
         """
         Set after() times used in auto_flash_game() and autoplay modes.
+
         Called from autospeed_fast and autospeed_slow Radiobuttons;
         from auto_flash_game() to set time for erasing flash color;
         from each autoplay_* method to set time between game restarts.
@@ -1490,10 +1504,11 @@ class TicTacToeGUI(tk.Tk):
 
     def autoplay_random(self) -> None:
         """
-        Automatically play computer vs. computer for 1000 turns
-        (~130 games) or until stopped by user. All play positions are
-        random.
-        Turns are played on a timed interval controlled through
+        Play all turns at random positions in Autoplay mode.
+
+        Number of turns is set by auto_marks, currently 1000 turns,
+        which gives ~130 games or until stopped by user.
+        Turns are played on a timed interval controlled by calls to
         auto_repeat().
         Yields ~15% tie games.
         Is called from auto_start().
@@ -1513,13 +1528,13 @@ class TicTacToeGUI(tk.Tk):
 
     def autoplay_strategy(self) -> None:
         """
-        Automatically play computer vs. computer for 1000 turns
-        (~120 games) or until stopped by user. Each turn is played on a
-        timed interval set by the self.autospeed_control() time used in the
-        after_id caller, one play per call.
-        Strategy, in decreasing play priority: win, block, defend
-        against opponent advantage, play corners for advantage, random.
-        Turns are played on a timed interval controlled through
+        Auto-plays turns according to a set order of conditional rules.
+
+        Rules, in decreasing play priority: win, block, defend against
+        an opponent advantage, play corners for an advantage, random.
+        Number of turns is set by auto_marks, currently 1000 turns,
+        which gives ~120 games or until stopped by user.
+        Turns are played on a timed interval controlled by calls to
         auto_repeat().
         Yields ~99% tie games.
         Is called from auto_start().
@@ -1560,11 +1575,13 @@ class TicTacToeGUI(tk.Tk):
 
     def autoplay_center(self) -> None:
         """
-        Automatically play computer vs. computer for 1000 turns
-        (~120 games) or until stopped by user.
-        First play is at the center position, subsequent
-        plays follow win,block,random preference play order.
-        Turns are played on a timed interval controlled through
+        First play is always at the center position.
+
+        Subsequent autoplay preference is : win, block, random.
+
+        Number of turns is set by auto_marks, currently 1000 turns,
+        which gives ~120 games or until stopped by user.
+        Turns are played on a timed interval controlled by calls to
         auto_repeat().
         Yields ~60% tie games.
         Is called from auto_start().
@@ -1598,7 +1615,8 @@ class TicTacToeGUI(tk.Tk):
 
     def auto_repeat(self, mark: str, auto_method: Callable) -> None:
         """
-        Statements used to complete and repeat an autoplay turn.
+        Complete and repeat each autoplay turn.
+
         Checks for winner, advances to the next player's *mark*, and
         applies after() to delay and repeat the *auto_method*.
 
@@ -1620,6 +1638,7 @@ class TicTacToeGUI(tk.Tk):
     def auto_flash_game(self, combo: tuple, mark: str) -> None:
         """
         For each auto_play game, flashes the winning or tying marks.
+
         On ties, flashes only the enter square (*combo* = (4, 4, 4);
         *mark* = 'TIE'). On wins, flashes the winning marks.
         Calls auto_setup() for the next auto_play() game.
