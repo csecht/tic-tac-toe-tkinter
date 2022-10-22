@@ -20,6 +20,7 @@ from ttt_utils.constants import KP2PLAY, KEYS2PLAY
 def keybindings(parent, state: str) -> None:
     """
     Key bindings for quit function and to play game board squares.
+
     Provides alternative play action to mouse clicks.
     Can use both key commands and the mouse when two people are
     playing Player v Player mode.
@@ -33,8 +34,8 @@ def keybindings(parent, state: str) -> None:
     #   positional 3x3 layout on the keypad and main board. Character
     #   order of each string corresponds with the 3x3 game board
     #   row-column layout and sorted board_label index values.
-    # Note: '<Control-q>' works will not be preempted by the 'q' binding
-    #   when KeyRelease is used to bind 'q' in key_strings.
+    # Note: '<Control-q>' will not be preempted by the 'q' binding
+    #   when KeyRelease is used to bind the 'q' in KEYS2PLAY string.
     def bind2this(index):
         parent.human_turn(parent.board_labels[index])
 
@@ -91,6 +92,7 @@ def manage_args() -> None:
 def program_name() -> str:
     """
     Extract the main program's file name from the full path.
+
     Expected use is for printing and Terminal message display.
 
     :return: Name of the main script file.
@@ -101,14 +103,16 @@ def program_name() -> str:
 def quit_game(mainloop, keybind=None) -> None:
     """
     Error-free and informative exit from the program.
-    Called from widget or keybindings.
+
     Explicitly closes all Matplotlib objects and their parent tk window
     when the user closes the plot window with the system's built-in
     close window icon ("X") or key command. This is required to cleanly
     exit and close the tk thread running Matplotlib.
+    Is called from widget or keybindings.
 
     :param mainloop: The main tk.Tk() window running the mainloop.
     :param keybind: Implicit event passed from bind().
+    :return: None
     """
 
     print('\n*** User quit the program. ***\n')
