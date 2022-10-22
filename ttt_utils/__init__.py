@@ -1,8 +1,6 @@
 """
 These constants are used with the --about command line argument or button.
-Program will exit here if any check fails when called.
 """
-from ttt_utils import platform_check, vcheck
 
 # Development status standards: https://pypi.org/classifiers/
 __author__ = 'Craig S. Echt'
@@ -33,6 +31,3 @@ __license__ = """                                MIT License
     see https://mit-license.org/
     """
 URL = 'https://github.com/csecht/tic-tac-toe-tkinter'
-
-platform_check.check_platform()
-vcheck.minversion('3.7')
