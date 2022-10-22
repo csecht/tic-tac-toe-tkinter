@@ -83,7 +83,7 @@ class TicTacToeGUI(tk.Tk):
     def __init__(self):
         super().__init__()
 
-        # Game stats widgets.
+        # Game stats widgets and variables.
         self.p1_points = 0
         self.p2_points = 0
         self.p1_score = tk.IntVar()
@@ -161,13 +161,21 @@ class TicTacToeGUI(tk.Tk):
         # Set platform-specific padding between board squares (board_labels).
         if MY_OS == 'dar':  # macOS
             pad = 6
+            ipady = 0
+            ipadx = 0
         elif MY_OS == 'lin':  # Linux
             pad = 0
+            ipady = 6
+            ipadx = 10
         else:  # Windows
             pad = 8
+            ipady = 6
+            ipadx = 10
 
         for lbl in self.board_labels:
-            lbl.grid(row=_row, column=_col, pady=pad, padx=pad, ipady=6, ipadx=10)
+            lbl.grid(row=_row, column=_col,
+                     pady=pad, padx=pad,
+                     ipady=ipady, ipadx=ipadx)
             _col += 1
             # Grid three columns in a row, then move to next row and repeat.
             if _col > 2:
@@ -201,18 +209,18 @@ class TicTacToeGUI(tk.Tk):
         #   cut/paste actions for platform-specific adjustments.
         if MY_OS == 'dar':
             self.score_header.grid(
-                row=0, column=1, rowspan=2, padx=(10, 0), pady=(0, 10), sticky=tk.W)
+                row=0, column=1, rowspan=2, padx=(0, 0), pady=(0, 10), sticky=tk.W)
             self.player1_header.grid(
-                row=0, column=1, rowspan=2, padx=(0, 0), pady=(0, 35), sticky=tk.E)
+                row=0, column=1, rowspan=2, padx=(0, 13), pady=(0, 35), sticky=tk.E)
             self.player2_header.grid(
-                row=0, column=1, rowspan=2, padx=(0, 0), pady=(20, 10), sticky=tk.E)
+                row=0, column=1, rowspan=2, padx=(0, 13), pady=(20, 10), sticky=tk.E)
         elif MY_OS == 'lin':
             self.score_header.grid(
                 row=0, column=1, rowspan=2, padx=(10, 0), pady=(0, 10), sticky=tk.W)
             self.player1_header.grid(
-                row=0, column=1, rowspan=2, padx=(0, 8), pady=(0, 35), sticky=tk.E)
+                row=0, column=1, rowspan=2, padx=(0, 12), pady=(0, 35), sticky=tk.E)
             self.player2_header.grid(
-                row=0, column=1, rowspan=2, padx=(0, 8), pady=(20, 10), sticky=tk.E)
+                row=0, column=1, rowspan=2, padx=(0, 12), pady=(20, 10), sticky=tk.E)
         else:  # is Windows
             self.score_header.grid(
                 row=0, column=1, rowspan=2, padx=(10, 0), pady=(0, 10), sticky=tk.W)
@@ -239,6 +247,7 @@ class TicTacToeGUI(tk.Tk):
         self.auto_turns_lbl.grid(
             row=0, column=2, rowspan=2,
             padx=(0, 8), pady=(0, 0), sticky=tk.SE)
+
         if MY_OS in 'lin, dar':
             self.auto_turns_header.grid(
                 row=0, column=2, rowspan=2,
@@ -248,11 +257,20 @@ class TicTacToeGUI(tk.Tk):
                 row=0, column=2, rowspan=2,
                 padx=(0, 8), pady=(0, 30), sticky=tk.SE)
 
-        if MY_OS in 'lin, dar':
+        if MY_OS == 'dar':
             self.ties_header.grid(
                 row=0, column=1,
                 rowspan=2,
-                padx=(0, 8), pady=(55, 0), sticky=tk.E)
+                padx=(0, 13), pady=(55, 0), sticky=tk.E)
+            self.ties_lbl.grid(
+                row=0, column=1,
+                rowspan=2, columnspan=2,
+                padx=(112, 0), pady=(55, 0), sticky=tk.W)
+        elif MY_OS == 'lin':
+            self.ties_header.grid(
+                row=0, column=1,
+                rowspan=2,
+                padx=(0, 12), pady=(55, 0), sticky=tk.E)
             self.ties_lbl.grid(
                 row=0, column=1,
                 rowspan=2, columnspan=2,
@@ -375,25 +393,32 @@ class TicTacToeGUI(tk.Tk):
         # Players' scores widgets:
         # Squiggle symbol, ︴, from https://coolsymbol.com/line-symbols.html
         self.score_header.config(
-            text='Score ︴', font=FONT['scores'],
+            text='Score ︴',
+            font=FONT['scores'],
             fg=COLOR['score_fg'])
         self.player1_header.config(
-            text=f'{PLAYER1}:', font=FONT['scores'],
+            text=f'{PLAYER1}:',
+            font=FONT['scores'],
             fg=COLOR['score_fg'])
         self.player2_header.config(
-            text=f'{PLAYER2}:', font=FONT['scores'],
+            text=f'{PLAYER2}:',
+            font=FONT['scores'],
             fg=COLOR['score_fg'])
         self.player1_score_lbl.config(
-            textvariable=self.p1_score, font=FONT['scores'],
+            textvariable=self.p1_score,
+            font=FONT['scores'],
             fg=COLOR['score_fg'])
         self.player2_score_lbl.config(
-            textvariable=self.p2_score, font=FONT['scores'],
+            textvariable=self.p2_score,
+            font=FONT['scores'],
             fg=COLOR['score_fg'])
         self.ties_header.config(
-            text='Ties:', font=FONT['scores'],
+            text='Ties:',
+            font=FONT['scores'],
             fg=COLOR['score_fg'])
         self.ties_lbl.config(
-            textvariable=self.ties_num, font=FONT['scores'],
+            textvariable=self.ties_num,
+            font=FONT['scores'],
             fg=COLOR['score_fg'])
 
         # Play mode control widgets:
@@ -482,13 +507,15 @@ class TicTacToeGUI(tk.Tk):
                   )
         style.configure('My.TButton', font=FONT['sm_button'])
         self.who_autostarts.configure(style="My.TButton",
-                                      text='Player 1 starts', width=14,
+                                      text='Player 1 starts',
+                                      width=14,
                                       takefocus=True,
                                       state=tk.DISABLED,
                                       command=self.autostart_who)
 
         self.quit_button.config(style="My.TButton",
-                                text='Quit', width=4,
+                                text='Quit',
+                                width=4,
                                 command=lambda: utils.quit_game(mainloop=app))
 
     def setup_game_board(self) -> None:
@@ -513,7 +540,8 @@ class TicTacToeGUI(tk.Tk):
         # Reset game board squares to starting configurations.
         for i, lbl in enumerate(self.board_labels):
             lbl.config(text=' ',
-                       height=1, width=2,
+                       height=1,
+                       width=2,
                        bg=COLOR['sq_not_won'],
                        fg=COLOR['mark_fg'],
                        font=FONT['mark'],
@@ -1097,10 +1125,9 @@ class TicTacToeGUI(tk.Tk):
         """
         Change color of board squares depending on game result.
 
-        Based on Bryan Oakley's answer for
+        Derived from Bryan Oakley's answer for
         how-to-make-a-button-flash-using-after-in-tkinter
         https://stackoverflow.com/a/57298778
-
         :param status: End game result, either 'win' or 'tie'.
         :param combo: Tuple of the three winning board_labels indices,
                       or None (default) for a tie.
@@ -1616,6 +1643,9 @@ class TicTacToeGUI(tk.Tk):
         Note that on a tie, the last played mark does not show on the
         game board before the flash.
 
+        Derived from Bryan Oakley's answer for
+        how-to-make-a-button-flash-using-after-in-tkinter
+        https://stackoverflow.com/a/57298778
         :param combo: The tuple index values for the board_labels
                       squares to flash.
         :param mark: The winning player's mark, usually 'X' or 'O'.

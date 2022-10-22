@@ -93,7 +93,7 @@ FONT = {
     'scores': ('TkHeadingFont', 9),
     'status': ('TkHeadingFont', 9, 'italic bold'),
     'condensed': ('TkTooltipFont', 8),
-    'mark': ('TkFixedFont', 50),
+    'mark': ('TkFixedFont', 52),
 }
 
 # Need to apply OS-specific font adjustments.
@@ -103,9 +103,10 @@ elif platform_check.MY_OS == 'dar':
     FONT['sm_button'] = ('TkHeadingFont', 10)
     FONT['who'] = ('TkHeadingFont', 11, 'italic bold')
     FONT['button'] = ('TkHeadingFont', 11, 'bold')
-    FONT['scores'] = ('TkHeadingFont', 12)
+    FONT['scores'] = ('TkHeadingFont', 13)
     FONT['status'] = ('TkHeadingFont', 13, 'italic bold')
     FONT['condensed'] = ('TkTooltipFont', 10)
+    FONT['mark'] = ('TkFixedFont', 75)
 
 # TIES (32) and WINS (1884) are all possible end-game board configurations,
 #   in index order; 3 rows x 3 col indices: 012345678.
