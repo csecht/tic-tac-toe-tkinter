@@ -1075,8 +1075,6 @@ class TicTacToeGUI(tk.Tk):
                 elif mode == 'pvpc':
                     award_points(mark)
                     self.highlight_result('win', combo)
-                    self.whose_turn.set('Game pending...')
-                    self.whose_turn_lbl.config(bg=COLOR['tk_white'])
 
                     if mark == P2_MARK:
                         self.display_status('PC WINS!')
