@@ -75,7 +75,7 @@ class TicTacToeGUI(tk.Tk):
         'player2_header', 'player2_score_lbl',
         'prev_game_num', 'prev_game_num_header', 'prev_game_num_lbl',
         'pvp_mode', 'pvpc_mode', 'quit_button',
-        'status_calls', 'status_window', 'statuswin_geometry',
+        'status_calls', 'statuswin_geometry',
         'score_header', 'separator', 'ties_header', 'ties_lbl',
         'ties_num', 'titlebar_offset', 'who_autostarts', 'whose_turn',
         'whose_turn_lbl', 'winner_found',
@@ -129,16 +129,17 @@ class TicTacToeGUI(tk.Tk):
         self.autospeed_fast = tk.Radiobutton()
         self.autospeed_slow = tk.Radiobutton()
 
-        # Additional widgets.
+        # Game Status window variables.
+        self.statuswin_geometry = ''  # Current Game Status window position.
+        self.status_calls = 0  # Used as flag to set titlebar_offset.
+        self.titlebar_offset = 0  # Used to properly position Game Status window.
+
+        # Additional widgets and variables.
         self.separator = ttk.Separator()
         self.after_id = None  # A handler for after() and after_cancel() calls.
         self.auto_marks = ''  # Used to dole out autoplay marks in proper register.
         self.curr_automode = ''  # Used to display whose_turn.
         self.curr_pmode = ''  # Used to evaluate mode state.
-        self.status_window = None  # Will be a toplevel in display_status().
-        self.status_calls = 0  # Allows recording of initial Status window position.
-        self.statuswin_geometry = ''  # Used to remember Status window position.
-        self.titlebar_offset = 0  # Used for accurate positioning of Status window.
         self.winner_found = False  # Used for game flow control.
         self.quit_button = ttk.Button()
 
@@ -540,7 +541,7 @@ class TicTacToeGUI(tk.Tk):
        """
         if label['bg'] == COLOR['sq_not_won'] and label['text'] == ' ':
             label['bg'] = COLOR['sq_mouseover']
-        else: # The square has already been played.
+        else:  # The square has already been played.
             label['bg'] = COLOR['sq_not_won']
 
     @staticmethod
@@ -773,7 +774,7 @@ class TicTacToeGUI(tk.Tk):
         turn_number = self.turn_number()
 
         # Delay play for a better feel, but not when PC starts a game b/c
-        #   that just delays closing the Status toplevel for a new game.
+        #   that just delays closing the Game Status toplevel for a new game.
         if turn_number > 0:
             app.after(const.PLAY_AFTER)
             self.choose_pc_pref.config(state=tk.DISABLED)
@@ -1185,11 +1186,11 @@ class TicTacToeGUI(tk.Tk):
         self.p2_score.set(self.p2_points)
 
         # Now set up the status window and its actions:
-        self.status_window = tk.Toplevel(self,
-                                         bg=COLOR['status_bg'],
-                                         borderwidth=4,
-                                         relief='raised')
-        self.status_window.title('Game Status')
+        status_window = tk.Toplevel(self,
+                                    bg=COLOR['status_bg'],
+                                    borderwidth=4,
+                                    relief='raised')
+        status_window.title('Game Status')
 
         if MY_OS == 'win':  # Windows
             size = '500x150'
@@ -1204,30 +1205,30 @@ class TicTacToeGUI(tk.Tk):
             min_w = 180
             min_h = 100
 
-        self.status_window.geometry(size)
-        self.status_window.minsize(min_w, min_h)
+        status_window.geometry(size)
+        status_window.minsize(min_w, min_h)
 
         self.status_calls += 1
-        self.window_geometry(self.status_window)
+        self.window_geometry(status_window)
 
         # Need to prevent focus shifting to app window which would cover
         #  the Report window.
-        self.status_window.attributes('-topmost', True)
-        self.status_window.focus_force()
+        status_window.attributes('-topmost', True)
+        status_window.focus_force()
 
-        status_lbl = tk.Label(self.status_window,
+        status_lbl = tk.Label(status_window,
                               text=status_msg,
                               font=FONT['status'],
                               bg=COLOR['status_bg'])
 
         def no_exit_on_x():
             messagebox.showinfo(
-                parent=self.status_window,
+                parent=status_window,
                 title='Click a button',
                 detail='Use either "New Game" or "Quit"'
                        ' to close Report window.')
 
-        self.status_window.protocol('WM_DELETE_WINDOW', no_exit_on_x)
+        status_window.protocol('WM_DELETE_WINDOW', no_exit_on_x)
 
         def restart_game():
             """
@@ -1241,23 +1242,23 @@ class TicTacToeGUI(tk.Tk):
             # Need to retain screen position of status window between games in case
             #   user has moved it from default position.
             self.statuswin_geometry = (
-                f'+{self.status_window.winfo_x()}'
-                f'+{self.status_window.winfo_y() - self.titlebar_offset}'
+                f'+{status_window.winfo_x()}'
+                f'+{status_window.winfo_y() - self.titlebar_offset}'
             )
             self.new_game()
-            self.status_window.destroy()
+            status_window.destroy()
 
-        again = tk.Button(self.status_window, text='New Game (\u23CE)',
+        again = tk.Button(status_window, text='New Game (\u23CE)',
                           # Unicode Return/Enter key symbol   ^^^.
                           font=FONT['button'],
                           relief='groove', overrelief='raised', border=3,
                           command=restart_game)
-        not_again = tk.Button(self.status_window, text='Quit',
+        not_again = tk.Button(status_window, text='Quit',
                               font=FONT['sm_button'],
                               relief='groove', overrelief='raised', border=3,
                               command=lambda: utils.quit_game(mainloop=app))
-        self.status_window.bind('<Return>', lambda _: restart_game())
-        self.status_window.bind('<KP_Enter>', lambda _: restart_game())
+        status_window.bind('<Return>', lambda _: restart_game())
+        status_window.bind('<KP_Enter>', lambda _: restart_game())
 
         status_lbl.pack(pady=3, padx=3)
         again.pack(pady=(0, 0))
@@ -1421,9 +1422,10 @@ class TicTacToeGUI(tk.Tk):
 
     def auto_stop(self, stop_msg: str) -> None:
         """
-        Stop autoplay method and call Status popup window.
+        Stop autoplay method and call Game Status popup window.
 
-        Disable player game actions (resets when Status window closes).
+        Disable player game actions (actions enabled once Game Status
+        window closes).
 
         :param stop_msg: Information on type of auto_stop call; e.g.,
             "ended", "cancelled", etc.
@@ -1489,18 +1491,18 @@ class TicTacToeGUI(tk.Tk):
         """
 
         if self.autospeed_selection.get() == 'fast':
-            auto_after = const.AUTO_FAST
+            after_time = const.AUTO_FAST
         else:
-            auto_after = const.AUTO_SLOW
+            after_time = const.AUTO_SLOW
 
-        # Note: Erase time needs to be less than auto_after time for
+        # Note: Erase time needs to be less than after_time time for
         #   proper display of game board winner/tie flash.
-        erase_after = int(auto_after * 0.9)
+        erase_after = int(after_time * 0.9)
 
         if after_type == 'flash':
             return erase_after
 
-        return auto_after
+        return after_time
 
     def autoplay_random(self) -> None:
         """
@@ -1523,53 +1525,6 @@ class TicTacToeGUI(tk.Tk):
             mark = self.auto_marks[0]
             self.play_random(turn_number, mark)
             self.auto_repeat(mark, self.autoplay_random)
-        else:
-            self.auto_stop('ended')
-
-    def autoplay_strategy(self) -> None:
-        """
-        Auto-plays turns according to a set order of conditional rules.
-
-        Rules, in decreasing play priority: win, block, defend against
-        an opponent advantage, play corners for an advantage, random.
-        Number of turns is set by auto_marks, currently 1000 turns,
-        which gives ~120 games or until stopped by user.
-        Turns are played on a timed interval controlled by calls to
-        auto_repeat().
-        Yields ~99% tie games.
-        Is called from auto_start().
-
-        :return: None
-        """
-        self.curr_automode = 'Autoplay strategy'
-
-        self.auto_turns_remaining.set(len(self.auto_marks))
-        turn_number = self.turn_number()
-
-        if len(self.auto_marks) > 0:
-            mark = self.auto_marks[0]
-
-            # Need to randomize starting play so games don't always
-            #  start with a corner play.
-            if turn_number == 0:
-                self.play_random(turn_number, mark)
-
-            # Look for a winning or blocking play.
-            if turn_number == self.turn_number():
-                self.play_rudiments(turn_number, mark)
-
-            if turn_number == self.turn_number():
-                self.play_defense(turn_number, mark)
-
-            if turn_number == self.turn_number():
-                self.play_corners(turn_number, mark)
-
-            # No preferred play available, so play random.
-            if turn_number == self.turn_number():
-                self.play_random(turn_number, mark)
-
-            self.auto_repeat(mark, self.autoplay_strategy)
-
         else:
             self.auto_stop('ended')
 
@@ -1609,6 +1564,53 @@ class TicTacToeGUI(tk.Tk):
                 self.play_random(turn_number, mark)
 
             self.auto_repeat(mark, self.autoplay_center)
+
+        else:
+            self.auto_stop('ended')
+
+    def autoplay_strategy(self) -> None:
+        """
+        Auto-plays turns according to a set order of conditional rules.
+
+        Rules, in decreasing play priority: win, block, defend against
+        an opponent advantage, play corners for an advantage, random.
+        Number of turns is set by auto_marks, currently 1000 turns,
+        which gives ~100 games or until stopped by user.
+        Turns are played on a timed interval controlled by calls to
+        auto_repeat().
+        Yields ~99% tie games.
+        Is called from auto_start().
+
+        :return: None
+        """
+        self.curr_automode = 'Autoplay strategy'
+
+        self.auto_turns_remaining.set(len(self.auto_marks))
+        turn_number = self.turn_number()
+
+        if len(self.auto_marks) > 0:
+            mark = self.auto_marks[0]
+
+            # Need to randomize starting play so games don't always
+            #  start with a corner play.
+            if turn_number == 0:
+                self.play_random(turn_number, mark)
+
+            # Look for a winning or blocking play.
+            if turn_number == self.turn_number():
+                self.play_rudiments(turn_number, mark)
+
+            if turn_number == self.turn_number():
+                self.play_defense(turn_number, mark)
+
+            if turn_number == self.turn_number():
+                self.play_corners(turn_number, mark)
+
+            # No preferred play available, so play random.
+            if turn_number == self.turn_number():
+                self.play_random(turn_number, mark)
+
+            self.auto_repeat(mark, self.autoplay_strategy)
 
         else:
             self.auto_stop('ended')
