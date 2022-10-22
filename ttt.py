@@ -1330,6 +1330,7 @@ class TicTacToeGUI(tk.Tk):
             self.auto_go_stop_txt.set('Start auto')
             self.auto_go_stop_radiobtn.config(state=tk.NORMAL)
             self.who_autostarts.configure(state=tk.NORMAL)
+            self.choose_pc_pref.config(state=tk.DISABLED)
 
     def reset_game_and_score(self) -> None:
         """
