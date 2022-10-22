@@ -53,7 +53,7 @@ class TicTacToeGUI(tk.Tk):
     auto_stop, play_rudiments, autoplay_center,
     autoplay_random, autoplay_strategy, autospeed_control,
     autostart_who, check_winner, color_pc_mark, configure_widgets,
-    display_status, flash_tie, flash_win, grid_widgets, human_turn,
+    display_status, highlight_result, grid_widgets, human_turn,
     mode_control, new_game, play_defense, pc_turn,
     play_random, reset_game_and_score, setup_game_board, turn_number,
     unbind_game_board, window_geometry, ready_player_one
@@ -1046,7 +1046,7 @@ class TicTacToeGUI(tk.Tk):
                     break
                 elif mode == 'pvpc':
                     award_points(mark)
-                    self.flash_win(combo)
+                    self.highlight_result('win', combo)
                     self.whose_turn.set('Game pending...')
                     self.whose_turn_lbl.config(bg=COLOR['tk_white'])
 
@@ -1064,7 +1064,7 @@ class TicTacToeGUI(tk.Tk):
                     break
                 else:  # Mode selection is pvp.
                     award_points(mark)
-                    self.flash_win(combo)
+                    self.highlight_result('win', combo)
                     self.display_status(f'{mark} WINS!')
 
         if self.turn_number() == 9 and not self.winner_found:  # Is a tie.
@@ -1084,7 +1084,7 @@ class TicTacToeGUI(tk.Tk):
             if 'Autoplay' in mode:
                 self.auto_flash_game((4, 4, 4), 'TIE')
             else:  # Mode selection is pvp or pvpc.
-                self.flash_tie()
+                self.highlight_result('tie')
                 self.display_status('IT IS A TIE!')
                 self.whose_turn.set('Game pending...')
                 self.whose_turn_lbl.config(bg=COLOR['tk_white'])
@@ -1093,34 +1093,30 @@ class TicTacToeGUI(tk.Tk):
                 if self.pc_pref.get() in 'PC plays strategy, PC plays center':
                     print('-Tie-')
 
-    def flash_win(self, combo) -> None:
+    def highlight_result(self, status: str, combo=None) -> None:
         """
-        Flashes the three winning squares, in series.
+        Change color of board squares depending on game result.
 
         Based on Bryan Oakley's answer for
         how-to-make-a-button-flash-using-after-in-tkinter
         https://stackoverflow.com/a/57298778
 
+        :param status: End game result, either 'win' or 'tie'.
+        :param combo: Tuple of the three winning board_labels indices,
+                      or None (default) for a tie.
         :return: None
         """
-        _x, _y, _z = combo
+        if status == 'win':
+            _x, _y, _z = combo
 
-        app.after(10, lambda: self.board_labels[_x].config(bg=COLOR['sq_won']))
-        app.after(175, lambda: self.board_labels[_y].config(bg=COLOR['sq_won']))
-        app.after(345, lambda: self.board_labels[_z].config(bg=COLOR['sq_won']))
+            app.after(10, lambda: self.board_labels[_x].config(bg=COLOR['sq_won']))
+            app.after(175, lambda: self.board_labels[_y].config(bg=COLOR['sq_won']))
+            app.after(345, lambda: self.board_labels[_z].config(bg=COLOR['sq_won']))
 
-    def flash_tie(self) -> None:
-        """
-        Make entire game board blue (COLOR['sq_won']) on a tie game.
-
-        (Is not really a flash.) All board squares show the color for a
-        tied game until new_game() is called from display_staus().
-
-        :return: None
-        """
-        for lbl in self.board_labels:
-            lbl.config(bg=COLOR['sq_won'])
-            app.update_idletasks()
+        else:  # status is 'tie'
+            for lbl in self.board_labels:
+                lbl.config(bg=COLOR['sq_won'])
+                app.update_idletasks()
 
     def window_geometry(self, toplevel: tk) -> None:
         """
@@ -1256,7 +1252,7 @@ class TicTacToeGUI(tk.Tk):
 
     def new_game(self) -> None:
         """
-        Set up the next game. Called from display_status().
+        Set up the next game. Called from display_status.restart_game().
 
         return: None
         """
@@ -1300,10 +1296,9 @@ class TicTacToeGUI(tk.Tk):
             else:
                 self.ready_player_one()
 
-        # At the end of an autoplay series or when stopped by user, need
-        #   to clear auto scores and games.
-        if ('Autoplay' in self.mode_clicked.get() or
-                self.auto_turns_remaining.get() > 0):
+        # At restart of an autoplay series or when stopped by user,
+        #   need to clear auto scores and games.
+        elif 'Autoplay' in self.mode_clicked.get():
             self.reset_game_and_score()
             self.auto_turns_remaining.set(0)
             self.auto_marks = ''
@@ -1376,10 +1371,8 @@ class TicTacToeGUI(tk.Tk):
         self.who_autostarts.config(state=tk.DISABLED)
 
         # Provide alternating pc player marks in autoplay turns;
-        #   If 500 marks per player (values set by const.MARKS*), then 1000
-        #   turns yields about 110 games.
         #   The marks string is shortened one character per turn in the
-        #   autoplay_ methods, and in auto_setup() depending on the
+        #   autoplay_* methods, and in auto_setup() depending on the
         #   who_autostarts option.
         self.auto_marks = ''.join(map(lambda m1, m2: m1 + m2, MARKS1, MARKS2))
 
