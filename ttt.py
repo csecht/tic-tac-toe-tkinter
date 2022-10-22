@@ -584,7 +584,6 @@ class TicTacToeGUI(tk.Tk):
         if 'player_modes' in group:
             self.pvp_mode.config(state=tk.DISABLED)
             self.pvpc_mode.config(state=tk.DISABLED)
-            self.choose_pc_pref.config(state=tk.DISABLED)
 
         if 'auto_modes' in group:
             self.auto_random_mode.config(state=tk.DISABLED)
@@ -705,7 +704,6 @@ class TicTacToeGUI(tk.Tk):
         #  On even PvPC games, pc will have already played 1st turn.
 
         if played_lbl['text'] == ' ':
-            self.choose_pc_pref.config(state=tk.DISABLED)
             self.disable('auto_modes', 'auto_controls')
 
             if self.mode_clicked.get() == 'pvp':
@@ -1291,7 +1289,6 @@ class TicTacToeGUI(tk.Tk):
 
         self.pvp_mode.config(state=tk.NORMAL)
         self.pvpc_mode.config(state=tk.NORMAL)
-        self.choose_pc_pref.config(state='readonly')
 
         # Make font invisible (bg color) to remove from view.
         self.auto_turns_header.config(fg=COLOR['tk_white'])
@@ -1302,13 +1299,13 @@ class TicTacToeGUI(tk.Tk):
 
         if self.mode_clicked.get() == 'pvp':
             utils.keybindings(self, 'bind_board')
+            self.choose_pc_pref.config(state=tk.DISABLED)
 
             if self.prev_game_num.get() % 2 == 0:
                 self.ready_player_one()
             else:
                 self.whose_turn.set(f'{PLAYER2} plays {P2_MARK}')
                 self.whose_turn_lbl.config(bg=COLOR['tk_white'])
-                self.choose_pc_pref.config(state=tk.DISABLED)
 
         elif self.mode_clicked.get() == 'pvpc':
             utils.keybindings(self, 'bind_board')
@@ -1316,10 +1313,10 @@ class TicTacToeGUI(tk.Tk):
             if self.prev_game_num.get() % 2 != 0:
                 self.whose_turn.set(f'PC plays {P2_MARK}')
                 self.whose_turn_lbl.config(bg=COLOR['tk_white'])
-                self.choose_pc_pref.config(state=tk.DISABLED)
                 self.pc_turn()
             else:
                 self.ready_player_one()
+                self.choose_pc_pref.config(state='readonly')
 
         # At restart of an autoplay series or when stopped by user,
         #   need to clear auto scores and games.
