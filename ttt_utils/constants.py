@@ -6,7 +6,7 @@ MARKS1, MARKS2: strings of duplicate marks that determine number of auto turns.
 WINNING_COMBOS, CORNERS, SIDES, PARA_CORNERS, ORTHO_SIDES, META_POSITIONS:
     lists of game board indices.
 KP2PLAY, KEYS2PLAY: strings of ordered keys for bind() functions.
-PLAY_AFTER, AUTO_FAST, AUTO_SLOW, AUTO_SHOW: ms integers for tk after() function.
+PLAY_AFTER, AUTO_FAST, AUTO_SLOW: ms integers for tk after() function.
 TIES, WINS: (unused) tuples of board end-game configurations, in index order.
 """
 # Copyright (C) 2022 C.S. Echt under GNU General Public License'
@@ -64,7 +64,6 @@ META_POSITIONS = {
 PLAY_AFTER = 600  # PC response time for PvPC mode.
 AUTO_FAST = 100  # Fast cycle time for all autoplay modes.
 AUTO_SLOW = 1000  # Slow cycle time for all autoplay modes.
-AUTO_SHOW = 1  # Necessary for proper auto_flash_game() operation.
 
 # Foreground and background colors.
 COLOR = {'score_fg': 'DodgerBlue4',

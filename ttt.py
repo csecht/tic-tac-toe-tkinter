@@ -36,7 +36,7 @@ except (ImportError, ModuleNotFoundError) as error:
           f'See also: https://tkdocs.com/tutorial/install.html \n{error}')
 
 # Local program imports:
-from ttt_utils import utils, constants as cst
+from ttt_utils import utils, constants as const
 from ttt_utils.constants import (PLAYER1, PLAYER2,
                                  P1_MARK, P2_MARK,
                                  MARKS1, MARKS2,
@@ -775,7 +775,7 @@ class TicTacToeGUI(tk.Tk):
         # Delay play for a better feel, but not when PC starts a game b/c
         #   that just delays closing the Status toplevel for a new game.
         if turn_number > 0:
-            app.after(cst.PLAY_AFTER)
+            app.after(const.PLAY_AFTER)
             self.choose_pc_pref.config(state=tk.DISABLED)
 
         # Need to re-order winner list so Human doesn't detect a pattern
@@ -930,7 +930,7 @@ class TicTacToeGUI(tk.Tk):
             SIDES.sort()
 
             # Have PC play the appropriate corner to defend.
-            for key, val in cst.ORTHO_SIDES.items():
+            for key, val in const.ORTHO_SIDES.items():
                 if self.board_labels[key]['text'] == ' ' and oppo_positions == val:
                     self.board_labels[key]['text'] = mark
                     if pvpc:
@@ -942,7 +942,7 @@ class TicTacToeGUI(tk.Tk):
         # When opponent has played a corner and a non-adjacent side, defend with
         #   play to opponent's shared (nearest) corner.
         if turn_number == self.turn_number():
-            for key, val in cst.META_POSITIONS.items():
+            for key, val in const.META_POSITIONS.items():
                 if self.board_labels[key]['text'] == ' ' and oppo_positions == val:
                     self.board_labels[key]['text'] = mark
                     if pvpc:
@@ -957,7 +957,7 @@ class TicTacToeGUI(tk.Tk):
             random.shuffle(SIDES)
             side2play = SIDES[0]
 
-            for i in cst.PARA_CORNERS:
+            for i in const.PARA_CORNERS:
                 if i == oppo_positions:
                     self.board_labels[side2play]['text'] = mark
                     if pvpc:
@@ -979,9 +979,9 @@ class TicTacToeGUI(tk.Tk):
         :return: None
         """
 
-        random.shuffle(cst.CORNERS)
+        random.shuffle(const.CORNERS)
 
-        for i in cst.CORNERS:
+        for i in const.CORNERS:
             c_txt = self.board_labels[i]['text']
             if turn_number == self.turn_number() and c_txt == ' ':
                 self.board_labels[i]['text'] = mark
@@ -1399,7 +1399,7 @@ class TicTacToeGUI(tk.Tk):
         self.who_autostarts.config(state=tk.DISABLED)
 
         # Provide alternating pc player marks in autoplay turns;
-        #   If 500 marks per player (values set by cst.MARKS*), then 1000
+        #   If 500 marks per player (values set by const.MARKS*), then 1000
         #   turns yields about 110 games.
         #   The marks string is shortened one character per turn in the
         #   autoplay_ methods, and in auto_setup() depending on the
@@ -1489,9 +1489,9 @@ class TicTacToeGUI(tk.Tk):
         """
 
         if self.autospeed_selection.get() == 'fast':
-            auto_after = cst.AUTO_FAST
+            auto_after = const.AUTO_FAST
         else:
-            auto_after = cst.AUTO_SLOW
+            auto_after = const.AUTO_SLOW
 
         # Note: Erase time needs to be less than auto_after time for
         #   proper display of game board winner/tie flash.
@@ -1637,7 +1637,7 @@ class TicTacToeGUI(tk.Tk):
 
     def auto_flash_game(self, combo: tuple, mark: str) -> None:
         """
-        For each auto_play game, flashes the winning or tying marks.
+        For each auto_play game, flashes the marks for win or tie.
 
         On ties, flashes only the enter square (*combo* = (4, 4, 4);
         *mark* = 'TIE'). On wins, flashes the winning marks.
@@ -1645,25 +1645,26 @@ class TicTacToeGUI(tk.Tk):
         Note that on a tie, the last played mark does not show on the
         game board before the flash.
 
-        :param combo: The tuple index values for the winning squares on
-                      the board.
+        :param combo: The tuple index values for the board_labels
+                      squares to flash.
         :param mark: The winning player's mark, usually 'X' or 'O'.
         """
         _x, _y, _z = combo
 
-        def winner_show():
+        def flash_show():
             self.board_labels[_x].config(text=mark, bg=COLOR['sq_won'])
             self.board_labels[_y].config(text=mark, bg=COLOR['sq_won'])
             self.board_labels[_z].config(text=mark, bg=COLOR['sq_won'])
             app.update_idletasks()
 
-        def winner_erase():
+        def flash_erase():
             self.board_labels[_x].config(text=' ', bg=COLOR['sq_not_won'])
             self.board_labels[_y].config(text=' ', bg=COLOR['sq_not_won'])
             self.board_labels[_z].config(text=' ', bg=COLOR['sq_not_won'])
 
-        app.after(cst.AUTO_SHOW, winner_show)
-        app.after(self.autospeed_control('flash'), winner_erase)
+        # after() time of 1ms is needed for the flash to work.
+        app.after(1, flash_show)
+        app.after(self.autospeed_control('flash'), flash_erase)
 
         # Need to allow idle time for auto_setup to complete given
         #   autospeed_control() time; keeps auto_marks in correct register.
