@@ -637,6 +637,7 @@ class TicTacToeGUI(tk.Tk):
             if mode_clicked == 'pvpc':
                 self.choose_pc_pref.config(state='readonly')
                 self.player2_header.config(text='PC:')
+                app.update_idletasks()  # For immediate replacement of header text.
             else:
                 self.choose_pc_pref.config(state=tk.DISABLED)
                 self.player2_header.config(text=f'{PLAYER2}:')
@@ -1282,7 +1283,7 @@ class TicTacToeGUI(tk.Tk):
 
         return: None
         """
-        self.quit_button.config(state=tk.NORMAL)
+        mode = self.mode_clicked.get()
 
         self.auto_random_mode.config(state=tk.NORMAL)
         self.auto_center_mode.config(state=tk.NORMAL)
@@ -1293,6 +1294,8 @@ class TicTacToeGUI(tk.Tk):
         self.pvp_mode.config(state=tk.NORMAL)
         self.pvpc_mode.config(state=tk.NORMAL)
 
+        self.quit_button.config(state=tk.NORMAL)
+
         # Make font invisible (bg color) to remove from view.
         self.auto_turns_header.config(fg=COLOR['tk_white'])
         self.auto_turns_lbl.config(fg=COLOR['tk_white'])
@@ -1300,7 +1303,7 @@ class TicTacToeGUI(tk.Tk):
         self.winner_found = False
         self.setup_game_board()
 
-        if self.mode_clicked.get() == 'pvp':
+        if mode == 'pvp':
             utils.keybindings(self, 'bind_board')
             self.choose_pc_pref.config(state=tk.DISABLED)
 
@@ -1310,12 +1313,13 @@ class TicTacToeGUI(tk.Tk):
                 self.whose_turn.set(f'{PLAYER2} plays {P2_MARK}')
                 self.whose_turn_lbl.config(bg=COLOR['tk_white'])
 
-        elif self.mode_clicked.get() == 'pvpc':
+        elif mode == 'pvpc':
             utils.keybindings(self, 'bind_board')
 
             if self.prev_game_num.get() % 2 != 0:
                 self.whose_turn.set(f'PC plays {P2_MARK}')
                 self.whose_turn_lbl.config(bg=COLOR['tk_white'])
+                self.disable('auto_modes', 'auto_controls')
                 self.pc_turn()
             else:
                 self.ready_player_one()
@@ -1323,7 +1327,7 @@ class TicTacToeGUI(tk.Tk):
 
         # At restart of an autoplay series or when stopped by user,
         #   need to clear auto scores and games.
-        elif 'Autoplay' in self.mode_clicked.get():
+        elif 'Autoplay' in mode:
             self.reset_game_and_score()
             self.auto_turns_remaining.set(0)
             self.auto_marks = ''
