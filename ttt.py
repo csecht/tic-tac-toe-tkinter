@@ -52,11 +52,10 @@ class TicTacToeGUI(tk.Tk):
     Methods: auto_command, auto_flash_game, auto_setup, auto_start,
     auto_stop, play_rudiments, autoplay_center,
     autoplay_random, autoplay_strategy, autospeed_control,
-    autostart_who, block_player_action, check_winner,
-    color_pc_mark, configure_widgets, display_status, flash_tie,
-    flash_win, grid_widgets, human_turn, mode_control, new_game,
-    on_enter, on_leave, play_defense, pc_turn, play_random,
-    reset_game_and_score, setup_game_board, turn_number,
+    autostart_who, check_winner, color_pc_mark, configure_widgets,
+    display_status, flash_tie, flash_win, grid_widgets, human_turn,
+    mode_control, new_game, play_defense, pc_turn,
+    play_random, reset_game_and_score, setup_game_board, turn_number,
     unbind_game_board, window_geometry, ready_player_one
     """
     # Using __slots__ for all Class attributes gives slight reduction of
@@ -498,6 +497,20 @@ class TicTacToeGUI(tk.Tk):
 
         :return: None
         """
+        # Functions to change square backgrounds with mouseover & leave.
+        def on_enter(label: tk) -> None:
+            if label['bg'] == COLOR['sq_not_won'] and label['text'] == ' ':
+                label['bg'] = COLOR['sq_mouseover']
+            else:  # The square has already been played.
+                label['bg'] = COLOR['sq_not_won']
+
+        def on_leave(label: tk):
+            if label['bg'] == COLOR['sq_mouseover']:
+                label['bg'] = COLOR['sq_not_won']
+            elif label['bg'] == COLOR['sq_not_won']:
+                label['bg'] = COLOR['sq_not_won']
+
+        # Reset game board squares to starting configurations.
         for i, lbl in enumerate(self.board_labels):
             lbl.config(text=' ',
                        height=1, width=2,
@@ -516,8 +529,8 @@ class TicTacToeGUI(tk.Tk):
                          lambda event, lbl_idx=i:
                          self.human_turn(self.board_labels[lbl_idx])
                          )
-                lbl.bind('<Enter>', lambda event, l=lbl: self.on_enter(l))
-                lbl.bind('<Leave>', lambda event, l=lbl: self.on_leave(l))
+                lbl.bind('<Enter>', lambda event, l=lbl: on_enter(l))
+                lbl.bind('<Leave>', lambda event, l=lbl: on_leave(l))
 
     def unbind_game_board(self) -> None:
         """
@@ -530,32 +543,6 @@ class TicTacToeGUI(tk.Tk):
             lbl.unbind('<Enter>')
             lbl.unbind('<Leave>')
         utils.keybindings(self, 'unbind_board')
-
-    @staticmethod
-    def on_enter(label: tk) -> None:
-        """
-        On mouseover, indicate game board square with a COLOR change.
-
-        :param label: The tk.Label object.
-        :return: None
-       """
-        if label['bg'] == COLOR['sq_not_won'] and label['text'] == ' ':
-            label['bg'] = COLOR['sq_mouseover']
-        else:  # The square has already been played.
-            label['bg'] = COLOR['sq_not_won']
-
-    @staticmethod
-    def on_leave(label: tk):
-        """
-        On mouse leave, game board square returns to entered COLOR.
-
-        :param label: The tk.Label object.
-        :return: None
-        """
-        if label['bg'] == COLOR['sq_mouseover']:
-            label['bg'] = COLOR['sq_not_won']
-        elif label['bg'] == COLOR['sq_not_won']:
-            label['bg'] = COLOR['sq_not_won']
 
     def disable(self, *group: str) -> None:
         """
@@ -823,7 +810,7 @@ class TicTacToeGUI(tk.Tk):
 
     def play_rudiments(self, turn_number: int, mark: str, pvpc=False) -> None:
         """
-        The rules engine for basic play, look for a win or block.
+        The rules engine for basic play to win or block.
 
         :param turn_number: Current turn count from turn_number().
         :param mark: The played mark string character.
@@ -887,7 +874,7 @@ class TicTacToeGUI(tk.Tk):
 
         Strategy in decreasing priority: defend center, sides, corners.
 
-        :param turn_number: The current turn number, from turn_number().
+        :param turn_number: Current turn count from turn_number().
         :param mark: The played mark character, as string.
         :param pvpc: Use when called from a P v PC mode (default, False).
 
@@ -973,7 +960,7 @@ class TicTacToeGUI(tk.Tk):
 
         Used for 'strategy' play modes.
 
-        :param turn_number: The current turn number, from turn_number().
+        :param turn_number: Current turn count from turn_number().
         :param mark: The played mark character, as string.
         :param pvpc: Use when called from a P vs PC mode (default, False).
 
@@ -993,10 +980,10 @@ class TicTacToeGUI(tk.Tk):
                 break
 
     def play_random(self, turn_number: int, mark: str) -> None:
-        """ Play *mark* in a random position of board_labels index.
+        """ Play a random position in board_labels.
 
+        :param turn_number: Current turn count from turn_number().
         :param mark: The player's mark string to play.
-        :param turn_number: The current turn number, from turn_number().
 
         :return: None
         """
@@ -1177,7 +1164,10 @@ class TicTacToeGUI(tk.Tk):
         """
 
         # Game result needs to be displayed, but first freeze game actions.
-        self.block_player_action()
+        self.unbind_game_board()
+        self.quit_button.config(state=tk.DISABLED)
+        self.disable('player_modes', 'auto_modes', 'auto_controls')
+
         self.whose_turn.set('Game pending...')
         self.whose_turn_lbl.config(bg=COLOR['tk_white'])
 
@@ -1264,18 +1254,6 @@ class TicTacToeGUI(tk.Tk):
         again.pack(pady=(0, 0))
         not_again.pack(pady=5)
 
-    def block_player_action(self) -> None:
-        """
-        Prevent user action in app window while Game Status window is open.
-
-        Called from display_status().
-
-        :return: None
-        """
-        self.unbind_game_board()
-        self.quit_button.config(state=tk.DISABLED)
-        self.disable('player_modes', 'auto_modes', 'auto_controls')
-
     def new_game(self) -> None:
         """
         Set up the next game. Called from display_status().
@@ -1358,11 +1336,9 @@ class TicTacToeGUI(tk.Tk):
 
     def auto_command(self) -> None:
         """
-        Check that an autoplay mode is selected before calling auto_start().
+        Manage on/off commands of auto_go_stop_radiobtn Radiobutton.
 
         Toggles text displayed on auto_go_stop_radiobtn.
-        Called from auto_go_stop_radiobtn Radiobutton.
-
         :return: None
         """
         if self.auto_go_stop_txt.get() == 'Start auto':
@@ -1381,10 +1357,10 @@ class TicTacToeGUI(tk.Tk):
 
     def auto_start(self) -> None:
         """
-        Set starting values for autoplay; disable modes during autoplay.
+        Set starting values for autoplay; call selected Autoplay method.
 
         Display number of auto turns remaining.
-
+        Disable modes during autoplay.
         :return: None
         """
         self.auto_setup()
