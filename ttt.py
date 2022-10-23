@@ -406,29 +406,31 @@ class TicTacToeGUI(tk.Tk):
                 padx=(0, 80), pady=(16, 0), sticky=tk.E)
 
         if MY_OS in 'win, dar':
-            padx = (5, 0)
+            mode_padx = (5, 0)
         else:  # is Linux
-            padx = 0
+            mode_padx = 0
+
         self.auto_random_mode.grid(
             row=8, column=0,
-            padx=padx, pady=(4, 0), sticky=tk.W)
+            padx=mode_padx, pady=(4, 0), sticky=tk.W)
         self.auto_center_mode.grid(
             row=9, column=0,
-            padx=padx, pady=0, sticky=tk.W)
+            padx=mode_padx, pady=0, sticky=tk.W)
         self.auto_strategy_mode.grid(
             row=10, column=0,
-            padx=padx, pady=0, sticky=tk.W)
+            padx=mode_padx, pady=0, sticky=tk.W)
 
         if MY_OS == 'win':
-            self.who_autostarts.grid(
-                row=11, column=0,
-                columnspan=2,
-                padx=(0, 50), pady=(0, 7), sticky=tk.E)
-        elif MY_OS in 'lin, dar':
-            self.who_autostarts.grid(
-                row=11, column=0,
-                columnspan=2,
-                padx=(0, 17), pady=(0, 7), sticky=tk.E)
+            who_padx = (0, 50)
+        elif MY_OS == 'lin':
+            who_padx = (0, 17)
+        else:  # is macOS (dar)
+            who_padx = (0, 27)
+
+        self.who_autostarts.grid(
+            row=11, column=0,
+            columnspan=2,
+            padx=who_padx, pady=(0, 7), sticky=tk.E)
 
         self.quit_button.grid(
             row=11, column=2,
