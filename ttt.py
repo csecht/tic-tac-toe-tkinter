@@ -116,16 +116,16 @@ class TicTacToeGUI(tk.Tk):
         self.mode_clicked = tk.StringVar()
         self.pvp_mode = tk.Radiobutton()
         self.pvpc_mode = tk.Radiobutton()
-        self.choose_pc_pref = ttk.Combobox()
         self.pc_pref = tk.StringVar()
+        self.choose_pc_pref = ttk.Combobox()
+
         self.auto_random_mode = tk.Radiobutton()
         self.auto_strategy_mode = tk.Radiobutton()
         self.auto_center_mode = tk.Radiobutton()
         self.auto_start_stop = ttk.Button()
-
         self.who_autostarts = ttk.Button()
-        self.autospeed_lbl = tk.Label()
         self.autospeed_selection = tk.StringVar()
+        self.autospeed_lbl = tk.Label()
         self.autospeed_fast = tk.Radiobutton()
         self.autospeed_slow = tk.Radiobutton()
 
@@ -405,11 +405,7 @@ class TicTacToeGUI(tk.Tk):
                 columnspan=2,
                 padx=(0, 80), pady=(16, 0), sticky=tk.E)
 
-        if MY_OS in 'win, dar':
-            mode_padx = (5, 0)
-        else:  # is Linux
-            mode_padx = 0
-
+        mode_padx = 0 if MY_OS == 'lin' else (5, 0)  # is Windows or macOS
         self.auto_random_mode.grid(
             row=8, column=0,
             padx=mode_padx, pady=(4, 0), sticky=tk.W)
@@ -445,18 +441,30 @@ class TicTacToeGUI(tk.Tk):
         self.prev_game_num.set(0)
         self.ties_num.set(0)
 
+        # ttk.Buttons are used b/c tk.Buttons cannot be configured in macOS.
+        style = ttk.Style()
+        style.map('My.TButton',
+                  foreground=[('pressed', COLOR['disabled_fg']),
+                              ('active', COLOR['mark_fg']),
+                              ('disabled', COLOR['disabled_fg']),
+                              ],
+                  background=[('pressed', COLOR['tk_white']),
+                              ('active', COLOR['button_bg']),
+                              ]
+                  )
+        style.configure('My.TButton', font=FONT['sm_button'])
+
         # Player's turn widgets.
         self.prev_game_num_header.config(text='Games played',
                                          font=FONT['condensed'])
         self.prev_game_num_lbl.config(textvariable=self.prev_game_num,
                                       font=FONT['condensed'])
+
+        whose_w = 13 if MY_OS == 'dar' else 16  # is Linux or Windows
         self.whose_turn_lbl.config(textvariable=self.whose_turn,
                                    font=FONT['who'],
-                                   height=4)
-        if MY_OS in 'lin, win':  # is Linux or Windows
-            self.whose_turn_lbl.config(width=16)
-        else:  # is macOS
-            self.whose_turn_lbl.config(width=13)
+                                   height=4,
+                                   width=whose_w)
 
         self.ready_player_one()  # Starting prompt for Player1 to begin play.
         self.auto_turns_header.config(text='Turns to go',
@@ -513,20 +521,19 @@ class TicTacToeGUI(tk.Tk):
 
         # choose_pc_pref is enabled as readonly when pvpc_mode is selected.
         #   Set drop-down list font size to match displayed font size.
-        #   Set random, 1st in tuple, as the default.
-        self.choose_pc_pref.config(font=FONT['condensed'],
-                                   width=14,
+        pcpref_w = 13 if MY_OS == 'dar' else 14  # is Linux or Windows
+        self.choose_pc_pref.config(textvariable=self.pc_pref,
+                                   font=FONT['condensed'],
+                                   width=pcpref_w,
                                    values=('PC plays random',
                                            'PC plays center',
                                            'PC plays strategy'),
-                                   textvariable=self.pc_pref,
                                    state=tk.DISABLED)
         self.option_add("*TCombobox*Font", FONT['condensed'])
-        if MY_OS == 'dar':
-            self.choose_pc_pref.config(width=13)
-        self.choose_pc_pref.current(0)
         self.choose_pc_pref.bind('<<ComboboxSelected>>',
                                  lambda _: self.reset_game_and_score())
+        #  Set random, 1st in tuple, as the default.
+        self.choose_pc_pref.current(0)
 
         self.separator.configure(orient='horizontal')
 
@@ -558,34 +565,19 @@ class TicTacToeGUI(tk.Tk):
                                    value='slow',
                                    command=self.autospeed_control)
         self.autospeed_slow.select()  # Set default auto-speed to 'slow'.
-
-        # ttk.Buttons are used b/c tk.Buttons cannot be configured in macOS.
-        style = ttk.Style()
-        style.map('My.TButton',
-                  foreground=[('pressed', COLOR['disabled_fg']),
-                              ('active', COLOR['mark_fg']),
-                              ('disabled', COLOR['disabled_fg']),
-                              ],
-                  background=[('pressed', COLOR['tk_white']),
-                              ('active', COLOR['button_bg']),
-                              ]
-                  )
-        style.configure('My.TButton', font=FONT['sm_button'])
-
-        self.auto_start_stop.config(style='My.TButton',
-                                    text='Start Autoplay',
-                                    state=tk.DISABLED,
+        self.auto_start_stop.config(text='Start Autoplay',
+                                    style='My.TButton',
                                     width=0,
+                                    state=tk.DISABLED,
                                     command=self.auto_command)
-
-        self.who_autostarts.configure(style="My.TButton",
-                                      text='Player 1 starts',
+        self.who_autostarts.configure(text='Player 1 starts',
+                                      style='My.TButton',
                                       width=14,
                                       state=tk.DISABLED,
                                       command=self.autostart_who)
 
-        self.quit_button.config(style="My.TButton",
-                                text='Quit',
+        self.quit_button.config(text='Quit',
+                                style='My.TButton',
                                 width=4,
                                 command=lambda: utils.quit_game(mainloop=app))
 
