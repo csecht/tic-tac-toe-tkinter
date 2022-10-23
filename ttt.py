@@ -419,10 +419,17 @@ class TicTacToeGUI(tk.Tk):
             row=10, column=0,
             padx=padx, pady=0, sticky=tk.W)
 
-        self.who_autostarts.grid(
-            row=11, column=0,
-            columnspan=2,
-            padx=(0, 50), pady=(0, 7), sticky=tk.E)
+        if MY_OS == 'win':
+            self.who_autostarts.grid(
+                row=11, column=0,
+                columnspan=2,
+                padx=(0, 50), pady=(0, 7), sticky=tk.E)
+        elif MY_OS in 'lin, dar':
+            self.who_autostarts.grid(
+                row=11, column=0,
+                columnspan=2,
+                padx=(0, 17), pady=(0, 7), sticky=tk.E)
+
         self.quit_button.grid(
             row=11, column=2,
             padx=(0, 8), pady=(0, 7), sticky=tk.E)
