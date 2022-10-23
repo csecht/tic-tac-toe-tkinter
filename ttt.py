@@ -65,11 +65,10 @@ class TicTacToeGUI(tk.Tk):
     #   memory usage and maybe improved performance.
     __slots__ = (
         'after_id', 'auto_marks',
-        'auto_go_stop_radiobtn', 'auto_go_stop_txt',
-        'auto_random_mode', 'auto_strategy_mode', 'auto_center_mode',
-        'auto_turns_header', 'auto_turns_lbl', 'auto_turns_remaining',
-        'autoplay_on', 'autospeed_fast', 'autospeed_lbl',
-        'autospeed_selection', 'autospeed_slow',
+        'auto_start_stop', 'auto_random_mode', 'auto_strategy_mode',
+        'auto_center_mode', 'auto_turns_header', 'auto_turns_lbl',
+        'auto_turns_remaining', 'autospeed_fast', 'autospeed_slow',
+        'autospeed_lbl', 'autospeed_selection',
         'board_labels', 'choose_pc_pref', 'pc_pref',
         'curr_pmode', 'curr_automode', 'mode_clicked',
         'p1_points', 'p1_score', 'p2_points', 'p2_score',
@@ -122,9 +121,8 @@ class TicTacToeGUI(tk.Tk):
         self.auto_random_mode = tk.Radiobutton()
         self.auto_strategy_mode = tk.Radiobutton()
         self.auto_center_mode = tk.Radiobutton()
-        self.autoplay_on = tk.BooleanVar()
-        self.auto_go_stop_radiobtn = tk.Radiobutton()
-        self.auto_go_stop_txt = tk.StringVar()
+        self.auto_start_stop = ttk.Button()
+
         self.who_autostarts = ttk.Button()
         self.autospeed_lbl = tk.Label()
         self.autospeed_selection = tk.StringVar()
@@ -363,10 +361,10 @@ class TicTacToeGUI(tk.Tk):
             columnspan=3,
             padx=10, sticky=tk.EW)
 
-        self.auto_go_stop_radiobtn.grid(
+        self.auto_start_stop.grid(
             row=8, column=1,
             rowspan=2,
-            padx=(16, 0), pady=(6, 0), sticky=tk.W)
+            padx=(9, 0), pady=(6, 0), sticky=tk.W)
 
         if MY_OS == 'dar':
             self.autospeed_lbl.grid(
@@ -537,14 +535,6 @@ class TicTacToeGUI(tk.Tk):
                                        variable=self.mode_clicked,
                                        value='Autoplay strategy',
                                        command=self.mode_control)
-        self.auto_go_stop_radiobtn.config(textvariable=self.auto_go_stop_txt,
-                                          font=FONT['button'],
-                                          variable=self.autoplay_on,
-                                          fg=COLOR['mark_fg'],
-                                          bg=COLOR['radiobtn_bg'],
-                                          borderwidth=2,
-                                          indicatoron=False,
-                                          command=self.auto_command)
         self.autospeed_lbl.config(text='Auto-speed',
                                   font=FONT['condensed'])
         self.autospeed_fast.config(text='Fast',
@@ -559,9 +549,6 @@ class TicTacToeGUI(tk.Tk):
                                    command=self.autospeed_control)
         self.autospeed_slow.select()  # Set default auto-speed to 'slow'.
 
-        self.auto_go_stop_txt.set('Start auto')
-        self.auto_go_stop_radiobtn.config(state=tk.DISABLED)
-
         # ttk.Buttons are used b/c tk.Buttons cannot be configured in macOS.
         style = ttk.Style()
         style.map('My.TButton',
@@ -570,10 +557,17 @@ class TicTacToeGUI(tk.Tk):
                               ('disabled', COLOR['disabled_fg']),
                               ],
                   background=[('pressed', COLOR['tk_white']),
-                              ('active', COLOR['radiobtn_bg']),
+                              ('active', COLOR['button_bg']),
                               ]
                   )
         style.configure('My.TButton', font=FONT['sm_button'])
+
+        self.auto_start_stop.config(style='My.TButton',
+                                    text='Start Autoplay',
+                                    state=tk.DISABLED,
+                                    width=0,
+                                    command=self.auto_command)
+
         self.who_autostarts.configure(style="My.TButton",
                                       text='Player 1 starts',
                                       width=14,
@@ -658,7 +652,7 @@ class TicTacToeGUI(tk.Tk):
             self.auto_strategy_mode.config(state=tk.DISABLED)
 
         if 'auto_controls' in group:
-            self.auto_go_stop_radiobtn.config(state=tk.DISABLED)
+            self.auto_start_stop.config(state=tk.DISABLED)
             self.who_autostarts.configure(state=tk.DISABLED)
             self.autospeed_fast.config(state=tk.DISABLED)
             self.autospeed_slow.config(state=tk.DISABLED)
@@ -711,7 +705,7 @@ class TicTacToeGUI(tk.Tk):
                 self.ready_player_one()
                 utils.keybindings(self, 'bind_board')
             else:  # One of the auto modes was clicked.
-                self.auto_go_stop_radiobtn.config(state=tk.NORMAL)
+                self.auto_start_stop.config(state=tk.NORMAL)
                 self.who_autostarts.configure(state=tk.NORMAL)
                 self.autospeed_fast.config(state=tk.NORMAL)
                 self.autospeed_slow.config(state=tk.NORMAL)
@@ -1347,8 +1341,11 @@ class TicTacToeGUI(tk.Tk):
 
     def new_game(self) -> None:
         """
-        Set up the next game. Called from display_status.restart_game().
+        Set configurations for a new game.
 
+        Called from display_status.restart_game().
+        Calls to setup_game_board(); conditionally to ready_player_one(),
+        utils.keybindings(), pc_turn(), reset_game_and_score().
         return: None
         """
         mode = self.mode_clicked.get()
@@ -1399,8 +1396,8 @@ class TicTacToeGUI(tk.Tk):
             self.reset_game_and_score()
             self.auto_turns_remaining.set(0)
             self.auto_marks = ''
-            self.auto_go_stop_txt.set('Start auto')
-            self.auto_go_stop_radiobtn.config(state=tk.NORMAL)
+            self.auto_start_stop.config(text='Start Autoplay',
+                                        state=tk.NORMAL)
             self.who_autostarts.configure(state=tk.NORMAL)
             self.choose_pc_pref.config(state=tk.DISABLED)
 
@@ -1429,22 +1426,22 @@ class TicTacToeGUI(tk.Tk):
 
     def auto_command(self) -> None:
         """
-        Manage on/off commands of auto_go_stop_radiobtn Radiobutton.
+        Manage on/off commands of auto_start_stop Button.
 
-        Toggles text displayed on auto_go_stop_radiobtn.
+        Toggles text displayed on auto_start_stop.
+        Calls to auto_start(), auto_stop().
         :return: None
         """
-        if self.auto_go_stop_txt.get() == 'Start auto':
+        if self.auto_start_stop['text'] == 'Start Autoplay':
+
             if 'Autoplay' in self.mode_clicked.get():
-                self.auto_go_stop_txt.set('Stop auto')
+                self.auto_start_stop['text'] = 'Stop Autoplay'
                 self.auto_start()
             else:
-                self.auto_go_stop_txt.set('Start auto')
+                self.auto_start_stop['text'] = 'Start Autoplay'
         else:
-            self.auto_go_stop_txt.set('Start auto')
+            self.auto_start_stop['text'] = 'Start Autoplay'
             self.auto_stop('canceled')
-
-        self.autoplay_on.set(True)  # Required for bg color when 'on'.
 
     def auto_start(self) -> None:
         """
@@ -1463,7 +1460,7 @@ class TicTacToeGUI(tk.Tk):
         self.auto_turns_header.config(fg='black')
         self.auto_turns_lbl.config(fg='black')
 
-        self.auto_go_stop_radiobtn.config(state=tk.NORMAL)
+        self.auto_start_stop.config(state=tk.NORMAL)
         self.who_autostarts.config(state=tk.DISABLED)
 
         # Provide alternating pc player marks in autoplay turns;

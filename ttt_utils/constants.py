@@ -75,7 +75,7 @@ COLOR = {'score_fg': 'DodgerBlue4',
          'sq_won': 'blue',
          'sq_not_won': 'black',
          'sq_mouseover': 'grey15',
-         'radiobtn_bg': 'DodgerBlue1',
+         'button_bg': 'DodgerBlue1',
          }
 
 # Need tk to match system's default white shade.
