@@ -567,17 +567,16 @@ class TicTacToeGUI(tk.Tk):
         style.map('My.TButton',
                   foreground=[('pressed', COLOR['disabled_fg']),
                               ('active', COLOR['mark_fg']),
-                              ('disabled', COLOR['disabled_fg'],)
+                              ('disabled', COLOR['disabled_fg']),
                               ],
                   background=[('pressed', COLOR['tk_white']),
-                              ('active', COLOR['radiobtn_bg'],)
-                              ],
+                              ('active', COLOR['radiobtn_bg']),
+                              ]
                   )
         style.configure('My.TButton', font=FONT['sm_button'])
         self.who_autostarts.configure(style="My.TButton",
                                       text='Player 1 starts',
                                       width=14,
-                                      takefocus=True,
                                       state=tk.DISABLED,
                                       command=self.autostart_who)
 
@@ -620,7 +619,7 @@ class TicTacToeGUI(tk.Tk):
             else:  # is Linux or Windows.
                 lbl.config(highlightthickness=6)
 
-            if not self.autoplay_on.get():  # Is in PvP or PvPC mode.
+            if self.mode_clicked.get() in 'pvp, pvpc':
                 lbl.bind('<Button-1>',
                          lambda event, lbl_idx=i:
                          self.human_turn(self.board_labels[lbl_idx])
@@ -1086,7 +1085,7 @@ class TicTacToeGUI(tk.Tk):
             random_idx = random.randrange(0, 9)
             if self.board_labels[random_idx]['text'] == ' ':
                 self.board_labels[random_idx]['text'] = mark
-                if not self.autoplay_on.get():
+                if self.mode_clicked.get() in 'pvp, pvpc':
                     self.color_pc_mark(random_idx)
 
     def turn_number(self) -> int:
@@ -1438,16 +1437,14 @@ class TicTacToeGUI(tk.Tk):
         if self.auto_go_stop_txt.get() == 'Start auto':
             if 'Autoplay' in self.mode_clicked.get():
                 self.auto_go_stop_txt.set('Stop auto')
-                self.autoplay_on.set(True)
                 self.auto_start()
             else:
                 self.auto_go_stop_txt.set('Start auto')
-                self.autoplay_on.set(False)
-
         else:
             self.auto_go_stop_txt.set('Start auto')
-            self.autoplay_on.set(False)
             self.auto_stop('canceled')
+
+        self.autoplay_on.set(True)  # Required for bg color when 'on'.
 
     def auto_start(self) -> None:
         """
