@@ -1410,8 +1410,8 @@ class TicTacToeGUI(tk.Tk):
         Set game number and player points to zero.
 
         Called from mode_control() when user changes between PvP and
-        PvPC or changes PvPC play mode, and from auto_start(),
-        new_game(), and Combobox selection bindings.
+        PvPC or changes PvPC play mode, from new_game() when in Autoplay
+        mode, from auto_start(), and from Combobox selection bindings.
 
         :return: None
         """
@@ -1547,28 +1547,29 @@ class TicTacToeGUI(tk.Tk):
 
     def autospeed_control(self, after_type='game') -> int:
         """
-        Set after() times used in auto_flash_game() and autoplay modes.
+        Set after() times used in auto_flash_game() and Autoplay modes.
 
         Called from autospeed_fast and autospeed_slow Radiobuttons;
         from auto_flash_game() to set time for erasing flash color;
         from each autoplay_* method to set time between game restarts.
+        The *after_type* param is used as a default argument for
+        convenience of calling this method as a Radiobutton command.
 
-        :param after_type: function type to be paused;
-                           either "game" (default) or "flash".
+        :param after_type: Function type to be paused; 'game' (default),
+                          'flash', or 'fast'.
         :return: Milliseconds to use in after() calls.
         """
 
         if self.autospeed_selection.get() == 'fast':
             after_time = const.AUTO_FAST
-        else:
+        else:  # Is 'game' or 'flash' (or a misspelled argument call).
             after_time = const.AUTO_SLOW
 
-        # Note: Erase time needs to be less than after_time time for
-        #   proper display of game board winner/tie flash.
-        erase_after = int(after_time * 0.9)
-
+        # Note: *after_type* 'flash' is called from auto_flash_game()
+        #   where the flash time needs to be less than the after_time
+        #   time; this allows proper operation of auto_flash_game().
         if after_type == 'flash':
-            return erase_after
+            after_time = int(after_time * 0.9)
 
         return after_time
 
@@ -1703,24 +1704,25 @@ class TicTacToeGUI(tk.Tk):
 
         # Need a pause so user can see what play was made and also
         #   allow auto_stop() to break the call cycle.
+        # On tie games, the last mark played is not displayed: reason unk.
         self.after_id = app.after(self.autospeed_control('game'), auto_method)
 
     def auto_flash_game(self, combo: tuple, mark: str) -> None:
         """
         For each auto_play game, flashes the marks for win or tie.
 
-        On ties, flashes only the enter square (*combo* = (4, 4, 4);
-        *mark* = 'TIE'). On wins, flashes the winning marks.
+        On ties, flashes the played board, then the center with 'TIE'
+        On wins, flashes the winning marks.
+        Timing is everything.
         Calls auto_setup() for the next auto_play() game.
-        Note that on a tie, the last played mark does not show on the
-        game board before the flash.
 
         Derived from Bryan Oakley's answer for
         how-to-make-a-button-flash-using-after-in-tkinter
         https://stackoverflow.com/a/57298778
         :param combo: The tuple index values for the board_labels
-                      squares to flash.
+                    squares to flash. For tie games call with (4, 4, 4).
         :param mark: The winning player's mark, usually 'X' or 'O'.
+                     For tie games call with 'TIE'.
         """
         _x, _y, _z = combo
 
@@ -1734,6 +1736,14 @@ class TicTacToeGUI(tk.Tk):
             self.board_labels[_x].config(text=' ', bg=COLOR['sq_not_won'])
             self.board_labels[_y].config(text=' ', bg=COLOR['sq_not_won'])
             self.board_labels[_z].config(text=' ', bg=COLOR['sq_not_won'])
+
+        # On a tie game, flash the board, then 'TIE' in center square.
+        #   Flashing the board assures display of the last played *mark*.
+        if mark == 'TIE':
+            for lbl in self.board_labels:
+                lbl.config(bg=COLOR['sq_won'])
+                app.update_idletasks()
+            app.after(self.autospeed_control('fast'))
 
         # after() time of 1ms is needed for the flash to work.
         app.after(1, flash_show)
