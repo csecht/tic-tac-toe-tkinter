@@ -729,7 +729,7 @@ class TicTacToeGUI(tk.Tk):
         else:
             self.whose_turn.set(f'{PLAYER1} plays {P1_MARK}')
 
-        self.whose_turn_lbl.config(bg=COLOR['player_one'])
+        self.whose_turn_lbl.config(bg=COLOR['status_bg'])
 
     def human_turn(self, played_lbl: tk) -> None:
         """
@@ -1084,7 +1084,7 @@ class TicTacToeGUI(tk.Tk):
 
     def turn_number(self) -> int:
         """
-        Keep count of turns per game.
+        Keep count of turns taken during a game.
 
         Count number of board_labels squares with text other than a space.
 
@@ -1094,7 +1094,7 @@ class TicTacToeGUI(tk.Tk):
 
     def check_winner(self, mark: str) -> None:
         """
-        Check board_labels text values for win or tie index combinations.
+        Check played board_labels index combinations for a win or tie.
 
         :param mark: The played mark character to check for a win.
         :return: None

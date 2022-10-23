@@ -68,7 +68,6 @@ AUTO_SLOW = 1000  # Slow cycle time for all autoplay modes.
 # Foreground and background colors.
 COLOR = {'score_fg': 'DodgerBlue4',
          'status_bg': 'yellow3',
-         'player_one': 'yellow3',
          'disabled_fg': 'grey65',
          'tk_white': '',
          'mark_fg': 'yellow2',
