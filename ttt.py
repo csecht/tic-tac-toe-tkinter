@@ -399,11 +399,11 @@ class TicTacToeGUI(tk.Tk):
             self.autospeed_fast.grid(
                 row=9, column=1,
                 columnspan=2,
-                padx=(150, 0), pady=(16, 0), sticky=tk.W)
+                padx=(180, 0), pady=(16, 0), sticky=tk.W)
             self.autospeed_slow.grid(
                 row=9, column=1,
                 columnspan=2,
-                padx=(0, 40), pady=(16, 0), sticky=tk.E)
+                padx=(0, 80), pady=(16, 0), sticky=tk.E)
 
         if MY_OS in 'win, dar':
             padx = (5, 0)
@@ -421,10 +421,11 @@ class TicTacToeGUI(tk.Tk):
 
         self.who_autostarts.grid(
             row=11, column=0,
-            padx=(10, 0), pady=5, sticky=tk.W)
+            columnspan=2,
+            padx=(0, 50), pady=(0, 7), sticky=tk.E)
         self.quit_button.grid(
             row=11, column=2,
-            padx=5, pady=5, sticky=tk.E)
+            padx=(0, 8), pady=(0, 7), sticky=tk.E)
 
     def configure_widgets(self) -> None:
         """Initial configurations of app window widgets."""
