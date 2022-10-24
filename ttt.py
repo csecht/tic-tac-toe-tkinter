@@ -23,7 +23,7 @@ https://gist.github.com/riya1620/72c2b668ef29da061c44d97a82318572
 # Standard library imports:
 import random
 import sys
-from typing import Callable
+from typing import Callable  # Used only in auto_repeat()
 
 try:
     import tkinter as tk
@@ -1596,7 +1596,7 @@ class TicTacToeGUI(tk.Tk):
         """
         First play is always at the center position.
 
-        Subsequent autoplay preference is : win, block, random.
+        Subsequent play preference is : win, block, random.
 
         Number of turns is set by auto_marks, currently 1000 turns,
         which gives ~120 games or until stopped by user.
@@ -1699,7 +1699,6 @@ class TicTacToeGUI(tk.Tk):
 
         # Need a pause so user can see what play was made and also
         #   allow auto_stop() to break the call cycle.
-        # On tie games, the last mark played is not displayed: reason unk.
         self.after_id = app.after(self.autospeed_control('game'), auto_method)
 
     def auto_flash_game(self, combo: tuple, mark: str) -> None:
