@@ -184,7 +184,9 @@ class TicTacToeGUI(tk.Tk):
                 _col = 0
 
         # Squeeze everything in with pretty spanning, padding, and stickies.
-        #  Grid statements are sorted by row, then column.
+        #   Grid statements are sorted by row, then column.
+        # Developer: see all gridded objects against contrasting background.
+        # self.config(bg='purple')
 
         # Adjust gridding of whose_turn_lbl to avoid shifting when text changes.
         if MY_OS == 'lin':  # Linux
@@ -475,7 +477,7 @@ class TicTacToeGUI(tk.Tk):
                                    fg=COLOR['tk_white'])  # match default bg.
 
         # Players' scores widgets:
-        # Squiggle symbol, ︴, from https://coolsymbol.com/line-symbols.html
+        # Squiggle symbol, '︴', from https://coolsymbol.com/line-symbols.html
         self.score_header.config(
             text='Score ︴',
             font=FONT['scores'],
