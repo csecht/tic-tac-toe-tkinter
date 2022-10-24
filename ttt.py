@@ -972,13 +972,10 @@ class TicTacToeGUI(tk.Tk):
 
         :return: None
         """
-        opponent = P2_MARK if mark == P1_MARK else P1_MARK
 
-        # Create list of indices of opponent's played squares.
-        oppo_positions = []
-        for i in range(9):
-            if self.board_labels[i]['text'] == opponent:
-                oppo_positions.append(i)
+        # Get opponent's mark and list indices of its played squares.
+        oppo_mrk = P2_MARK if mark == P1_MARK else P1_MARK
+        oppo_list = [i for i in range(9) if self.board_labels[i]['text'] == oppo_mrk]
 
         # Always defend center, if available, in response to opponent's 1st turn.
         if turn_number == 1:
@@ -993,7 +990,7 @@ class TicTacToeGUI(tk.Tk):
         #   possibility of a loss.
         if turn_number == self.turn_number():
             for i in SIDES:
-                if self.board_labels[i]['text'] == opponent:
+                if self.board_labels[i]['text'] == oppo_mrk:
                     if self.board_labels[4]['text'] == ' ':
                         self.board_labels[4]['text'] = mark
                         if pvpc:
@@ -1011,7 +1008,7 @@ class TicTacToeGUI(tk.Tk):
 
             # Have PC play the appropriate corner to defend.
             for key, val in const.ORTHO_SIDES.items():
-                if self.board_labels[key]['text'] == ' ' and oppo_positions == val:
+                if self.board_labels[key]['text'] == ' ' and oppo_list == val:
                     self.board_labels[key]['text'] = mark
                     if pvpc:
                         self.color_pc_mark(key)
@@ -1023,7 +1020,7 @@ class TicTacToeGUI(tk.Tk):
         #   play to opponent's shared (nearest) corner.
         if turn_number == self.turn_number():
             for key, val in const.META_POSITIONS.items():
-                if self.board_labels[key]['text'] == ' ' and oppo_positions == val:
+                if self.board_labels[key]['text'] == ' ' and oppo_list == val:
                     self.board_labels[key]['text'] = mark
                     if pvpc:
                         self.color_pc_mark(key)
@@ -1037,8 +1034,8 @@ class TicTacToeGUI(tk.Tk):
             random.shuffle(SIDES)
             side2play = SIDES[0]
 
-            for i in const.PARA_CORNERS:
-                if i == oppo_positions:
+            for corner_list in const.PARA_CORNERS:
+                if corner_list == oppo_list:
                     self.board_labels[side2play]['text'] = mark
                     if pvpc:
                         self.color_pc_mark(side2play)
