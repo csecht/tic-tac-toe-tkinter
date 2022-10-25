@@ -4,7 +4,7 @@ Functions to check current Python version.
 minversion: Exit program if not minimum required version.
 maxversion: Warn if current version is newer than tested versions.
 """
-# Copyright (C) 2021-2022 C.S. Echt under GNU General Public License'
+# Copyright (C) 2021-2022 C.S. Echt under MIT License'
 
 import sys
 

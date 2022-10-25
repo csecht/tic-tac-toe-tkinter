@@ -3,7 +3,7 @@ Check that a supported system platform is present.
 Constants: MY_OS - abbreviated platform ID, used throughout main program.
 Functions: check_platform - called from ttt_utils.__init__ at startup.
 """
-# Copyright (C) 2021-2022 C.S. Echt under GNU General Public License'
+# Copyright (C) 2021-2022 C.S. Echt under MIT License'
 
 import sys
 import platform

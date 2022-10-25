@@ -9,7 +9,7 @@ KP2PLAY, KEYS2PLAY: strings of ordered keys for bind() functions.
 PLAY_AFTER, AUTO_FAST, AUTO_SLOW: ms integers for tk after() function.
 TIES, WINS: (unused) tuples of board end-game configurations, in index order.
 """
-# Copyright (C) 2022 C.S. Echt under GNU General Public License'
+# Copyright (C) 2022 C.S. Echt under MIT License'
 
 from ttt_utils import platform_check  # need MY_OS
 
