@@ -38,6 +38,7 @@ except (ImportError, ModuleNotFoundError) as error:
 # Local program imports:
 from ttt_utils import (platform_check,
                        vcheck,
+                       grid_this,
                        utils,
                        constants as const)
 from ttt_utils.constants import (PLAYER1, PLAYER2,
@@ -183,256 +184,17 @@ class TicTacToeGUI(tk.Tk):
                 _row += 1
                 _col = 0
 
-        # Squeeze everything in with pretty spanning, padding, and stickies.
-        #   Grid statements are sorted by row, then column.
         # Developer: see all gridded objects against contrasting background.
         # self.config(bg='purple')
 
-        # Adjust gridding of whose_turn_lbl to avoid shifting when text changes.
-        if MY_OS == 'lin':  # Linux
-            self.whose_turn_lbl.grid(
-                row=0, column=0,
-                padx=(12, 0), pady=(5, 0), sticky=tk.W)
-        else:  # macOS or Windows
-            self.whose_turn_lbl.grid(
-                row=0, column=0,
-                padx=0, pady=(5, 0))
-
-        if MY_OS in 'lin, dar':  # Linux or macOS (darwin)
-            self.prev_game_num_header.grid(
-                row=0, column=2,
-                rowspan=2,
-                padx=(0, 8), pady=(8, 0), sticky=tk.NE)
-            self.prev_game_num_lbl.grid(
-                row=0, column=2,
-                rowspan=2,
-                padx=(0, 8), pady=(22, 0), sticky=tk.NE)
-        else:  # is Windows
-            self.prev_game_num_header.grid(
-                row=0, column=2,
-                rowspan=2,
-                padx=(0, 8), pady=(13, 0), sticky=tk.NE)
-            self.prev_game_num_lbl.grid(
-                row=0, column=2,
-                rowspan=2,
-                padx=(0, 8), pady=(35, 0), sticky=tk.NE)
-
-        # There is duplication in the elif statements to allow easy editing and
-        #   cut/paste actions for platform-specific adjustments.
-        if MY_OS == 'dar':
-            self.score_header.grid(
-                row=0, column=1,
-                rowspan=2,
-                padx=(0, 0), pady=(0, 10), sticky=tk.W)
-            self.player1_header.grid(
-                row=0, column=1,
-                rowspan=2,
-                padx=(0, 13), pady=(0, 35), sticky=tk.E)
-            self.player2_header.grid(
-                row=0, column=1,
-                rowspan=2,
-                padx=(0, 13), pady=(20, 10), sticky=tk.E)
-        elif MY_OS == 'lin':
-            self.score_header.grid(
-                row=0, column=1,
-                rowspan=2,
-                padx=(10, 0), pady=(0, 10), sticky=tk.W)
-            self.player1_header.grid(
-                row=0, column=1,
-                rowspan=2,
-                padx=(0, 12), pady=(0, 35), sticky=tk.E)
-            self.player2_header.grid(
-                row=0, column=1,
-                rowspan=2,
-                padx=(0, 12), pady=(20, 10), sticky=tk.E)
-        else:  # is Windows
-            self.score_header.grid(
-                row=0, column=1,
-                rowspan=2,
-                padx=(10, 0), pady=(0, 10), sticky=tk.W)
-            self.player1_header.grid(
-                row=0, column=1,
-                rowspan=2,
-                padx=(0, 8), pady=(0, 45), sticky=tk.E)
-            self.player2_header.grid(
-                row=0, column=1,
-                rowspan=2,
-                padx=(0, 8), pady=(30, 10), sticky=tk.E)
-
-        if MY_OS in 'lin, dar':
-            self.player1_score_lbl.grid(
-                row=0, column=1,
-                rowspan=2, columnspan=2,
-                padx=(112, 0), pady=(0, 35), sticky=tk.W)
-            self.player2_score_lbl.grid(
-                row=0, column=1, rowspan=2, columnspan=2,
-                padx=(112, 0), pady=(20, 10), sticky=tk.W)
-        else:  # is Windows
-            self.player1_score_lbl.grid(
-                row=0, column=2,
-                rowspan=2,
-                padx=0, pady=(0, 50), sticky=tk.W)
-            self.player2_score_lbl.grid(
-                row=0, column=2,
-                rowspan=2,
-                padx=0, pady=(30, 10), sticky=tk.W)
-
-        self.auto_turns_lbl.grid(
-            row=0, column=2,
-            rowspan=2,
-            padx=(0, 8), pady=(0, 0), sticky=tk.SE)
-
-        if MY_OS in 'lin, dar':
-            self.auto_turns_header.grid(
-                row=0, column=2,
-                rowspan=2,
-                padx=(0, 8), pady=(0, 16), sticky=tk.SE)
-        else:  # is Windows
-            self.auto_turns_header.grid(
-                row=0, column=2,
-                rowspan=2,
-                padx=(0, 8), pady=(0, 30), sticky=tk.SE)
-
-        if MY_OS == 'dar':
-            self.ties_header.grid(
-                row=0, column=1,
-                rowspan=2,
-                padx=(0, 13), pady=(55, 0), sticky=tk.E)
-            self.ties_lbl.grid(
-                row=0, column=1,
-                rowspan=2, columnspan=2,
-                padx=(112, 0), pady=(55, 0), sticky=tk.W)
-        elif MY_OS == 'lin':
-            self.ties_header.grid(
-                row=0, column=1,
-                rowspan=2,
-                padx=(0, 12), pady=(55, 0), sticky=tk.E)
-            self.ties_lbl.grid(
-                row=0, column=1,
-                rowspan=2, columnspan=2,
-                padx=(112, 0), pady=(55, 0), sticky=tk.W)
-        else:  # is Windows
-            self.ties_header.grid(
-                row=0, column=1,
-                rowspan=2,
-                padx=(0, 8), pady=(85, 0), sticky=tk.E)
-            self.ties_lbl.grid(
-                row=0, column=2,
-                rowspan=2,
-                padx=0, pady=(85, 0), sticky=tk.W)
-
-        if MY_OS == 'dar':
-            self.pvp_mode.grid(
-                row=5, column=0,
-                padx=(20, 0), pady=5, sticky=tk.W)
-            self.pvpc_mode.grid(
-                row=5, column=1,
-                columnspan=2,
-                padx=(20, 0), pady=5, sticky=tk.W)
-            self.choose_pc_pref.grid(
-                row=5, column=1,
-                columnspan=2,
-                padx=(0, 25), pady=0, sticky=tk.E)
-        elif MY_OS == 'lin':
-            self.pvp_mode.grid(
-                row=5, column=0,
-                padx=(10, 0), pady=5, sticky=tk.W)
-            self.pvpc_mode.grid(
-                row=5, column=1,
-                columnspan=2,
-                padx=(0, 0), pady=5, sticky=tk.W)
-            self.choose_pc_pref.grid(
-                row=5, column=1,
-                columnspan=2,
-                padx=(0, 35), pady=0, sticky=tk.E)
-        else:  # is Windows
-            self.pvp_mode.grid(
-                row=5, column=0,
-                padx=(25, 0), pady=5, sticky=tk.W)
-            self.pvpc_mode.grid(
-                row=5, column=1,
-                columnspan=2,
-                padx=(30, 0), pady=5, sticky=tk.W)
-            self.choose_pc_pref.grid(
-                row=5, column=1,
-                columnspan=2,
-                padx=(0, 45), pady=0, sticky=tk.E)
-
-        self.separator.grid(
-            row=7, column=0,
-            columnspan=3,
-            padx=10, sticky=tk.EW)
-
-        self.auto_start_stop_btn.grid(
-            row=8, column=1,
-            rowspan=2,
-            padx=(9, 0), pady=(6, 0), sticky=tk.W)
-
-        if MY_OS == 'dar':
-            self.autospeed_lbl.grid(
-                row=8, column=1,
-                rowspan=2, columnspan=2,
-                padx=(0, 50), pady=(6, 0), sticky=tk.E)
-            self.autospeed_fast.grid(
-                row=9, column=1, columnspan=2,
-                padx=(0, 90), pady=(16, 0), sticky=tk.E)
-            self.autospeed_slow.grid(
-                row=9, column=1,
-                columnspan=2,
-                padx=(0, 30), pady=(16, 0), sticky=tk.E)
-        elif MY_OS == 'lin':
-            self.autospeed_lbl.grid(
-                row=8, column=1,
-                rowspan=2, columnspan=2,
-                padx=(0, 54), pady=(6, 0), sticky=tk.E)
-            self.autospeed_fast.grid(
-                row=9, column=1,
-                columnspan=2,
-                padx=(0, 100), pady=(16, 0), sticky=tk.E)
-            self.autospeed_slow.grid(
-                row=9, column=1,
-                columnspan=2,
-                padx=(0, 40), pady=(16, 0), sticky=tk.E)
-        else:  # is Windows
-            self.autospeed_lbl.grid(
-                row=8, column=2,
-                rowspan=2,
-                padx=(0, 0), pady=(6, 0), sticky=tk.W)
-            self.autospeed_fast.grid(
-                row=9, column=1,
-                columnspan=2,
-                padx=(180, 0), pady=(16, 0), sticky=tk.W)
-            self.autospeed_slow.grid(
-                row=9, column=1,
-                columnspan=2,
-                padx=(0, 80), pady=(16, 0), sticky=tk.E)
-
-        mode_padx = 0 if MY_OS == 'lin' else (5, 0)  # is Windows or macOS
-        self.auto_random_mode.grid(
-            row=8, column=0,
-            padx=mode_padx, pady=(4, 0), sticky=tk.W)
-        self.auto_center_mode.grid(
-            row=9, column=0,
-            padx=mode_padx, pady=0, sticky=tk.W)
-        self.auto_strategy_mode.grid(
-            row=10, column=0,
-            padx=mode_padx, pady=0, sticky=tk.W)
-
+        # All other OS-specific widget grid calls are in the gridding module.
+        # In these calls, 'self' refers to the mainloop, 'app'.
         if MY_OS == 'win':
-            who_padx = (0, 50)
+            grid_this.windows(self)
         elif MY_OS == 'lin':
-            who_padx = (0, 17)
-        else:  # is macOS (dar)
-            who_padx = (0, 27)
-
-        self.who_autostarts_btn.grid(
-            row=11, column=0,
-            columnspan=2,
-            padx=who_padx, pady=(0, 7), sticky=tk.E)
-
-        self.quit_button.grid(
-            row=11, column=2,
-            padx=(0, 8), pady=(0, 7), sticky=tk.E)
+            grid_this.linux(self)
+        else:
+            grid_this.mac(self)
 
     def configure_widgets(self) -> None:
         """Initial configurations of app window widgets."""
@@ -1031,7 +793,7 @@ class TicTacToeGUI(tk.Tk):
                     break
 
         # When opponent has played to opposite corners, defend with play to
-        #   any side.
+        #   a random side.
         if turn_number == self.turn_number():
             random.shuffle(SIDES)
             side2play = SIDES[0]
