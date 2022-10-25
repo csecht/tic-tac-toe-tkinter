@@ -161,18 +161,18 @@ class TicTacToeGUI(tk.Tk):
         _col = 0
 
         # Set platform-specific padding between board squares (board_labels).
-        if MY_OS == 'dar':  # macOS
-            pad = 6
-            ipadx = 0
-            ipady = 0
+        if MY_OS == 'win':  # Windows
+            pad = 8
+            ipadx = 10
+            ipady = 6
         elif MY_OS == 'lin':  # Linux
             pad = 0
             ipadx = 10
             ipady = 6
-        else:  # Windows
-            pad = 8
-            ipadx = 10
-            ipady = 6
+        else:  # macOS
+            pad = 6
+            ipadx = 0
+            ipady = 0
 
         for lbl in self.board_labels:
             lbl.grid(row=_row, column=_col,
@@ -187,8 +187,8 @@ class TicTacToeGUI(tk.Tk):
         # Developer: see all gridded objects against contrasting background.
         # self.config(bg='purple')
 
-        # All other OS-specific widget grid calls are in the gridding module.
-        # In these calls, 'self' refers to the mainloop, 'app'.
+        # All other OS-specific widget grid calls are in the grid_this module.
+        # In these calls, 'self' refers to the mainloop, 'app', this Class.
         if MY_OS == 'win':
             grid_this.windows(self)
         elif MY_OS == 'lin':
