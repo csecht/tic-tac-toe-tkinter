@@ -65,7 +65,7 @@ class TicTacToeGUI(tk.Tk):
     #   memory usage and maybe improved performance.
     __slots__ = (
         'after_id', 'auto_marks',
-        'auto_start_stop', 'auto_random_mode', 'auto_strategy_mode',
+        'auto_start_stop_btn', 'auto_random_mode', 'auto_strategy_mode',
         'auto_center_mode', 'auto_turns_header', 'auto_turns_lbl',
         'auto_turns_remaining', 'autospeed_fast', 'autospeed_slow',
         'autospeed_lbl', 'autospeed_selection',
@@ -78,7 +78,7 @@ class TicTacToeGUI(tk.Tk):
         'pvp_mode', 'pvpc_mode', 'quit_button',
         'status_calls', 'statuswin_geometry',
         'score_header', 'separator', 'ties_header', 'ties_lbl',
-        'ties_num', 'titlebar_offset', 'who_autostarts', 'whose_turn',
+        'ties_num', 'titlebar_offset', 'who_autostarts_btn', 'whose_turn',
         'whose_turn_lbl', 'winner_found',
     )
 
@@ -122,8 +122,8 @@ class TicTacToeGUI(tk.Tk):
         self.auto_random_mode = tk.Radiobutton()
         self.auto_strategy_mode = tk.Radiobutton()
         self.auto_center_mode = tk.Radiobutton()
-        self.auto_start_stop = ttk.Button()
-        self.who_autostarts = ttk.Button()
+        self.auto_start_stop_btn = ttk.Button()
+        self.who_autostarts_btn = ttk.Button()
         self.autospeed_selection = tk.StringVar()
         self.autospeed_lbl = tk.Label()
         self.autospeed_fast = tk.Radiobutton()
@@ -363,7 +363,7 @@ class TicTacToeGUI(tk.Tk):
             columnspan=3,
             padx=10, sticky=tk.EW)
 
-        self.auto_start_stop.grid(
+        self.auto_start_stop_btn.grid(
             row=8, column=1,
             rowspan=2,
             padx=(9, 0), pady=(6, 0), sticky=tk.W)
@@ -425,7 +425,7 @@ class TicTacToeGUI(tk.Tk):
         else:  # is macOS (dar)
             who_padx = (0, 27)
 
-        self.who_autostarts.grid(
+        self.who_autostarts_btn.grid(
             row=11, column=0,
             columnspan=2,
             padx=who_padx, pady=(0, 7), sticky=tk.E)
@@ -566,18 +566,20 @@ class TicTacToeGUI(tk.Tk):
                                    variable=self.autospeed_selection,
                                    value='slow',
                                    command=self.autospeed_control)
-        self.autospeed_slow.select()  # Set default auto-speed to 'slow'.
-        self.auto_start_stop.config(text='Start Autoplay',
-                                    style='My.TButton',
-                                    width=0,
-                                    state=tk.DISABLED,
-                                    command=self.auto_command)
-        self.who_autostarts.configure(text='Player 1 starts',
-                                      style='My.TButton',
-                                      width=14,
-                                      state=tk.DISABLED,
-                                      command=self.autostart_who)
+        # Set default auto-speed to 'slow'.
+        self.autospeed_slow.select()
 
+        # Configure ttk Buttons.
+        self.auto_start_stop_btn.config(text='Start Autoplay',
+                                        style='My.TButton',
+                                        width=0,
+                                        state=tk.DISABLED,
+                                        command=self.auto_command)
+        self.who_autostarts_btn.configure(text='Player 1 starts',
+                                          style='My.TButton',
+                                          width=14,
+                                          state=tk.DISABLED,
+                                          command=self.autostart_who)
         self.quit_button.config(text='Quit',
                                 style='My.TButton',
                                 width=4,
@@ -656,8 +658,8 @@ class TicTacToeGUI(tk.Tk):
             self.auto_strategy_mode.config(state=tk.DISABLED)
 
         if 'auto_controls' in group:
-            self.auto_start_stop.config(state=tk.DISABLED)
-            self.who_autostarts.configure(state=tk.DISABLED)
+            self.auto_start_stop_btn.config(state=tk.DISABLED)
+            self.who_autostarts_btn.configure(state=tk.DISABLED)
             self.autospeed_fast.config(state=tk.DISABLED)
             self.autospeed_slow.config(state=tk.DISABLED)
 
@@ -709,8 +711,8 @@ class TicTacToeGUI(tk.Tk):
                 self.ready_player_one()
                 utils.keybindings(self, 'bind_board')
             else:  # One of the auto modes was clicked.
-                self.auto_start_stop.config(state=tk.NORMAL)
-                self.who_autostarts.configure(state=tk.NORMAL)
+                self.auto_start_stop_btn.config(state=tk.NORMAL)
+                self.who_autostarts_btn.configure(state=tk.NORMAL)
                 self.autospeed_fast.config(state=tk.NORMAL)
                 self.autospeed_slow.config(state=tk.NORMAL)
                 self.whose_turn.set(mode_clicked)
@@ -1397,9 +1399,9 @@ class TicTacToeGUI(tk.Tk):
             self.reset_game_and_score()
             self.auto_turns_remaining.set(0)
             self.auto_marks = ''
-            self.auto_start_stop.config(text='Start Autoplay',
-                                        state=tk.NORMAL)
-            self.who_autostarts.configure(state=tk.NORMAL)
+            self.auto_start_stop_btn.config(text='Start Autoplay',
+                                            state=tk.NORMAL)
+            self.who_autostarts_btn.configure(state=tk.NORMAL)
             self.choose_pc_pref.config(state=tk.DISABLED)
 
     def reset_game_and_score(self) -> None:
@@ -1427,21 +1429,21 @@ class TicTacToeGUI(tk.Tk):
 
     def auto_command(self) -> None:
         """
-        Manage on/off commands of auto_start_stop Button.
+        Manage on/off commands of auto_start_stop_btn Button.
 
-        Toggles text displayed on auto_start_stop.
+        Toggles text displayed on auto_start_stop_btn.
         Calls to auto_start(), auto_stop().
         :return: None
         """
-        if self.auto_start_stop['text'] == 'Start Autoplay':
+        if self.auto_start_stop_btn['text'] == 'Start Autoplay':
 
             if 'Autoplay' in self.mode_clicked.get():
-                self.auto_start_stop['text'] = 'Stop Autoplay'
+                self.auto_start_stop_btn['text'] = 'Stop Autoplay'
                 self.auto_start()
             else:
-                self.auto_start_stop['text'] = 'Start Autoplay'
+                self.auto_start_stop_btn['text'] = 'Start Autoplay'
         else:
-            self.auto_start_stop['text'] = 'Start Autoplay'
+            self.auto_start_stop_btn['text'] = 'Start Autoplay'
             self.auto_stop('canceled')
 
     def auto_start(self) -> None:
@@ -1461,13 +1463,13 @@ class TicTacToeGUI(tk.Tk):
         self.auto_turns_header.config(fg='black')
         self.auto_turns_lbl.config(fg='black')
 
-        self.auto_start_stop.config(state=tk.NORMAL)
-        self.who_autostarts.config(state=tk.DISABLED)
+        self.auto_start_stop_btn.config(state=tk.NORMAL)
+        self.who_autostarts_btn.config(state=tk.DISABLED)
 
         # Provide alternating pc player marks in autoplay turns;
         #   The marks string is shortened one character per turn in the
         #   autoplay_* methods, and in auto_setup() depending on the
-        #   who_autostarts option.
+        #   who_autostarts_btn option.
         self.auto_marks = ''.join(map(lambda m1, m2: m1 + m2, MARKS1, MARKS2))
 
         # Start repeating calls to one of the autoplay methods;
@@ -1514,7 +1516,7 @@ class TicTacToeGUI(tk.Tk):
         self.p2_score.set(self.p2_points)
 
         if len(self.auto_marks) > 0:
-            if self.who_autostarts['text'] == 'Player 1 starts':
+            if self.who_autostarts_btn['text'] == 'Player 1 starts':
                 # All games start with P1_MARK.
                 self.auto_marks = self.auto_marks.lstrip(P2_MARK)
             else:
@@ -1529,16 +1531,16 @@ class TicTacToeGUI(tk.Tk):
 
     def autostart_who(self) -> None:
         """
-        Toggle who_autostarts Button text.
+        Toggle who_autostarts_btn Button text.
 
         Button's text content is used for conditions in auto_setup().
 
         :return: None
         """
-        if self.who_autostarts['text'] == 'Player 1 starts':
-            self.who_autostarts['text'] = 'Players alternate'
+        if self.who_autostarts_btn['text'] == 'Player 1 starts':
+            self.who_autostarts_btn['text'] = 'Players alternate'
         else:
-            self.who_autostarts['text'] = 'Player 1 starts'
+            self.who_autostarts_btn['text'] = 'Player 1 starts'
 
     def autospeed_control(self, after_type='game') -> int:
         """
