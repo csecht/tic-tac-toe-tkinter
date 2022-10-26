@@ -29,14 +29,14 @@ There are five play modes:
 - Player vs PC (computer)
 - Autoplay, random: Computer plays itself randomly; about 15% end in ties.
 - Autoplay, center: Prefers the center, then plays for win, then block, then random; ~60% tie games.
-- Autoplay, strategy: A game of defensive and offensive moves, with minimal use of random play. The priority of PC play is win, block, defend against opponent advantage, play a corner for advantage, play random; ~98% tie games.
+- Autoplay, tactics: A game of defensive and offensive moves, with minimal use of random play. The priority of PC play is win, block, defend against opponent advantage, play a corner for advantage, play random; ~98% tie games.
 
 In Player v PC game mode, the human Player can choose among options for the PC to play, as described above for the corresponding autoplay modes.
 - PC plays random; easiest to beat
 - PC plays center
-- PC plays strategy; hardest to beat
+- PC plays tactics; hardest to beat
 
-Wins, ties, and mode-specific PC moves are recorded in the Terminal window when "center" or "strategy" PC modes are selected. This output may help the human improve their game. Good luck!
+Wins, ties, and mode-specific PC moves are recorded in the Terminal window when "center" or "tactics" PC modes are selected. This output may help the human improve their game. Good luck!
 
 In Autoplay mode, the PC plays itself. You can choose to have Player 1 (X) start every game or have the PC Players 1 & 2 alternate game starts. 1000 turns are played. Fast mode is at a rate of about 10 turns per second, slow is one turn per second. Scores are updated in realtime through the turn series, giving about 110 to 130 games. Studying autoplay results in different play modes can be instructive for improving your game strategies!
 
@@ -46,7 +46,7 @@ Human (Player 1, X) wins 9th game in "PC plays center" mode. A Game Status pop-u
 
 ![pvpc-game](images/X_wins_PvPC.png)
 
-Autoplay game in progress with strategy mode, with PC players alternating start turns, 650 turns remaining, autoplay speed set to Slow, the default:
+Autoplay game in progress with tactics mode, with PC players alternating start turns, 745 turns remaining, autoplay speed set to Slow, the default:
 
 ![autoplay-game](images/autoplay.png)
 
