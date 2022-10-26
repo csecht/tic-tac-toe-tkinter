@@ -1,5 +1,6 @@
 """
-Utility functions for general ousekeeping.
+Utility functions for general housekeeping.
+check_platform: Exits if not a supported platform; adjust Windows scale.
 manage_args: Handles command line arguments.
 program_name:
 quit_gui: Safe and informative exit from the program.
@@ -9,12 +10,30 @@ quit_gui: Safe and informative exit from the program.
 # Standard library imports:
 import argparse
 import sys
+import platform
+
 from pathlib import Path
 
 # Local program imports:
 from __main__ import __doc__
 import ttt_utils  # Needed for __init__.py custom dunders and constants.
-from ttt_utils.constants import KP2PLAY, KEYS2PLAY
+from ttt_utils.constants import MY_OS, KP2PLAY, KEYS2PLAY
+
+
+def check_platform():
+    if MY_OS not in 'lin, win, dar':
+        print(f'Platform <{sys.platform}> is not supported.\n'
+              'Windows, Linux, and MacOS (darwin) are supported.')
+        sys.exit(1)
+
+    # Need to account for scaling in Windows10 and earlier releases.
+    if MY_OS == 'win':
+        from ctypes import windll
+
+        if platform.release() < '10':
+            windll.user32.SetProcessDPIAware()
+        else:
+            windll.shcore.SetProcessDpiAwareness(1)
 
 
 def keybindings(parent, state: str) -> None:

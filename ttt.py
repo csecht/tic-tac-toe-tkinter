@@ -36,17 +36,16 @@ except (ImportError, ModuleNotFoundError) as error:
           f'See also: https://tkdocs.com/tutorial/install.html \n{error}')
 
 # Local program imports:
-from ttt_utils import (platform_check,
-                       vcheck,
+from ttt_utils import (vcheck,
                        grid_this,
                        utils,
                        constants as const)
-from ttt_utils.constants import (PLAYER1, PLAYER2,
+from ttt_utils.constants import (MY_OS,
+                                 PLAYER1, PLAYER2,
                                  P1_MARK, P2_MARK,
                                  MARKS1, MARKS2,
                                  COLOR, FONT,
                                  SIDES, WINNING_COMBOS)
-from ttt_utils.platform_check import MY_OS
 
 
 class TicTacToeGUI(tk.Tk):
@@ -1519,7 +1518,7 @@ class TicTacToeGUI(tk.Tk):
 if __name__ == '__main__':
 
     # Run checks on supported platforms and Python versions; exit on fail.
-    platform_check.check_platform()
+    utils.check_platform()
     vcheck.minversion('3.7')
 
     # Check for invocation arguments (exit after running --about).

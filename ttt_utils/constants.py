@@ -1,5 +1,6 @@
 """
 Constants and configuration settings.
+MY_OS: the first 3 letters of current system platform.
 PLAYER1, PLAYER2: the displayed player names.
 P1_MARK, P2_MARK: 'X', 'O', respectively, but can be changed.
 MARKS1, MARKS2: strings of duplicate marks that determine number of auto turns.
@@ -11,7 +12,9 @@ TIES, WINS: (unused) tuples of board end-game configurations, in index order.
 """
 # Copyright (C) 2022 C.S. Echt under MIT License'
 
-from ttt_utils import platform_check  # need MY_OS
+from sys import platform
+
+MY_OS = platform[:3]
 
 # Used only for display of player ID.
 PLAYER1 = 'Player 1'
@@ -78,9 +81,9 @@ COLOR = {'score_fg': 'DodgerBlue4',
          }
 
 # Need tk to match system's default white shade.
-if platform_check.MY_OS == 'dar':  # macOS
+if MY_OS == 'dar':  # macOS
     COLOR['tk_white'] = 'white'
-elif platform_check.MY_OS == 'lin':  # Linux (Ubuntu)
+elif MY_OS == 'lin':  # Linux (Ubuntu)
     COLOR['tk_white'] = 'grey85'
 else:  # platform is 'win'  # Windows (10)
     COLOR['tk_white'] = 'grey95'
@@ -96,9 +99,9 @@ FONT = {
 }
 
 # Need to apply OS-specific font adjustments.
-if platform_check.MY_OS == 'lin':
+if MY_OS == 'lin':
     FONT['status'] = ('TkHeadingFont', 10, 'italic bold')
-elif platform_check.MY_OS == 'dar':
+elif MY_OS == 'dar':
     FONT['sm_button'] = ('TkHeadingFont', 10)
     FONT['who'] = ('TkHeadingFont', 11, 'italic bold')
     FONT['button'] = ('TkHeadingFont', 11, 'bold')
