@@ -178,7 +178,7 @@ class TicTacToeGUI(tk.Tk):
                      padx=pad, pady=pad,
                      ipadx=ipadx, ipady=ipady)
             _col += 1
-            # Grid three columns in a row, then move to next row and repeat.
+            # Grid 3 labels in 3 columns, then move to next row and repeat.
             if _col > 2:
                 _row += 1
                 _col = 0
@@ -375,7 +375,6 @@ class TicTacToeGUI(tk.Tk):
 
         for i, lbl in enumerate(self.board_labels):
             lbl.config(text=' ',
-                       # height=1,  # number of lines
                        width=2,  # number of characters
                        bg=COLOR['sq_not_won'],
                        fg=COLOR['mark_fg'],
