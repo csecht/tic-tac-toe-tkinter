@@ -68,7 +68,7 @@ def linux(parent):
     parent.pvpc_mode.grid(
         row=5, column=1,
         columnspan=2,
-        padx=(0, 0), pady=5, sticky=W)
+        padx=(10, 0), pady=5, sticky=W)
     parent.choose_pc_pref.grid(
         row=5, column=1,
         columnspan=2,
@@ -99,7 +99,7 @@ def linux(parent):
     parent.auto_center_mode.grid(
         row=9, column=0,
         padx=0, pady=0, sticky=W)
-    parent.auto_strategy_mode.grid(
+    parent.auto_tactics_mode.grid(
         row=10, column=0,
         padx=0, pady=0, sticky=W)
     parent.who_autostarts_btn.grid(
@@ -114,7 +114,7 @@ def linux(parent):
 def mac(parent):
     parent.whose_turn_lbl.grid(
         row=0, column=0,
-        padx=0, pady=(5, 0))
+        padx=(5, 0), pady=(5, 0))
     parent.prev_game_num_header.grid(
         row=0, column=2,
         rowspan=2,
@@ -160,15 +160,15 @@ def mac(parent):
         padx=(112, 0), pady=(55, 0), sticky=W)
     parent.pvp_mode.grid(
         row=5, column=0,
-        padx=(20, 0), pady=5, sticky=W)
+        padx=(16, 0), pady=5, sticky=W)
     parent.pvpc_mode.grid(
         row=5, column=1,
         columnspan=2,
-        padx=(20, 0), pady=5, sticky=W)
+        padx=(16, 0), pady=5, sticky=W)
     parent.choose_pc_pref.grid(
         row=5, column=1,
         columnspan=2,
-        padx=(0, 25), pady=0, sticky=E)
+        padx=(0, 20), pady=0, sticky=E)
     parent.separator.grid(
         row=7, column=0,
         columnspan=3,
@@ -194,13 +194,13 @@ def mac(parent):
     parent.auto_center_mode.grid(
         row=9, column=0,
         padx=(5, 0), pady=0, sticky=W)
-    parent.auto_strategy_mode.grid(
+    parent.auto_tactics_mode.grid(
         row=10, column=0,
         padx=(5, 0), pady=0, sticky=W)
     parent.who_autostarts_btn.grid(
         row=11, column=0,
         columnspan=2,
-        padx=(0, 27), pady=(0, 7), sticky=E)
+        padx=(0, 15), pady=(0, 7), sticky=E)
     parent.quit_button.grid(
         row=11, column=2,
         padx=(0, 8), pady=(0, 7), sticky=E)
@@ -291,7 +291,7 @@ def windows(parent):
     parent.auto_center_mode.grid(
         row=9, column=0,
         padx=(5, 0), pady=0, sticky=W)
-    parent.auto_strategy_mode.grid(
+    parent.auto_tactics_mode.grid(
         row=10, column=0,
         padx=(5, 0), pady=0, sticky=W)
     parent.who_autostarts_btn.grid(

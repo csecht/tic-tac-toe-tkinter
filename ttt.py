@@ -55,7 +55,7 @@ class TicTacToeGUI(tk.Tk):
     Provide multiple modes of play action, with scoring.
     Methods: auto_command, auto_flash_game, auto_setup, auto_start,
     auto_stop, play_rudiments, autoplay_center,
-    autoplay_random, autoplay_strategy, autospeed_control,
+    autoplay_random, autoplay_tactics, autospeed_control,
     autostart_who, check_winner, color_pc_mark, configure_widgets,
     display_status, highlight_result, grid_widgets, human_turn,
     mode_control, new_game, play_defense, pc_turn,
@@ -66,8 +66,8 @@ class TicTacToeGUI(tk.Tk):
     #   memory usage and maybe improved performance.
     __slots__ = (
         'after_id', 'auto_marks',
-        'auto_start_stop_btn', 'auto_random_mode', 'auto_strategy_mode',
-        'auto_center_mode', 'auto_turns_header', 'auto_turns_lbl',
+        'auto_start_stop_btn', 'auto_center_mode', 'auto_random_mode',
+        'auto_tactics_mode', 'auto_turns_header', 'auto_turns_lbl',
         'auto_turns_remaining', 'autospeed_fast', 'autospeed_slow',
         'autospeed_lbl', 'autospeed_selection',
         'board_labels', 'choose_pc_pref', 'pc_pref',
@@ -121,7 +121,7 @@ class TicTacToeGUI(tk.Tk):
         self.choose_pc_pref = ttk.Combobox()
 
         self.auto_random_mode = tk.Radiobutton()
-        self.auto_strategy_mode = tk.Radiobutton()
+        self.auto_tactics_mode = tk.Radiobutton()
         self.auto_center_mode = tk.Radiobutton()
         self.auto_start_stop_btn = ttk.Button()
         self.who_autostarts_btn = ttk.Button()
@@ -285,13 +285,12 @@ class TicTacToeGUI(tk.Tk):
 
         # choose_pc_pref is enabled as readonly when pvpc_mode is selected.
         #   Set drop-down list font size to match displayed font size.
-        pcpref_w = 13 if MY_OS == 'dar' else 14  # is Linux or Windows
         self.choose_pc_pref.config(textvariable=self.pc_pref,
                                    font=FONT['condensed'],
-                                   width=pcpref_w,
+                                   width=13,
                                    values=('PC plays random',
                                            'PC plays center',
-                                           'PC plays strategy'),
+                                           'PC plays tactics'),
                                    state=tk.DISABLED)
         self.option_add("*TCombobox*Font", FONT['condensed'])
         self.choose_pc_pref.bind('<<ComboboxSelected>>',
@@ -311,11 +310,11 @@ class TicTacToeGUI(tk.Tk):
                                      variable=self.mode_clicked,
                                      value='Autoplay center',
                                      command=self.mode_control)
-        self.auto_strategy_mode.config(text='Autoplay strategy',
-                                       font=FONT['condensed'],
-                                       variable=self.mode_clicked,
-                                       value='Autoplay strategy',
-                                       command=self.mode_control)
+        self.auto_tactics_mode.config(text='Autoplay tactics',
+                                      font=FONT['condensed'],
+                                      variable=self.mode_clicked,
+                                      value='Autoplay tactics',
+                                      command=self.mode_control)
         self.autospeed_lbl.config(text='Auto-speed',
                                   font=FONT['condensed'])
         self.autospeed_fast.config(text='Fast',
@@ -353,6 +352,7 @@ class TicTacToeGUI(tk.Tk):
 
         :return: None
         """
+
         # Functions to change square backgrounds with mouseover & leave.
         def on_enter(label: tk) -> None:
             if label['bg'] == COLOR['sq_not_won'] and label['text'] == ' ':
@@ -367,19 +367,23 @@ class TicTacToeGUI(tk.Tk):
                 label['bg'] = COLOR['sq_not_won']
 
         # Reset game board squares to starting configurations.
+        if MY_OS == 'dar':
+            bd = 6
+            hilite_w = 0
+        else:  # is Linux or Windows.
+            bd = 2  # default
+            hilite_w = 5
+
         for i, lbl in enumerate(self.board_labels):
             lbl.config(text=' ',
-                       height=1,
-                       width=2,
+                       # height=1,  # number of lines
+                       width=2,  # number of characters
                        bg=COLOR['sq_not_won'],
                        fg=COLOR['mark_fg'],
                        font=FONT['mark'],
+                       borderwidth=bd,
+                       highlightthickness=hilite_w,
                        )
-
-            if MY_OS == 'dar':
-                lbl.config(borderwidth=12)
-            else:  # is Linux or Windows.
-                lbl.config(highlightthickness=6)
 
             if self.mode_clicked.get() in 'pvp, pvpc':
                 lbl.bind('<Button-1>',
@@ -417,7 +421,7 @@ class TicTacToeGUI(tk.Tk):
         if 'auto_modes' in group:
             self.auto_random_mode.config(state=tk.DISABLED)
             self.auto_center_mode.config(state=tk.DISABLED)
-            self.auto_strategy_mode.config(state=tk.DISABLED)
+            self.auto_tactics_mode.config(state=tk.DISABLED)
 
         if 'auto_controls' in group:
             self.auto_start_stop_btn.config(state=tk.DISABLED)
@@ -584,7 +588,7 @@ class TicTacToeGUI(tk.Tk):
             else:
                 curr_player = PLAYER2
                 curr_mark = P2_MARK
-            self.whose_turn.set(f'That square is\ntaken {curr_player}\n'
+            self.whose_turn.set(f'That square is\ntaken {curr_player}.\n'
                                 f'Put {curr_mark} elsewhere.')
 
     def color_pc_mark(self, _id: int) -> None:
@@ -642,7 +646,7 @@ class TicTacToeGUI(tk.Tk):
             self.play_rudiments(turn_number, P2_MARK, pvpc=True)
 
         # Strategy preference: now play a set of rules for defense.
-        if self.choose_pc_pref.get() == 'PC plays strategy':
+        if self.choose_pc_pref.get() == 'PC plays tactics':
             if turn_number == self.turn_number():
                 self.play_defense(turn_number, P2_MARK, pvpc=True)
 
@@ -811,7 +815,7 @@ class TicTacToeGUI(tk.Tk):
         """
         Fill in available corners to increase probability of a win.
 
-        Used for 'strategy' play modes.
+        Used for 'tactics' play modes.
 
         :param turn_number: Current turn count from turn_number().
         :param mark: The played mark character, as string.
@@ -828,7 +832,7 @@ class TicTacToeGUI(tk.Tk):
                 self.board_labels[i]['text'] = mark
                 if pvpc:
                     self.color_pc_mark(i)
-                    print('PC played corner strategy, '
+                    print('PC played corner tactics, '
                           f'G{self.prev_game_num.get() + 1}:T{turn_number + 1}')
                 break
 
@@ -907,7 +911,7 @@ class TicTacToeGUI(tk.Tk):
                         self.display_status('You WIN!')
 
                     # Print is not needed here for 'PC plays random'.
-                    if self.pc_pref.get() in 'PC plays strategy, PC plays center':
+                    if self.pc_pref.get() in 'PC plays tactics, PC plays center':
                         if mark == P2_MARK:
                             print(f'PC won "{pc_pref}", G{game}:T{turn}.')
                         else:
@@ -941,7 +945,7 @@ class TicTacToeGUI(tk.Tk):
                 self.whose_turn_lbl.config(bg=COLOR['tk_white'])
 
                 # Print is not needed here for 'PC plays random'.
-                if self.pc_pref.get() in 'PC plays strategy, PC plays center':
+                if self.pc_pref.get() in 'PC plays tactics, PC plays center':
                     print('-Tie-')
 
     def highlight_result(self, status: str, combo=None) -> None:
@@ -1117,7 +1121,7 @@ class TicTacToeGUI(tk.Tk):
 
         self.auto_random_mode.config(state=tk.NORMAL)
         self.auto_center_mode.config(state=tk.NORMAL)
-        self.auto_strategy_mode.config(state=tk.NORMAL)
+        self.auto_tactics_mode.config(state=tk.NORMAL)
         self.autospeed_fast.config(state=tk.NORMAL)
         self.autospeed_slow.config(state=tk.NORMAL)
 
@@ -1238,8 +1242,8 @@ class TicTacToeGUI(tk.Tk):
         #   calls are controlled by after_id.
         if self.mode_clicked.get() == 'Autoplay random':
             self.autoplay_random()
-        elif self.mode_clicked.get() == 'Autoplay strategy':
-            self.autoplay_strategy()
+        elif self.mode_clicked.get() == 'Autoplay tactics':
+            self.autoplay_tactics()
         elif self.mode_clicked.get() == 'Autoplay center':
             self.autoplay_center()
 
@@ -1396,7 +1400,7 @@ class TicTacToeGUI(tk.Tk):
         else:
             self.auto_stop('ended')
 
-    def autoplay_strategy(self) -> None:
+    def autoplay_tactics(self) -> None:
         """
         Auto-plays turns according to a set order of conditional rules.
 
@@ -1411,7 +1415,7 @@ class TicTacToeGUI(tk.Tk):
 
         :return: None
         """
-        self.curr_automode = 'Autoplay strategy'
+        self.curr_automode = 'Autoplay tactics'
 
         self.auto_turns_remaining.set(len(self.auto_marks))
         turn_number = self.turn_number()
@@ -1438,7 +1442,7 @@ class TicTacToeGUI(tk.Tk):
             if turn_number == self.turn_number():
                 self.play_random(turn_number, mark)
 
-            self.auto_repeat(mark, self.autoplay_strategy)
+            self.auto_repeat(mark, self.autoplay_tactics)
 
         else:
             self.auto_stop('ended')
