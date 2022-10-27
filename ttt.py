@@ -239,34 +239,27 @@ class TicTacToeGUI(tk.Tk):
 
         # Players' scores widgets:
         # Squiggle symbol, '︴', from https://coolsymbol.com/line-symbols.html
-        self.score_header.config(
-            text='Score ︴',
-            font=FONT['scores'],
-            fg=COLOR['score_fg'])
-        self.player1_header.config(
-            text=f'{PLAYER1}:',
-            font=FONT['scores'],
-            fg=COLOR['score_fg'])
-        self.player2_header.config(
-            text=f'{PLAYER2}:',
-            font=FONT['scores'],
-            fg=COLOR['score_fg'])
-        self.player1_score_lbl.config(
-            textvariable=self.p1_score,
-            font=FONT['scores'],
-            fg=COLOR['score_fg'])
-        self.player2_score_lbl.config(
-            textvariable=self.p2_score,
-            font=FONT['scores'],
-            fg=COLOR['score_fg'])
-        self.ties_header.config(
-            text='Ties:',
-            font=FONT['scores'],
-            fg=COLOR['score_fg'])
-        self.ties_lbl.config(
-            textvariable=self.ties_num,
-            font=FONT['scores'],
-            fg=COLOR['score_fg'])
+        self.score_header.config(text='Score ︴',
+                                 font=FONT['scores'],
+                                 fg=COLOR['score_fg'])
+        self.player1_header.config(text=f'{PLAYER1}:',
+                                   font=FONT['scores'],
+                                   fg=COLOR['score_fg'])
+        self.player2_header.config(text=f'{PLAYER2}:',
+                                   font=FONT['scores'],
+                                   fg=COLOR['score_fg'])
+        self.player1_score_lbl.config(textvariable=self.p1_score,
+                                      font=FONT['scores'],
+                                      fg=COLOR['score_fg'])
+        self.player2_score_lbl.config(textvariable=self.p2_score,
+                                      font=FONT['scores'],
+                                      fg=COLOR['score_fg'])
+        self.ties_header.config(text='Ties:',
+                                font=FONT['scores'],
+                                fg=COLOR['score_fg'])
+        self.ties_lbl.config(textvariable=self.ties_num,
+                             font=FONT['scores'],
+                             fg=COLOR['score_fg'])
 
         # Play mode control widgets:
         self.pvp_mode.config(text='Player v Player',
@@ -274,7 +267,7 @@ class TicTacToeGUI(tk.Tk):
                              variable=self.mode_clicked,
                              value='pvp',
                              command=self.mode_control)
-        self.pvp_mode.select()  # Start default mode is Player v Player.
+        self.pvp_mode.select()  # Set mode at startup.
 
         self.pvpc_mode.config(text='Player v PC',
                               font=FONT['condensed'],
@@ -294,7 +287,7 @@ class TicTacToeGUI(tk.Tk):
         self.option_add("*TCombobox*Font", FONT['condensed'])
         self.choose_pc_pref.bind('<<ComboboxSelected>>',
                                  lambda _: self.reset_game_and_score())
-        #  Set random, 1st in tuple, as the default.
+        #  Set 'PC plays random', 1st in tuple, as the startup default.
         self.choose_pc_pref.current(0)
 
         self.separator.configure(orient='horizontal')
@@ -326,7 +319,7 @@ class TicTacToeGUI(tk.Tk):
                                    variable=self.autospeed_selection,
                                    value='slow',
                                    command=self.autospeed_control)
-        # Set default auto-speed to 'slow'.
+        # Set startup auto-speed to 'slow'.
         self.autospeed_slow.select()
 
         # Configure ttk Buttons.
@@ -587,7 +580,7 @@ class TicTacToeGUI(tk.Tk):
                 curr_player = PLAYER2
                 curr_mark = P2_MARK
             self.whose_turn.set(f'That square is\ntaken {curr_player}.\n'
-                                f'Put {curr_mark} elsewhere.')
+                                f'Play {curr_mark} elsewhere.')
 
     def color_pc_mark(self, _id: int) -> None:
         """
@@ -643,7 +636,7 @@ class TicTacToeGUI(tk.Tk):
         if turn_number == self.turn_number():
             self.play_rudiments(turn_number, P2_MARK, pvpc=True)
 
-        # Strategy preference: now play a set of rules for defense.
+        # Tactical preference: play a set of rules to minimize losses.
         if self.choose_pc_pref.get() == 'PC plays tactics':
             if turn_number == self.turn_number():
                 self.play_defense(turn_number, P2_MARK, pvpc=True)
@@ -654,9 +647,9 @@ class TicTacToeGUI(tk.Tk):
 
         # No preferred plays are available, so play random.
         if turn_number == self.turn_number():
+            self.play_random(turn_number, P2_MARK)
             print('PC played randomly, '
                   f'G{self.prev_game_num.get() + 1}:T{turn_number + 1}')
-            self.play_random(turn_number, P2_MARK)
 
         if self.turn_number() >= 5:
             self.check_winner(P2_MARK)
