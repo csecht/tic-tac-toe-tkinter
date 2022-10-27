@@ -9,15 +9,21 @@ quit_gui: Safe and informative exit from the program.
 
 # Standard library imports:
 import argparse
-import sys
 import platform
-
-from pathlib import Path
-
+import sys
 # Local program imports:
 from __main__ import __doc__
-import ttt_utils  # Needed for __init__.py custom dunders and constants.
-from ttt_utils.constants import MY_OS, KP2PLAY, KEYS2PLAY
+from pathlib import Path
+
+from ttt_utils import (__author__,
+                       __copyright__,
+                       __dev_status__,
+                       __license__,
+                       __version__,
+                       URL)
+from ttt_utils.constants import (MY_OS,
+                                 KP2PLAY,
+                                 KEYS2PLAY)
 
 
 def check_platform():
@@ -45,7 +51,7 @@ def keybindings(parent, state: str) -> None:
     playing Player v Player mode.
 
     :param parent: The parent tk widget or mainloop to bind to.
-    :param state: Either 'quit', 'bind_board' or 'unbind_board'.
+    :param state: Either 'quit_keys', 'bind_board' or 'unbind_board'.
     :return: None
     """
 
@@ -86,7 +92,7 @@ def keybindings(parent, state: str) -> None:
 
 
 def manage_args() -> None:
-    """Allow handling of common command line arguments.
+    """Manage command line arguments.
     """
     parser = argparse.ArgumentParser()
     parser.add_argument('--about',
@@ -97,12 +103,12 @@ def manage_args() -> None:
     if args.about:
         print('====================== ABOUT START ====================')
         print(__doc__)
-        print(f'{"Author:".ljust(13)}', ttt_utils.__author__)
-        print(f'{"Version:".ljust(13)}', ttt_utils.__version__)
-        print(f'{"Status:".ljust(13)}', ttt_utils.__dev_status__)
-        print(f'{"URL:".ljust(13)}', ttt_utils.URL)
-        print(ttt_utils.__copyright__)
-        print(ttt_utils.__license__)
+        print(f'{"Author:".ljust(13)}', __author__)
+        print(f'{"Version:".ljust(13)}', __version__)
+        print(f'{"Status:".ljust(13)}', __dev_status__)
+        print(f'{"URL:".ljust(13)}', URL)
+        print(__copyright__)
+        print(__license__)
         print('====================== ABOUT END ====================')
 
         sys.exit(0)
