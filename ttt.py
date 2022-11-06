@@ -1522,8 +1522,18 @@ if __name__ == '__main__':
     app.title('TIC TAC TOE')
     app.resizable(False, False)
 
-    img = tk.PhotoImage(file='images/Tic_tac_toe.png')
-    app.wm_iconphoto(True, img)
+    # img = tk.PhotoImage(file='images/Tic_tac_toe.png')
+    # app.wm_iconphoto(True, img)
+
+    # Need an image to replace blank tk desktop icon.
+    #   Set correct path to the local 'images' directory and icon file.
+    try:
+        icon_path = utils.valid_path_to('images/Tic_tac_toe.png')
+        icon = tk.PhotoImage(file=icon_path)
+        app.wm_iconphoto(True, icon)
+    except tk.TclError as msg:
+        print('Cannot display program icon, so it will be left blank or tk default.')
+        print(f'tk error message: {msg}')
 
     try:
         app.mainloop()

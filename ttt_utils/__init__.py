@@ -5,7 +5,7 @@ argument or button.
 
 # Development status standards: https://pypi.org/classifiers/
 __author__ = 'Craig S. Echt'
-__version__: str = '0.2.36'
+__version__: str = '0.2.37'
 __dev_status__ = 'Development Status :: 4 - Beta'
 __copyright__ = 'Copyright (C) 2022 C.S. Echt, under MIT License'
 __license__ = """                                MIT License
