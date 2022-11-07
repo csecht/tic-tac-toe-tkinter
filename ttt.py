@@ -1534,9 +1534,8 @@ if __name__ == '__main__':
         print(f'tk error message: {msg}')
 
     try:
+        sys.excepthook = utils.handle_exception
+        app.report_callback_exception = utils.handle_exception
         app.mainloop()
     except KeyboardInterrupt:
         print("\n*** User quit the program ***\n")
-    except Exception as unknown:
-        print(f'\nAn unexpected error: {unknown}\n')
-        sys.exit(1)

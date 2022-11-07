@@ -9,6 +9,7 @@ quit_gui: Safe and informative exit from the program.
 
 # Standard library imports:
 import argparse
+import logging
 import platform
 import sys
 # Local program imports:
@@ -23,6 +24,38 @@ from ttt_utils import (__author__,
 from ttt_utils.constants import (MY_OS,
                                  KP2PLAY,
                                  KEYS2PLAY)
+
+logger = logging.getLogger(__name__)
+handler = logging.StreamHandler(stream=sys.stdout)
+logger.addHandler(handler)
+
+
+def handle_exception(exc_type, exc_value, exc_traceback):
+    """
+    Changes an unhandled exception to go to stdout rather than
+    stderr. Ignores KeyboardInterrupt so a console program can exit
+    with Ctrl + C. Relies entirely on python's logging module for
+    formatting the exception. Source:
+    https://stackoverflow.com/questions/6234405/
+    logging-uncaught-exceptions-in-python/16993115#16993115
+    https://stackoverflow.com/questions/43941276/
+    python-tkinter-and-imported-classes-logging-uncaught-exceptions/
+    44004413#44004413
+
+    Usage: in mainloop,
+     - sys.excepthook = utils.handle_exception
+     - app.report_callback_exception = utils.handle_exception
+
+    :param exc_type:
+    :param exc_value:
+    :param exc_traceback:
+    :return: None
+    """
+    if issubclass(exc_type, KeyboardInterrupt):
+        sys.__excepthook__(exc_type, exc_value, exc_traceback)
+        return
+
+    logger.error("Uncaught exception", exc_info=(exc_type, exc_value, exc_traceback))
 
 
 def check_platform():
