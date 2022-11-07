@@ -12,9 +12,8 @@ import argparse
 import platform
 import sys
 # Local program imports:
-from __main__ import __doc__
 from pathlib import Path
-
+from __main__ import __doc__
 from ttt_utils import (__author__,
                        __copyright__,
                        __dev_status__,

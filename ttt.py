@@ -360,10 +360,10 @@ class TicTacToeGUI(tk.Tk):
 
         # Reset game board squares to starting configurations.
         if MY_OS == 'dar':
-            bd = 6
+            bd_w = 6
             hilite_w = 0
         else:  # is Linux or Windows.
-            bd = 2  # default
+            bd_w = 2  # default
             hilite_w = 5
 
         for i, lbl in enumerate(self.board_labels):
@@ -372,7 +372,7 @@ class TicTacToeGUI(tk.Tk):
                        bg=COLOR['sq_not_won'],
                        fg=COLOR['mark_fg'],
                        font=FONT['mark'],
-                       borderwidth=bd,
+                       borderwidth=bd_w,
                        highlightthickness=hilite_w,
                        )
 
@@ -892,7 +892,7 @@ class TicTacToeGUI(tk.Tk):
                     award_points(mark)
                     self.auto_flash_game(combo, mark)
                     break
-                elif mode == 'pvpc':
+                if mode == 'pvpc':
                     award_points(mark)
                     self.highlight_result('win', combo)
 
@@ -908,10 +908,11 @@ class TicTacToeGUI(tk.Tk):
                         else:
                             print(f'Human won "{pc_pref}", G{game}:T{turn}.')
                     break
-                else:  # Mode selection is pvp.
-                    award_points(mark)
-                    self.highlight_result('win', combo)
-                    self.display_status(f'{mark} WINS!')
+
+                # No 'break' yet, so mode selection must be pvp.
+                award_points(mark)
+                self.highlight_result('win', combo)
+                self.display_status(f'{mark} WINS!')
 
         if self.turn_number() == 9 and not self.winner_found:  # Is a tie.
             self.winner_found = True
@@ -1521,9 +1522,6 @@ if __name__ == '__main__':
     app = TicTacToeGUI()
     app.title('TIC TAC TOE')
     app.resizable(False, False)
-
-    # img = tk.PhotoImage(file='images/Tic_tac_toe.png')
-    # app.wm_iconphoto(True, img)
 
     # Need an image to replace blank tk desktop icon.
     #   Set correct path to the local 'images' directory and icon file.
