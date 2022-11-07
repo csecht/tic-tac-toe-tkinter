@@ -172,7 +172,7 @@ def quit_game(mainloop, keybind=None) -> None:
     :return: None
     """
 
-    print('\n*** User quit the program. ***\n')
+    print('\n*** User quit the program ***\n')
 
     # pylint: disable=broad-except
     try:

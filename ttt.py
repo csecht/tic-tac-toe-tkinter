@@ -1517,11 +1517,13 @@ if __name__ == '__main__':
     # Check for invocation arguments (exit after running --about).
     utils.manage_args()
 
-    print(f'{utils.program_name()} now running...')
-
     app = TicTacToeGUI()
     app.title('TIC TAC TOE')
     app.resizable(False, False)
+
+    # Run custom handlers for unhandled system and tkinter exceptions.
+    sys.excepthook = utils.handle_exception
+    app.report_callback_exception = utils.handle_exception
 
     # Need an image to replace blank tk desktop icon.
     #   Set correct path to the local 'images' directory and icon file.
@@ -1533,9 +1535,9 @@ if __name__ == '__main__':
         print('Cannot display program icon, so it will be left blank or tk default.')
         print(f'tk error message: {msg}')
 
+    print(f'{utils.program_name()} now running...')
+
     try:
-        sys.excepthook = utils.handle_exception
-        app.report_callback_exception = utils.handle_exception
         app.mainloop()
     except KeyboardInterrupt:
-        print("\n*** User quit the program ***\n")
+        print("\n*** User quit the program from Terminal/Console ***\n")
