@@ -1521,9 +1521,9 @@ if __name__ == '__main__':
     app.title('TIC TAC TOE')
     app.resizable(False, False)
 
-    # Run custom handlers for unhandled system and tkinter exceptions.
-    sys.excepthook = utils.handle_exception
-    app.report_callback_exception = utils.handle_exception
+    # Developer: use custom handlers for unhandled system and tkinter exceptions.
+    # sys.excepthook = utils.handle_exception
+    # app.report_callback_exception = utils.handle_exception
 
     # Need an image to replace blank tk desktop icon.
     #   Set correct path to the local 'images' directory and icon file.
