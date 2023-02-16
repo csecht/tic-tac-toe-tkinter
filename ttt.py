@@ -22,7 +22,6 @@ https://gist.github.com/riya1620/72c2b668ef29da061c44d97a82318572
 
 # Standard library imports:
 import random
-import sys
 from typing import Callable  # Used only in auto_repeat()
 
 try:
@@ -648,8 +647,8 @@ class TicTacToeGUI(tk.Tk):
         # No preferred plays are available, so play random.
         if turn_number == self.turn_number():
             self.play_random(turn_number, P2_MARK)
-            print('PC played randomly, '
-                  f'G{self.prev_game_num.get() + 1}:T{turn_number + 1}')
+            print('PC played randomly (nothing to block or win), '
+                  f'Game {self.prev_game_num.get() + 1}:Turn {turn_number + 1}')
 
         if self.turn_number() >= 5:
             self.check_winner(P2_MARK)
@@ -743,7 +742,7 @@ class TicTacToeGUI(tk.Tk):
                 if pvpc:
                     self.color_pc_mark(4)
                     print('PC grabbed the center, '
-                          f'G{self.prev_game_num.get() + 1}:T{turn_number + 1}')
+                          f'Game {self.prev_game_num.get() + 1}:Turn {turn_number + 1}')
 
         # When opponent plays a side square, play the open center to reduce
         #   possibility of a loss.
@@ -755,7 +754,7 @@ class TicTacToeGUI(tk.Tk):
                         if pvpc:
                             self.color_pc_mark(4)
                             print('PC played center defense, '
-                                  f'G{self.prev_game_num.get() + 1}:T{turn_number + 1}')
+                                  f'Game {self.prev_game_num.get() + 1}:Turn {turn_number + 1}')
                         break
 
         # When opponent is on two adjacent side squares, defend with play
@@ -772,7 +771,7 @@ class TicTacToeGUI(tk.Tk):
                     if pvpc:
                         self.color_pc_mark(key)
                         print('PC played corner for orthogonal sides defense, '
-                              f'G{self.prev_game_num.get() + 1}:T{turn_number + 1}')
+                              f'Game {self.prev_game_num.get() + 1}:Turn {turn_number + 1}')
                     break
 
         # When opponent has played a corner and a non-adjacent side, defend with
@@ -784,7 +783,7 @@ class TicTacToeGUI(tk.Tk):
                     if pvpc:
                         self.color_pc_mark(key)
                         print('PC played corner for meta-positional defense, '
-                              f'G{self.prev_game_num.get() + 1}:T{turn_number + 1}')
+                              f'Game {self.prev_game_num.get() + 1}:Turn {turn_number + 1}')
                     break
 
         # When opponent has played to opposite corners, defend with play to
@@ -799,7 +798,7 @@ class TicTacToeGUI(tk.Tk):
                     if pvpc:
                         self.color_pc_mark(side2play)
                         print('PC played a side for para-corners defense, '
-                              f'G{self.prev_game_num.get() + 1}:T{turn_number + 1}')
+                              f'Game {self.prev_game_num.get() + 1}:Turn {turn_number + 1}')
                     break
 
     def play_corners(self, turn_number: int, mark: str, pvpc=False) -> None:
@@ -824,7 +823,7 @@ class TicTacToeGUI(tk.Tk):
                 if pvpc:
                     self.color_pc_mark(i)
                     print('PC played corner tactics, '
-                          f'G{self.prev_game_num.get() + 1}:T{turn_number + 1}')
+                          f'Game {self.prev_game_num.get() + 1}:Turn {turn_number + 1}')
                 break
 
     def play_random(self, turn_number: int, mark: str) -> None:
@@ -904,9 +903,9 @@ class TicTacToeGUI(tk.Tk):
                     # Print is not needed here for 'PC plays random'.
                     if self.pc_pref.get() in 'PC plays tactics, PC plays center':
                         if mark == P2_MARK:
-                            print(f'PC won "{pc_pref}", G{game}:T{turn}.')
+                            print(f'PC won "{pc_pref} mode", Game {game}:Turn {turn}.')
                         else:
-                            print(f'Human won "{pc_pref}", G{game}:T{turn}.')
+                            print(f'Human won "{pc_pref} mode", Game {game}:Turn {turn}.')
                     break
 
                 # No 'break' yet, so mode selection must be pvp.
