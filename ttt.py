@@ -236,29 +236,19 @@ class TicTacToeGUI(tk.Tk):
                                    font=FONT['condensed'],
                                    fg=COLOR['tk_white'])  # match default bg.
 
+        score_params = dict(
+            font=FONT['scores'],
+            fg=COLOR['score_fg'])
+
         # Players' scores widgets:
         # Squiggle symbol, '︴', from https://coolsymbol.com/line-symbols.html
-        self.score_header.config(text='Score ︴',
-                                 font=FONT['scores'],
-                                 fg=COLOR['score_fg'])
-        self.player1_header.config(text=f'{PLAYER1}:',
-                                   font=FONT['scores'],
-                                   fg=COLOR['score_fg'])
-        self.player2_header.config(text=f'{PLAYER2}:',
-                                   font=FONT['scores'],
-                                   fg=COLOR['score_fg'])
-        self.player1_score_lbl.config(textvariable=self.p1_score,
-                                      font=FONT['scores'],
-                                      fg=COLOR['score_fg'])
-        self.player2_score_lbl.config(textvariable=self.p2_score,
-                                      font=FONT['scores'],
-                                      fg=COLOR['score_fg'])
-        self.ties_header.config(text='Ties:',
-                                font=FONT['scores'],
-                                fg=COLOR['score_fg'])
-        self.ties_lbl.config(textvariable=self.ties_num,
-                             font=FONT['scores'],
-                             fg=COLOR['score_fg'])
+        self.score_header.config(text='Score ︴', **score_params)
+        self.player1_header.config(text=f'{PLAYER1}:', **score_params)
+        self.player2_header.config(text=f'{PLAYER2}:', **score_params)
+        self.player1_score_lbl.config(textvariable=self.p1_score, **score_params)
+        self.player2_score_lbl.config(textvariable=self.p2_score, **score_params)
+        self.ties_header.config(text='Ties:', **score_params)
+        self.ties_lbl.config(textvariable=self.ties_num, **score_params)
 
         # Play mode control widgets:
         self.pvp_mode.config(text='Player v Player',
