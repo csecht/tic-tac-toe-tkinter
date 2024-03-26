@@ -72,7 +72,7 @@ def linux(parent):
     parent.choose_pc_pref.grid(
         row=5, column=1,
         columnspan=2,
-        padx=(0, 35), pady=0, sticky=E)
+        padx=(0, 25), pady=0, sticky=E)
     parent.separator.grid(
         row=7, column=0,
         columnspan=3,
@@ -84,15 +84,15 @@ def linux(parent):
     parent.autospeed_lbl.grid(
         row=8, column=1,
         rowspan=2, columnspan=2,
-        padx=(0, 54), pady=(6, 0), sticky=E)
+        padx=(0, 45), pady=(6, 0), sticky=E)
     parent.autospeed_fast.grid(
         row=9, column=1,
         columnspan=2,
-        padx=(0, 100), pady=(16, 0), sticky=E)
+        padx=(0, 90), pady=(16, 0), sticky=E)
     parent.autospeed_slow.grid(
         row=9, column=1,
         columnspan=2,
-        padx=(0, 40), pady=(16, 0), sticky=E)
+        padx=(0, 30), pady=(16, 0), sticky=E)
     parent.auto_random_mode.grid(
         row=8, column=0,
         padx=0, pady=(4, 0), sticky=W)

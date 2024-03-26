@@ -88,27 +88,36 @@ elif MY_OS == 'lin':  # Linux (Ubuntu)
 else:  # platform is 'win'  # Windows (10)
     COLOR['tk_white'] = 'grey95'
 
+# Fonts for various widgets. Make it os-specific instead of using
+#  Tkinter's default named fonts because they can change and affect spacing.
+if MY_OS == 'dar':  # macOS
+    os_font = 'SF Pro'
+elif MY_OS == 'lin':  # Linux (Ubuntu)
+    os_font = 'DejaVu Sans'
+else:  # platform is 'win'  # Windows (10, 11)
+    os_font = 'Segoe UI'
+
 FONT = {
-    'sm_button': ('TkHeadingFont', 8),
-    'who': ('TkHeadingFont', 7, 'italic bold'),
-    'button': ('TkHeadingFont', 8, 'bold'),
-    'scores': ('TkHeadingFont', 9),
-    'status': ('TkHeadingFont', 9, 'italic bold'),
-    'condensed': ('TkTooltipFont', 8),
-    'mark': ('TkFixedFont', 52),
+    'sm_button': (os_font, 8),
+    'who': (os_font, 7, 'italic bold'),
+    'button': (os_font, 8, 'bold'),
+    'scores': (os_font, 9),
+    'status': (os_font, 9, 'italic bold'),
+    'condensed': (os_font, 8),
+    'mark': (os_font, 52),
 }
 
-# Need to apply OS-specific font adjustments.
+# Need OS-specific font size adjustments.
 if MY_OS == 'lin':
-    FONT['status'] = ('TkHeadingFont', 10, 'italic bold')
+    FONT['status'] = (os_font, 10, 'italic bold')
 elif MY_OS == 'dar':
-    FONT['sm_button'] = ('TkHeadingFont', 10)
-    FONT['who'] = ('TkHeadingFont', 11, 'italic bold')
-    FONT['button'] = ('TkHeadingFont', 11, 'bold')
-    FONT['scores'] = ('TkHeadingFont', 13)
-    FONT['status'] = ('TkHeadingFont', 13, 'italic bold')
-    FONT['condensed'] = ('TkTooltipFont', 10)
-    FONT['mark'] = ('TkFixedFont', 75)
+    FONT['sm_button'] = (os_font, 10)
+    FONT['who'] = (os_font, 11, 'italic bold')
+    FONT['button'] = (os_font, 11, 'bold')
+    FONT['scores'] = (os_font, 13)
+    FONT['status'] = (os_font, 13, 'italic bold')
+    FONT['condensed'] = (os_font, 10)
+    FONT['mark'] = (os_font, 75)
 
 # TIES (32) and WINS (1884) are all possible end-game board configurations,
 #   in index order; 3 rows x 3 col indices: 012345678.
