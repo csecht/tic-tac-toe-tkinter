@@ -213,7 +213,7 @@ def windows(parent):
     parent.prev_game_num_header.grid(
         row=0, column=2,
         rowspan=2,
-        padx=(0, 8), pady=(13, 0), sticky=NE)
+        padx=(0, 8), pady=(7, 0), sticky=NE)
     parent.prev_game_num_lbl.grid(
         row=0, column=2,
         rowspan=2,
@@ -249,11 +249,11 @@ def windows(parent):
     parent.ties_header.grid(
         row=0, column=1,
         rowspan=2,
-        padx=(0, 8), pady=(85, 0), sticky=E)
+        padx=(0, 8), pady=(90, 0), sticky=E)
     parent.ties_lbl.grid(
         row=0, column=2,
         rowspan=2,
-        padx=0, pady=(85, 0), sticky=W)
+        padx=0, pady=(90, 0), sticky=W)
     parent.pvp_mode.grid(
         row=5, column=0,
         padx=(25, 0), pady=5, sticky=W)
@@ -276,7 +276,7 @@ def windows(parent):
     parent.autospeed_lbl.grid(
         row=8, column=2,
         rowspan=2,
-        padx=(0, 0), pady=(6, 0), sticky=W)
+        padx=(0, 0), pady=(0, 0), sticky=W)
     parent.autospeed_fast.grid(
         row=9, column=1,
         columnspan=2,

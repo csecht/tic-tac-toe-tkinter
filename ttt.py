@@ -268,7 +268,7 @@ class TicTacToeGUI(tk.Tk):
         #   Set drop-down list font size to match displayed font size.
         self.choose_pc_pref.config(textvariable=self.pc_pref,
                                    font=FONT['condensed'],
-                                   width=13,
+                                   width=15,
                                    values=('PC plays random',
                                            'PC plays center',
                                            'PC plays tactics'),
