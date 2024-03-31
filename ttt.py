@@ -147,7 +147,7 @@ class TicTacToeGUI(tk.Tk):
         self.setup_game_board()
 
     def grid_widgets(self) -> None:
-        """Position app window widgets."""
+        """Position mainloop (app, self) window widgets."""
 
         # Position play action Labels in 3 x 3 grid. Note that while
         #   nothing is gridded in row index 1, the top row uses rowspan=2
@@ -195,7 +195,7 @@ class TicTacToeGUI(tk.Tk):
             grid_this.mac(self)
 
     def configure_widgets(self) -> None:
-        """Initial configurations of app window widgets."""
+        """Initial configurations of mainloop window widgets."""
         ttk.Style().theme_use('alt')
         utils.keybindings(self, 'quit_keys')
         utils.keybindings(self, 'bind_board')
@@ -325,7 +325,7 @@ class TicTacToeGUI(tk.Tk):
         self.quit_button.config(text='Quit',
                                 style='My.TButton',
                                 width=4,
-                                command=lambda: utils.quit_game(mainloop=app))
+                                command=lambda: utils.quit_game(mainloop=self))
 
     def setup_game_board(self) -> None:
         """
@@ -447,7 +447,7 @@ class TicTacToeGUI(tk.Tk):
             if mode_clicked == 'pvpc':
                 self.choose_pc_pref.config(state='readonly')
                 self.player2_header.config(text='PC:')
-                app.update_idletasks()  # For immediate replacement of header text.
+                self.update_idletasks()  # For immediate replacement of header text.
             else:
                 self.choose_pc_pref.config(state=tk.DISABLED)
                 self.player2_header.config(text=f'{PLAYER2}:')
@@ -546,8 +546,8 @@ class TicTacToeGUI(tk.Tk):
                       self.prev_game_num.get() % 2 != 0):
                     h_plays_p1_v_pc()  # odd prev_game, odd turn
 
-                # Need to update for app.after delay to work in pc_turn().
-                app.update_idletasks()
+                # Need to update for self.after delay to work in pc_turn().
+                self.update_idletasks()
 
                 if self.turn_number() >= 5:
                     self.check_winner(P1_MARK)
@@ -603,7 +603,7 @@ class TicTacToeGUI(tk.Tk):
         # Delay play for a better feel, but not when PC starts a game b/c
         #   that just delays closing the Game Status toplevel for a new game.
         if turn_number > 0:
-            app.after(const.PLAY_AFTER)
+            self.after(const.PLAY_AFTER)
             self.choose_pc_pref.config(state=tk.DISABLED)
 
         # Need to re-order winner list so Human doesn't detect a pattern
@@ -646,7 +646,7 @@ class TicTacToeGUI(tk.Tk):
         if not self.winner_found:
             self.ready_player_one()
 
-        app.update_idletasks()
+        self.update_idletasks()
 
     def play_rudiments(self, turn_number: int, mark: str, pvpc=False) -> None:
         """
@@ -944,14 +944,14 @@ class TicTacToeGUI(tk.Tk):
         if status == 'win':
             _x, _y, _z = combo
 
-            app.after(10, lambda: self.board_labels[_x].config(bg=COLOR['sq_won']))
-            app.after(175, lambda: self.board_labels[_y].config(bg=COLOR['sq_won']))
-            app.after(345, lambda: self.board_labels[_z].config(bg=COLOR['sq_won']))
+            self.after(10, lambda: self.board_labels[_x].config(bg=COLOR['sq_won']))
+            self.after(175, lambda: self.board_labels[_y].config(bg=COLOR['sq_won']))
+            self.after(345, lambda: self.board_labels[_z].config(bg=COLOR['sq_won']))
 
         else:  # status is 'tie'
             for lbl in self.board_labels:
                 lbl.config(bg=COLOR['sq_won'])
-                app.update_idletasks()
+                self.update_idletasks()
 
     def window_geometry(self, toplevel: tk) -> None:
         """
@@ -970,7 +970,7 @@ class TicTacToeGUI(tk.Tk):
         if self.statuswin_geometry:
             toplevel.geometry(self.statuswin_geometry)
         else:
-            toplevel.geometry(f'+{app.winfo_x()}+{app.winfo_y()}')
+            toplevel.geometry(f'+{self.winfo_x()}+{self.winfo_y()}')
 
         # Need to position the geometry of the Report window by applying
         #   a y offset for the height of the system's window title bar.
@@ -979,8 +979,8 @@ class TicTacToeGUI(tk.Tk):
         # Title bar height is determined only once from the default
         #   placement of the Report window at top-left of the app window.
         if self.status_calls == 1:
-            app.update_idletasks()
-            self.titlebar_offset = toplevel.winfo_y() - app.winfo_y()
+            self.update_idletasks()
+            self.titlebar_offset = toplevel.winfo_y() - self.winfo_y()
 
     def display_status(self, status_msg: str) -> None:
         """
@@ -1081,7 +1081,7 @@ class TicTacToeGUI(tk.Tk):
                               relief='groove',
                               overrelief='raised',
                               border=3,
-                              command=lambda: utils.quit_game(mainloop=app))
+                              command=lambda: utils.quit_game(mainloop=self))
         status_window.bind('<Return>', lambda _: restart_game())
         status_window.bind('<KP_Enter>', lambda _: restart_game())
 
@@ -1244,7 +1244,7 @@ class TicTacToeGUI(tk.Tk):
         :return: None
         """
         if self.after_id:
-            app.after_cancel(self.after_id)
+            self.after_cancel(self.after_id)
             self.after_id = None
 
         self.setup_game_board()
@@ -1252,7 +1252,7 @@ class TicTacToeGUI(tk.Tk):
 
     def auto_setup(self) -> None:
         """
-        At start of new autoplay games, update scores in the app window.
+        At start of new autoplay games, update scores in the main window.
 
         Clear all marks from the board.
         Called from auto_start() and auto_flash_game().
@@ -1448,7 +1448,7 @@ class TicTacToeGUI(tk.Tk):
 
         # Need a pause so user can see what play was made and also
         #   allow auto_stop() to break the call cycle.
-        self.after_id = app.after(self.autospeed_control('game'), auto_method)
+        self.after_id = self.after(self.autospeed_control('game'), auto_method)
 
     def auto_flash_game(self, combo: tuple, mark: str) -> None:
         """
@@ -1473,7 +1473,7 @@ class TicTacToeGUI(tk.Tk):
             self.board_labels[_x].config(text=mark, bg=COLOR['sq_won'])
             self.board_labels[_y].config(text=mark, bg=COLOR['sq_won'])
             self.board_labels[_z].config(text=mark, bg=COLOR['sq_won'])
-            app.update_idletasks()
+            self.update_idletasks()
 
         def flash_erase():
             self.board_labels[_x].config(text=' ', bg=COLOR['sq_not_won'])
@@ -1485,27 +1485,30 @@ class TicTacToeGUI(tk.Tk):
         if mark == 'TIE':
             for lbl in self.board_labels:
                 lbl.config(bg=COLOR['sq_won'])
-                app.update_idletasks()
-            app.after(self.autospeed_control('fast'))
+                self.update_idletasks()
+            self.after(self.autospeed_control('fast'))
 
         # after() time of 1ms is needed for the flash to work.
-        app.after(1, flash_show)
-        app.after(self.autospeed_control('flash'), flash_erase)
+        self.after(1, flash_show)
+        self.after(self.autospeed_control('flash'), flash_erase)
 
         # Need to allow idle time for auto_setup to complete given
         #   autospeed_control() time; keeps auto_marks in correct register.
-        app.after_idle(self.auto_setup)
+        self.after_idle(self.auto_setup)
 
+def run_checks() -> None:
+    """
+    Run checks on supported platforms and Python versions; exit on fail.
 
-if __name__ == '__main__':
-
-    # Run checks on supported platforms and Python versions; exit on fail.
+    :return: None
+    """
     utils.check_platform()
     vcheck.minversion('3.7')
 
     # Check for invocation arguments (exit after running --about).
     utils.manage_args()
 
+def main():
     app = TicTacToeGUI()
     app.title('TIC TAC TOE')
     app.resizable(False, False)
@@ -1530,3 +1533,8 @@ if __name__ == '__main__':
         app.mainloop()
     except KeyboardInterrupt:
         print("\n*** User quit the program from Terminal/Console ***\n")
+
+if __name__ == '__main__':
+
+    run_checks() # Comment out to run PyInstaller on this script.
+    main()
