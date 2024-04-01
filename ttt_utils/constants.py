@@ -68,56 +68,44 @@ PLAY_AFTER = 600  # PC response time for PvPC mode.
 AUTO_FAST = 100  # Fast cycle time for all autoplay modes.
 AUTO_SLOW = 1000  # Slow cycle time for all autoplay modes.
 
-# Foreground and background colors.
-COLOR = {'score_fg': 'DodgerBlue4',
-         'status_bg': 'yellow3',
-         'disabled_fg': 'grey65',
-         'tk_white': '',
-         'mark_fg': 'yellow2',
-         'sq_won': 'blue',
-         'sq_not_won': 'black',
-         'sq_mouseover': 'grey15',
-         'button_bg': 'DodgerBlue1',
-         }
-
-# Need tk to match system's default white shade.
-if MY_OS == 'dar':  # macOS
-    COLOR['tk_white'] = 'white'
-elif MY_OS == 'lin':  # Linux (Ubuntu)
-    COLOR['tk_white'] = 'grey85'
-else:  # platform is 'win'  # Windows (10)
-    COLOR['tk_white'] = 'grey95'
-
-# Fonts for various widgets. Make it os-specific instead of using
-#  Tkinter's default named fonts because they can change and affect spacing.
-if MY_OS == 'dar':  # macOS
-    os_font = 'SF Pro'
-elif MY_OS == 'lin':  # Linux (Ubuntu)
-    os_font = 'DejaVu Sans'
-else:  # platform is 'win'  # Windows (10, 11)
-    os_font = 'Segoe UI'
-
-FONT = {
-    'sm_button': (os_font, 8),
-    'who': (os_font, 7, 'italic bold'),
-    'button': (os_font, 8, 'bold'),
-    'scores': (os_font, 9),
-    'status': (os_font, 9, 'italic bold'),
-    'condensed': (os_font, 8),
-    'mark': (os_font, 52),
+# A dictionary to directly map the operating system to the corresponding
+#  color for 'tk_white'. This eliminates the need for a if-elif-else
+#  structure. The get method is used to provide a default value of 'grey95'
+#  if the operating system is not 'dar' (macOS) or 'lin' (Linux).
+COLOR = {
+    'score_fg': 'DodgerBlue4',
+    'status_bg': 'yellow3',
+    'disabled_fg': 'grey65',
+    'tk_white': {'dar': 'white', 'lin': 'grey85'}.get(MY_OS, 'grey95'),
+    'mark_fg': 'yellow2',
+    'sq_won': 'blue',
+    'sq_not_won': 'black',
+    'sq_mouseover': 'grey15',
+    'button_bg': 'DodgerBlue1',
 }
 
-# Need OS-specific font size adjustments.
-if MY_OS == 'lin':
-    FONT['status'] = (os_font, 10, 'italic bold')
-elif MY_OS == 'dar':
-    FONT['sm_button'] = (os_font, 10)
-    FONT['who'] = (os_font, 11, 'italic bold')
-    FONT['button'] = (os_font, 11, 'bold')
-    FONT['scores'] = (os_font, 13)
-    FONT['status'] = (os_font, 13, 'italic bold')
-    FONT['condensed'] = (os_font, 10)
-    FONT['mark'] = (os_font, 75)
+# These font statements ensure that the GUI has a consistent look and feel
+#  across different operating systems. Default system fonts are used and
+#  font sizes and weights adjusted as needed.
+OS_FONT = {
+    'dar': 'SF Pro',  # macOS
+    'lin': 'DejaVu Sans',  # Linux (Ubuntu)
+    'win': 'Segoe UI'  # Windows (10, 11)
+}
+
+# If the operating system is not one of the three defined in the OS_FONT
+#  dictionary, it defaults to 'Arial'. Correct spacing is not guaranteed.
+os_font = OS_FONT.get(MY_OS, 'Arial')
+
+FONT = {
+    'sm_button': (os_font, 10 if MY_OS == 'dar' else 8),
+    'who': (os_font, 11 if MY_OS == 'dar' else 7, 'italic bold'),
+    'button': (os_font, 11 if MY_OS == 'dar' else 8, 'bold'),
+    'scores': (os_font, 13 if MY_OS == 'dar' else 9),
+    'status': (os_font, 13 if MY_OS == 'dar' else 10 if MY_OS == 'lin' else 9, 'italic bold'),
+    'condensed': (os_font, 10 if MY_OS == 'dar' else 8),
+    'mark': (os_font, 75 if MY_OS == 'dar' else 52),
+}
 
 # TIES (32) and WINS (1884) are all possible end-game board configurations,
 #   in index order; 3 rows x 3 col indices: 012345678.
