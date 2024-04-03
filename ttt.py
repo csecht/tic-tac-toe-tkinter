@@ -214,7 +214,7 @@ class TicTacToeGUI(tk.Tk):
                               ('active', COLOR['button_bg']),
                               ]
                   )
-        style.configure('My.TButton', font=FONT['sm_button'])
+        style.configure('My.TButton', font=FONT['button'])
 
         # Player's turn widgets.
         self.prev_game_num_header.config(text='Games played',
@@ -1071,13 +1071,13 @@ class TicTacToeGUI(tk.Tk):
 
         again = tk.Button(status_window, text='New Game (\u23CE)',
                           # Unicode Return/Enter key symbol ^^^.
-                          font=FONT['button'],
+                          font=FONT['button_bold'],
                           relief='groove',
                           overrelief='raised',
                           border=3,
                           command=restart_game)
         not_again = tk.Button(status_window, text='Quit',
-                              font=FONT['sm_button'],
+                              font=FONT['button'],
                               relief='groove',
                               overrelief='raised',
                               border=3,

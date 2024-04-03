@@ -69,9 +69,9 @@ AUTO_FAST = 100  # Fast cycle time for all autoplay modes.
 AUTO_SLOW = 1000  # Slow cycle time for all autoplay modes.
 
 # A dictionary to directly map the operating system to the corresponding
-#  color for 'tk_white'. This eliminates the need for a if-elif-else
+#  color for 'tk_white'. This eliminates the need for an if-elif-else
 #  structure. The get method is used to provide a default value of 'grey95'
-#  if the operating system is not 'dar' (macOS) or 'lin' (Linux).
+#  (Windows) if the operating system is not 'dar' (macOS) or 'lin' (Linux).
 COLOR = {
     'score_fg': 'DodgerBlue4',
     'status_bg': 'yellow3',
@@ -86,26 +86,59 @@ COLOR = {
 
 # These font statements ensure that the GUI has a consistent look and feel
 #  across different operating systems. Default system fonts are used and
-#  font sizes and weights adjusted as needed.
-OS_FONT = {
-    'dar': 'SF Pro',  # macOS
-    'lin': 'DejaVu Sans',  # Linux (Ubuntu)
-    'win': 'Segoe UI'  # Windows (10, 11)
+#  sizes and weights adjusted as needed for proper spacing.
+# Sub-keys are descriptive of the widget or text parameter args being set.
+FONT_SETTINGS = {
+    'lin': {
+        'os_font': 'DejaVu Sans',
+        'button': (8,),
+        'button_bold': (8, 'bold'),
+        'who': (7, 'italic bold'),
+        'scores': (9,),
+        'status': (10, 'italic bold'),
+        'condensed': (8,),
+        'mark': (52,),
+    },
+    'win': {
+        'os_font': 'Segoe UI',
+        'button': (8,),
+        'button_bold': (8, 'bold'),
+        'who': (7, 'italic bold'),
+        'scores': (9,),
+        'status': (9, 'italic bold'),
+        'condensed': (8,),
+        'mark': (52,),
+    },
+    'dar': {
+        'os_font': 'SF Pro',
+        'button': (10,),
+        'button_bold': (11, 'bold'),
+        'who': (11, 'italic bold'),
+        'scores': (13,),
+        'status': (13, 'italic bold'),
+        'condensed': (10,),
+        'mark': (75,),
+    },
+    'unknown': {
+        'os_font': 'Arial', # Default font
+        'button': (8,),
+        'button_bold': (8, 'bold'),
+        'who': (7, 'italic bold'),
+        'scores': (9,),
+        'status': (10,),
+        'condensed': (8,),
+        'mark': (52,),
+    },
 }
 
-# If the operating system is not one of the three defined in the OS_FONT
-#  dictionary, it defaults to 'Arial'. Correct spacing is not guaranteed.
-os_font = OS_FONT.get(MY_OS, 'Arial')
+# If the operating system is not one of the three expected for MY_OS, the
+#  'unknown' key is used to select default font styles, which may not work well.
+os_settings = FONT_SETTINGS.get(MY_OS, FONT_SETTINGS['unknown'])
+os_font = os_settings['os_font']
+setting_uses = FONT_SETTINGS['lin'].keys()
 
-FONT = {
-    'sm_button': (os_font, 10 if MY_OS == 'dar' else 8),
-    'who': (os_font, 11 if MY_OS == 'dar' else 7, 'italic bold'),
-    'button': (os_font, 11 if MY_OS == 'dar' else 8, 'bold'),
-    'scores': (os_font, 13 if MY_OS == 'dar' else 9),
-    'status': (os_font, 13 if MY_OS == 'dar' else 10 if MY_OS == 'lin' else 9, 'italic bold'),
-    'condensed': (os_font, 10 if MY_OS == 'dar' else 8),
-    'mark': (os_font, 75 if MY_OS == 'dar' else 52),
-}
+# Example usage: button1.configure(font=FONT['button_bold'])
+FONT = {_u: (os_font, *os_settings[_u]) for _u in setting_uses if _u != 'os_font'}
 
 # TIES (32) and WINS (1884) are all possible end-game board configurations,
 #   in index order; 3 rows x 3 col indices: 012345678.
