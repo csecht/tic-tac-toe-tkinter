@@ -419,44 +419,35 @@ class TicTacToeGUI(tk.Tk):
 
         :return: None
         """
+
         mode_clicked = self.mode_clicked.get()
+        game_in_progress = self.turn_number() > 0 and not self.winner_found
+        is_pvpc = mode_clicked == 'pvpc'
+        is_pvp = mode_clicked == 'pvp'
 
         # If a game is in progress, ignore any mode selections & post msg.
-        if self.turn_number() > 0 and not self.winner_found:
-            if mode_clicked in 'pvp, pvpc':
+        if game_in_progress:
+            if is_pvp or is_pvpc:
                 self.disable('auto_modes', 'auto_controls')
-
-                if self.curr_pmode == 'pvp':
-                    self.pvp_mode.select()
-                    self.pvpc_mode.config(state=tk.DISABLED)
-                    self.pvpc_mode.deselect()
-                elif self.curr_pmode == 'pvpc':
-                    self.pvpc_mode.select()
-                    self.pvp_mode.config(state=tk.DISABLED)
-                    # Only allow changing pc prefs on Human (P1) turn;
-                    #   forces completion of a two-turn game cycle.
-                    if self.prev_game_num.get() % 2 == 0:
-                        self.choose_pc_pref.config(state='readonly')
-                    self.pvp_mode.deselect()
-
+                self.pvp_mode.select() if self.curr_pmode == 'pvp' else self.pvpc_mode.select()
+                self.pvpc_mode.config(
+                    state=tk.DISABLED) if self.curr_pmode == 'pvp' else self.pvp_mode.config(
+                    state=tk.DISABLED)
+                # Only allow changing pc prefs on Human (P1) turn;
+                #   forces completion of a two-turn game cycle.
+                if self.curr_pmode == 'pvpc' and self.prev_game_num.get() % 2 == 0:
+                    self.choose_pc_pref.config(state='readonly')
                 messagebox.showinfo(title='Mode is unavailable now',
-                                    detail='Finish the current game,\n'
-                                           'then change mode.')
-
-        else:  # No game in progress.
-            if mode_clicked == 'pvpc':
-                self.choose_pc_pref.config(state='readonly')
-                self.player2_header.config(text='PC:')
-                self.update_idletasks()  # For immediate replacement of header text.
-            else:
-                self.choose_pc_pref.config(state=tk.DISABLED)
-                self.player2_header.config(text=f'{PLAYER2}:')
-
-            if mode_clicked in 'pvp, pvpc':
+                                    detail='Finish the current game,\nthen change mode.')
+        else:
+            self.choose_pc_pref.config(state='readonly' if is_pvpc else tk.DISABLED)
+            self.player2_header.config(text='PC:' if is_pvpc else f'{PLAYER2}:')
+            self.update_idletasks()  # For immediate replacement of header text.
+            if is_pvp or is_pvpc:
                 self.disable('auto_controls')
                 self.ready_player_one()
                 utils.keybindings(self, 'bind_board')
-            else:  # One of the auto modes was clicked.
+            else:  # one of the auto modes is active.
                 self.auto_start_stop_btn.config(state=tk.NORMAL)
                 self.who_autostarts_btn.configure(state=tk.NORMAL)
                 self.autospeed_fast.config(state=tk.NORMAL)
