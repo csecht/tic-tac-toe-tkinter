@@ -614,7 +614,7 @@ class TicTacToeGUI(tk.Tk):
 
         # Now prefer to play for win, then for block.
         if turn_number == self.turn_number():
-            self.play_rudiments(turn_number, P2_MARK, pvpc=True)
+            self.play_rudiments(P2_MARK, pvpc=True)
 
         # Tactical preference: play a set of rules to minimize losses.
         if self.choose_pc_pref.get() == 'PC plays tactics':
@@ -639,65 +639,53 @@ class TicTacToeGUI(tk.Tk):
 
         self.update_idletasks()
 
-    def play_rudiments(self, turn_number: int, mark: str, pvpc=False) -> None:
+    def play_rudiments(self, mark: str, pvpc=False) -> None:
         """
-        The rules engine for basic play to win or block.
+        The rules engine for basic PC play to win or block.
+        Called from pc_turn(), autoplay_center(), autoplay_tactics.
 
-        :param turn_number: Current turn count from turn_number().
         :param mark: The played mark string character.
-        :param pvpc: Use when called from a P v PC mode (default, False).
+        :param pvpc: Use when called from a P v PC mode to employ
+            alternate color for the PC's mark (default, False).
         :returns: None
         """
 
+        # Randomize the order of the WINNING_COMBOS list so Human
+        #  can't detect a pattern of PC play.
         random.shuffle(WINNING_COMBOS)
         opponent = P2_MARK if mark == P1_MARK else P1_MARK
 
+        # Note that running two loops is necessary to prioritize
+        #  winning over blocking because need to first evaluate ALL
+        #  possible winning moves before trying to block.
+        # Use the count method to check if there are two marks in the
+        #  positions and the index method to find an empty position.
+
+        # First, play to win; check positions of current player's marks.
+        #  If two player's marks are aligned, fill the empty third position.
         for combo in WINNING_COMBOS:
             _x, _y, _z = combo
-            x_txt = self.board_labels[_x]['text']
-            y_txt = self.board_labels[_y]['text']
-            z_txt = self.board_labels[_z]['text']
+            positions = [self.board_labels[pos]['text'] for pos in combo]
+            empty_index = positions.index(' ') if ' ' in positions else None
 
-            # Play to win.
-            if x_txt == y_txt == mark and z_txt == ' ':
-                self.board_labels[_z]['text'] = mark
+            if positions.count(mark) == 2 and empty_index is not None:
+                self.board_labels[combo[empty_index]]['text'] = mark
                 if pvpc:
-                    self.color_pc_mark(_z)
-                break
-            if y_txt == z_txt == mark and x_txt == ' ':
-                self.board_labels[_x]['text'] = mark
-                if pvpc:
-                    self.color_pc_mark(_x)
-                break
-            if x_txt == z_txt == mark and y_txt == ' ':
-                self.board_labels[_y]['text'] = mark
-                if pvpc:
-                    self.color_pc_mark(_y)
-                break
+                    self.color_pc_mark(combo[empty_index])
+                return
 
-        # No win available, so play to block.
-        if turn_number == self.turn_number():
-            for combo in WINNING_COMBOS:
-                _x, _y, _z = combo
-                x_txt = self.board_labels[_x]['text']
-                y_txt = self.board_labels[_y]['text']
-                z_txt = self.board_labels[_z]['text']
+        # No win available, so play to block; check positions of opponent's marks.
+        #  If two opponent's marks are aligned, fill the empty third position.
+        for combo in WINNING_COMBOS:
+            _x, _y, _z = combo
+            positions = [self.board_labels[pos]['text'] for pos in combo]
+            empty_index = positions.index(' ') if ' ' in positions else None
 
-                if x_txt == y_txt == opponent and z_txt == ' ':
-                    self.board_labels[_z]['text'] = mark
-                    if pvpc:
-                        self.color_pc_mark(_z)
-                    break
-                if y_txt == z_txt == opponent and x_txt == ' ':
-                    self.board_labels[_x]['text'] = mark
-                    if pvpc:
-                        self.color_pc_mark(_x)
-                    break
-                if x_txt == z_txt == opponent and y_txt == ' ':
-                    self.board_labels[_y]['text'] = mark
-                    if pvpc:
-                        self.color_pc_mark(_y)
-                    break
+            if positions.count(opponent) == 2 and empty_index is not None:
+                self.board_labels[combo[empty_index]]['text'] = mark
+                if pvpc:
+                    self.color_pc_mark(combo[empty_index])
+                return
 
     def play_defense(self, turn_number: int, mark: str, pvpc=False) -> None:
         """
@@ -1361,7 +1349,7 @@ class TicTacToeGUI(tk.Tk):
 
             # Look for a winning or blocking play.
             if turn_number == self.turn_number():
-                self.play_rudiments(turn_number, mark)
+                self.play_rudiments(mark)
 
             # No preferred play available, so play random.
             if turn_number == self.turn_number():
@@ -1402,7 +1390,7 @@ class TicTacToeGUI(tk.Tk):
 
             # Look for a winning or blocking play.
             if turn_number == self.turn_number():
-                self.play_rudiments(turn_number, mark)
+                self.play_rudiments(mark)
 
             if turn_number == self.turn_number():
                 self.play_defense(turn_number, mark)
