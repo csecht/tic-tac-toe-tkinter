@@ -35,16 +35,27 @@ except (ImportError, ModuleNotFoundError) as error:
           f'See also: https://tkdocs.com/tutorial/install.html \n{error}')
 
 # Local program imports:
-from ttt_utils import (vcheck,
-                       grid_this,
-                       utils,
-                       constants as const)
-from ttt_utils.constants import (MY_OS,
-                                 PLAYER1, PLAYER2,
-                                 P1_MARK, P2_MARK,
-                                 MARKS1, MARKS2,
-                                 COLOR, FONT,
-                                 SIDES, WINNING_COMBOS)
+from ttt_utils import vcheck, grid_this, utils
+from ttt_utils.constants import (
+    AUTO_FAST,
+    AUTO_SLOW,
+    COLOR,
+    CORNERS,
+    FONT,
+    MARKS1,
+    MARKS2,
+    META_POSITIONS,
+    MY_OS,
+    ORTHO_SIDES,
+    P1_MARK,
+    P2_MARK,
+    PARA_CORNERS,
+    PLAY_AFTER,
+    PLAYER1,
+    PLAYER2,
+    SIDES,
+    WINNING_COMBOS,
+)
 
 
 class TicTacToeGUI(tk.Tk):
@@ -419,35 +430,44 @@ class TicTacToeGUI(tk.Tk):
 
         :return: None
         """
-
         mode_clicked = self.mode_clicked.get()
-        game_in_progress = self.turn_number() > 0 and not self.winner_found
-        is_pvpc = mode_clicked == 'pvpc'
-        is_pvp = mode_clicked == 'pvp'
 
         # If a game is in progress, ignore any mode selections & post msg.
-        if game_in_progress:
-            if is_pvp or is_pvpc:
+        if self.turn_number() > 0 and not self.winner_found:
+            if mode_clicked in 'pvp, pvpc':
                 self.disable('auto_modes', 'auto_controls')
-                self.pvp_mode.select() if self.curr_pmode == 'pvp' else self.pvpc_mode.select()
-                self.pvpc_mode.config(
-                    state=tk.DISABLED) if self.curr_pmode == 'pvp' else self.pvp_mode.config(
-                    state=tk.DISABLED)
-                # Only allow changing pc prefs on Human (P1) turn;
-                #   forces completion of a two-turn game cycle.
-                if self.curr_pmode == 'pvpc' and self.prev_game_num.get() % 2 == 0:
-                    self.choose_pc_pref.config(state='readonly')
+
+                if self.curr_pmode == 'pvp':
+                    self.pvp_mode.select()
+                    self.pvpc_mode.config(state=tk.DISABLED)
+                    self.pvpc_mode.deselect()
+                elif self.curr_pmode == 'pvpc':
+                    self.pvpc_mode.select()
+                    self.pvp_mode.config(state=tk.DISABLED)
+                    # Only allow changing pc prefs on Human (P1) turn;
+                    #  this forces completion of a two-turn game cycle.
+                    if self.prev_game_num.get() % 2 == 0:
+                        self.choose_pc_pref.config(state='readonly')
+                    self.pvp_mode.deselect()
+
                 messagebox.showinfo(title='Mode is unavailable now',
-                                    detail='Finish the current game,\nthen change mode.')
-        else:
-            self.choose_pc_pref.config(state='readonly' if is_pvpc else tk.DISABLED)
-            self.player2_header.config(text='PC:' if is_pvpc else f'{PLAYER2}:')
-            self.update_idletasks()  # For immediate replacement of header text.
-            if is_pvp or is_pvpc:
+                                    detail='Finish the current game,\n'
+                                           'then change mode.')
+        else:  # No game in progress.
+            if mode_clicked == 'pvpc':
+                self.choose_pc_pref.config(state='readonly')
+                self.player2_header.config(text='PC:')
+                # Need immediate replacement of header text.
+                self.update_idletasks()
+            else:
+                self.choose_pc_pref.config(state=tk.DISABLED)
+                self.player2_header.config(text=f'{PLAYER2}:')
+
+            if mode_clicked in 'pvp, pvpc':
                 self.disable('auto_controls')
                 self.ready_player_one()
                 utils.keybindings(self, 'bind_board')
-            else:  # one of the auto modes is active.
+            else:  # one of the auto modes was clicked.
                 self.auto_start_stop_btn.config(state=tk.NORMAL)
                 self.who_autostarts_btn.configure(state=tk.NORMAL)
                 self.autospeed_fast.config(state=tk.NORMAL)
@@ -461,7 +481,6 @@ class TicTacToeGUI(tk.Tk):
     def ready_player_one(self) -> None:
         """
         Display when it is Human's (Player 1) turn after PC has played.
-
         Shout out to Steven Spielberg.
 
         :return: None
@@ -477,7 +496,6 @@ class TicTacToeGUI(tk.Tk):
     def human_turn(self, played_lbl: tk) -> None:
         """
         Check whether *played_lbl* selected by player was already played.
-
         If not, assign player's mark to the text value of the selected
         label.
         Players' marks (X or O) alternate who has first the turn in
@@ -489,20 +507,12 @@ class TicTacToeGUI(tk.Tk):
         :return: None
         """
 
-        def h_plays_p1():
-            played_lbl['text'] = P1_MARK
-            self.whose_turn.set(f'{PLAYER2} plays {P2_MARK}')
+        def h_plays(mark: str, next_turn_msg: str) -> None:
+            played_lbl['text'] = mark
+            self.whose_turn.set(next_turn_msg)
             self.whose_turn_lbl.config(bg=COLOR['tk_white'])
-
-        def h_plays_p2():
-            played_lbl['text'] = P2_MARK
-            played_lbl.config(fg=COLOR['tk_white'])
-            self.ready_player_one()
-
-        def h_plays_p1_v_pc():
-            played_lbl['text'] = P1_MARK
-            self.whose_turn.set(f'PC plays {P2_MARK}')
-            self.whose_turn_lbl.config(bg=COLOR['tk_white'])
+            if mark == P2_MARK:
+                played_lbl.config(fg=COLOR['tk_white'])
 
         # At start, Previous game # = 0, then increments after a win/tie.
         #  At start of a new game, turn # = 0.
@@ -513,31 +523,19 @@ class TicTacToeGUI(tk.Tk):
 
             if self.mode_clicked.get() == 'pvp':
                 self.curr_pmode = 'pvp'
-                if self.prev_game_num.get() % 2 == 0:
-                    if self.turn_number() % 2 == 0:
-                        h_plays_p1()  # even prev_game, even turn
-                    else:
-                        h_plays_p2()  # even prev_game, odd turn
+                if self.prev_game_num.get() % 2 == self.turn_number() % 2:
+                    h_plays(P1_MARK, f'{PLAYER2} plays {P2_MARK}')
                 else:
-                    if self.turn_number() % 2 == 0:
-                        h_plays_p2()  # odd prev_game, even turn
-                    else:
-                        h_plays_p1()  # odd prev_game, odd turn
+                    h_plays(P2_MARK, f'{PLAYER1} plays {P1_MARK}')
 
                 if self.turn_number() >= 5:
                     self.check_winner(played_lbl.cget('text'))
 
             else:  # The PvPC mode was clicked.
                 self.curr_pmode = 'pvpc'
-                if (self.turn_number() % 2 == 0 and
-                        self.prev_game_num.get() % 2 == 0):
-                    h_plays_p1_v_pc()  # even prev_game, even turn
+                if self.prev_game_num.get() % 2 == self.turn_number() % 2:
+                    h_plays(P1_MARK, f'PC plays {P2_MARK}')
 
-                elif (self.turn_number() % 2 != 0 and
-                      self.prev_game_num.get() % 2 != 0):
-                    h_plays_p1_v_pc()  # odd prev_game, odd turn
-
-                # Need to update for self.after delay to work in pc_turn().
                 self.update_idletasks()
 
                 if self.turn_number() >= 5:
@@ -547,25 +545,21 @@ class TicTacToeGUI(tk.Tk):
                     self.pc_turn()
 
             # Play is now underway so disable the Player v... mode that
-            #   is not in play.
+            #  is not in play.
             if self.curr_pmode == 'pvp':
                 self.pvpc_mode.config(state=tk.DISABLED)
             else:
                 self.pvp_mode.config(state=tk.DISABLED)
-        else:  # That square/label has a player's mark as its text.
-            if PLAYER1 in self.whose_turn.get():
-                curr_player = PLAYER1
-                curr_mark = P1_MARK
-            else:
-                curr_player = PLAYER2
-                curr_mark = P2_MARK
+
+        else:  # The played_lbl has a player's mark as its text.
+            curr_player = PLAYER1 if PLAYER1 in self.whose_turn.get() else PLAYER2
+            curr_mark = P1_MARK if PLAYER1 in self.whose_turn.get() else P2_MARK
             self.whose_turn.set(f'That square is\ntaken {curr_player}.\n'
                                 f'Play {curr_mark} elsewhere.')
 
     def color_pc_mark(self, _id: int) -> None:
         """
         In PvPC mode, display alternate fg color for PC's mark text.
-
         Default color (COLOR['mark_fg']) for human (Player 1) is set in
         setup_game_board(), so change that to a white fg.
 
@@ -578,7 +572,6 @@ class TicTacToeGUI(tk.Tk):
     def pc_turn(self) -> None:
         """
         Conditions for PC to play as Player2 (P2_MARK).
-
         Precedence of PC play: selected pref option > play for a win >
         block P1 win > play to corner, if preferred > play random.
         Called from human_turn() and new_game().
@@ -594,13 +587,18 @@ class TicTacToeGUI(tk.Tk):
         # Delay play for a better feel, but not when PC starts a game b/c
         #   that just delays closing the Game Status toplevel for a new game.
         if turn_number > 0:
-            self.after(const.PLAY_AFTER)
+            self.after(PLAY_AFTER)
             self.choose_pc_pref.config(state=tk.DISABLED)
 
         # Need to re-order winner list so Human doesn't detect a pattern
         #   of where PC will play.
         #   CORNERS list is shuffled in play_corners().
         random.shuffle(WINNING_COMBOS)
+
+        """Turn number will advance following PC play from any of the
+        play_xxx() methods used here in succession. If no play is made,
+        turn_number will not advance, so the next play_xxx() method will
+        be called."""
 
         # Preference: all PC moves are random.
         if self.choose_pc_pref.get() == 'PC plays random':
@@ -641,12 +639,10 @@ class TicTacToeGUI(tk.Tk):
 
     def play_rudiments(self, mark: str, pvpc=False) -> None:
         """
-        The rules engine for basic PC play to win or block.
-        Called from pc_turn(), autoplay_center(), autoplay_tactics.
+        The rules engine for basic play to win or block.
 
         :param mark: The played mark string character.
-        :param pvpc: Use when called from a P v PC mode to employ
-            alternate color for the PC's mark (default, False).
+        :param pvpc: Use when called from a P v PC mode (default, False).
         :returns: None
         """
 
@@ -675,7 +671,7 @@ class TicTacToeGUI(tk.Tk):
                 return
 
         # No win available, so play to block; check positions of opponent's marks.
-        #  If two opponent's marks are aligned, fill the empty third position.
+        #  If two opponent's marks are aligned, play the empty third position.
         for combo in WINNING_COMBOS:
             _x, _y, _z = combo
             positions = [self.board_labels[pos]['text'] for pos in combo]
@@ -685,12 +681,11 @@ class TicTacToeGUI(tk.Tk):
                 self.board_labels[combo[empty_index]]['text'] = mark
                 if pvpc:
                     self.color_pc_mark(combo[empty_index])
-                return
+                break
 
     def play_defense(self, turn_number: int, mark: str, pvpc=False) -> None:
         """
         A rules-based set of defensive responses to minimize PC losses.
-
         Strategy in decreasing priority: defend center, sides, corners.
 
         :param turn_number: Current turn count from turn_number().
@@ -701,8 +696,8 @@ class TicTacToeGUI(tk.Tk):
         """
 
         # Get opponent's mark and list indices of its played squares.
-        oppo_mrk = P2_MARK if mark == P1_MARK else P1_MARK
-        oppo_list = [i for i in range(9) if self.board_labels[i]['text'] == oppo_mrk]
+        oppo_mark = P2_MARK if mark == P1_MARK else P1_MARK
+        oppo_list = [i for i in range(9) if self.board_labels[i]['text'] == oppo_mark]
 
         # Always defend center, if available, in response to opponent's 1st turn.
         if turn_number == 1:
@@ -712,88 +707,69 @@ class TicTacToeGUI(tk.Tk):
                     self.color_pc_mark(4)
                     print('PC grabbed the center, '
                           f'Game {self.prev_game_num.get() + 1}:Turn {turn_number + 1}')
+        elif turn_number > 1:
+            # When opponent plays a side square, play the open center to
+            #  reduce possibility of a loss.
+            if (self.board_labels[4]['text'] == ' ' and
+                    oppo_mark in (self.board_labels[i]['text'] for i in SIDES)):
+                self.board_labels[4]['text'] = mark
+                if pvpc:
+                    self.color_pc_mark(4)
+                    print('PC played center defense, '
+                          f'Game {self.prev_game_num.get() + 1}:Turn {turn_number + 1}')
+                    return
 
-        # When opponent plays a side square, play the open center to reduce
-        #   possibility of a loss.
-        if turn_number == self.turn_number():
-            for i in SIDES:
-                if self.board_labels[i]['text'] == oppo_mrk:
-                    if self.board_labels[4]['text'] == ' ':
-                        self.board_labels[4]['text'] = mark
-                        if pvpc:
-                            self.color_pc_mark(4)
-                            print('PC played center defense, '
-                                  f'Game {self.prev_game_num.get() + 1}:Turn {turn_number + 1}')
-                        break
-
-        # When opponent is on two adjacent side squares, defend with play
-        #   to the shared (nearest) corner.
-        # Need SIDES in ascending order, so sort() in case random.shuffle
-        #   was previously used on SIDES.
-        if turn_number == self.turn_number():
-            SIDES.sort()
-
-            # Have PC play the appropriate corner to defend.
-            for key, val in const.ORTHO_SIDES.items():
+            # When opponent is on two adjacent side squares, defend with play
+            #   to the shared (nearest) corner.
+            for key, val in ORTHO_SIDES.items():
                 if self.board_labels[key]['text'] == ' ' and oppo_list == val:
                     self.board_labels[key]['text'] = mark
                     if pvpc:
                         self.color_pc_mark(key)
                         print('PC played corner for orthogonal sides defense, '
                               f'Game {self.prev_game_num.get() + 1}:Turn {turn_number + 1}')
-                    break
+                    return
 
-        # When opponent has played a corner and a non-adjacent side, defend with
-        #   play to opponent's shared (nearest) corner.
-        if turn_number == self.turn_number():
-            for key, val in const.META_POSITIONS.items():
+            # When opponent has played a corner and a non-adjacent side, defend with
+            #   play to opponent's shared (nearest) corner.
+            for key, val in META_POSITIONS.items():
                 if self.board_labels[key]['text'] == ' ' and oppo_list == val:
                     self.board_labels[key]['text'] = mark
                     if pvpc:
                         self.color_pc_mark(key)
                         print('PC played corner for meta-positional defense, '
                               f'Game {self.prev_game_num.get() + 1}:Turn {turn_number + 1}')
-                    break
+                    return
 
-        # When opponent has played to opposite corners, defend with play to
-        #   a random side.
-        if turn_number == self.turn_number():
-            random.shuffle(SIDES)
-            side2play = SIDES[0]
-
-            for corner_list in const.PARA_CORNERS:
-                if corner_list == oppo_list:
-                    self.board_labels[side2play]['text'] = mark
-                    if pvpc:
-                        self.color_pc_mark(side2play)
-                        print('PC played a side for para-corners defense, '
-                              f'Game {self.prev_game_num.get() + 1}:Turn {turn_number + 1}')
-                    break
+            # When opponent has played to opposite corners, defend with play to
+            #   a random side.
+            side2play = random.choice(SIDES)
+            if oppo_list in PARA_CORNERS:
+                self.board_labels[side2play]['text'] = mark
+                if pvpc:
+                    self.color_pc_mark(side2play)
+                    print('PC played a side for para-corners defense,'
+                          f' Game {self.prev_game_num.get() + 1}:Turn {turn_number + 1}')
 
     def play_corners(self, turn_number: int, mark: str, pvpc=False) -> None:
         """
         Fill in available corners to increase probability of a win.
-
         Used for 'tactics' play modes.
 
         :param turn_number: Current turn count from turn_number().
         :param mark: The played mark character, as string.
-        :param pvpc: Use when called from a P vs PC mode (default, False).
+        :param pvpc: True when called from a P vs PC mode (default, False).
 
         :return: None
         """
 
-        random.shuffle(const.CORNERS)
-
-        for i in const.CORNERS:
-            c_txt = self.board_labels[i]['text']
-            if turn_number == self.turn_number() and c_txt == ' ':
-                self.board_labels[i]['text'] = mark
-                if pvpc:
-                    self.color_pc_mark(i)
-                    print('PC played corner tactics, '
-                          f'Game {self.prev_game_num.get() + 1}:Turn {turn_number + 1}')
-                break
+        available_corners = [i for i in CORNERS if self.board_labels[i]['text'] == ' ']
+        if available_corners and turn_number == self.turn_number():
+            i = random.choice(available_corners)
+            self.board_labels[i]['text'] = mark
+            if pvpc:
+                self.color_pc_mark(i)
+                print(f'PC played corner tactics, Game {self.prev_game_num.get() + 1}:Turn {turn_number + 1}')
 
     def play_random(self, turn_number: int, mark: str) -> None:
         """ Play a random position in board_labels.
@@ -803,17 +779,15 @@ class TicTacToeGUI(tk.Tk):
 
         :return: None
         """
-        while turn_number == self.turn_number():
-            random_idx = random.randrange(0, 9)
-            if self.board_labels[random_idx]['text'] == ' ':
-                self.board_labels[random_idx]['text'] = mark
-                if self.mode_clicked.get() in 'pvp, pvpc':
-                    self.color_pc_mark(random_idx)
-
+        available_positions = [i for i in range(9) if self.board_labels[i]['text'] == ' ']
+        if available_positions and turn_number == self.turn_number():
+            random_idx = random.choice(available_positions)
+            self.board_labels[random_idx]['text'] = mark
+            if self.mode_clicked.get() in 'pvp, pvpc':
+                self.color_pc_mark(random_idx)
     def turn_number(self) -> int:
         """
         Keep count of turns taken during a game.
-
         Count number of board_labels squares with text other than a space.
 
         :return: The number of turns played, as integer.
@@ -821,66 +795,55 @@ class TicTacToeGUI(tk.Tk):
         return len([i for i in self.board_labels if ' ' not in i['text']])
 
     def check_winner(self, mark: str) -> None:
-        """
-        Check played board_labels index combinations for a win or tie.
+        """Check played board_labels for a win or tie.
 
         :param mark: The played mark character to check for a win.
         :return: None
         """
 
-        pc_pref = self.choose_pc_pref.get()
         mode = self.mode_clicked.get()
 
-        def award_points(winning_mark):
-            if winning_mark == P1_MARK:
-                self.p1_points += 1
-            else:
-                self.p2_points += 1
+        def award_points(winning_mark: str) -> None:
+            """
+            This uses the fact that Python treats True as 1 and False as
+            0. So, if winning_mark is equal to P1_MARK,
+            winning_mark == P1_MARK will be True and 1 will be added to
+            p1_points. Otherwise, it will be False and 0 will be added.
+            Similarly, if winning_mark is not equal to P1_MARK,
+            winning_mark != P1_MARK will be True and 1 will be added to
+            p2_points. Otherwise, it will be False and 0 will be added.
+            (Thank you Copilot for the explanation.)
+            :param winning_mark: Current player's mark
+            :return: None
+            """
+            self.p1_points += winning_mark == P1_MARK
+            self.p2_points += winning_mark != P1_MARK
 
         # Loop breaks when the first winning combo is found.
         for combo in WINNING_COMBOS:
-            _x, _y, _z = combo
-            lbl_x_txt = self.board_labels[_x]['text']
-            lbl_y_txt = self.board_labels[_y]['text']
-            lbl_z_txt = self.board_labels[_z]['text']
+            lbl_texts = [self.board_labels[i]['text'] for i in combo]
 
-            if lbl_x_txt == lbl_y_txt == lbl_z_txt == mark:
+            if all(text == mark for text in lbl_texts):
                 self.winner_found = True
                 self.prev_game_num.set(self.prev_game_num.get() + 1)
-
-                # Record to file all winning board_labels lists.
-                # winlist = f'{[i["text"] for i in self.board_labels]}\n'
-                # with open('wins', 'a') as file:
-                #     file.write(winlist)
-
-                game = self.prev_game_num.get()  # Is current game number.
+                game = self.prev_game_num.get()
                 turn = self.turn_number()
 
-                if 'Autoplay' in mode:
-                    award_points(mark)
-                    self.auto_flash_game(combo, mark)
-                    break
-                if mode == 'pvpc':
-                    award_points(mark)
-                    self.highlight_result('win', combo)
-
-                    if mark == P2_MARK:
-                        self.display_status('PC WINS!')
-                    else:
-                        self.display_status('You WIN!')
-
-                    # Print is not needed here for 'PC plays random'.
-                    if self.pc_pref.get() in 'PC plays tactics, PC plays center':
-                        if mark == P2_MARK:
-                            print(f'PC won "{pc_pref} mode", Game {game}:Turn {turn}.')
-                        else:
-                            print(f'Human won "{pc_pref} mode", Game {game}:Turn {turn}.')
-                    break
-
-                # No 'break' yet, so mode selection must be pvp.
                 award_points(mark)
-                self.highlight_result('win', combo)
-                self.display_status(f'{mark} WINS!')
+                if 'Autoplay' in mode:
+                    self.auto_flash_game(combo, mark)
+                elif mode == 'pvpc':
+                    self.highlight_result('win', combo)
+                    display_message = 'PC WINS!' if mark == P2_MARK else 'You WIN!'
+                    self.display_status(display_message)
+                    if self.pc_pref.get() in ['PC plays tactics', 'PC plays center']:
+                        winner = 'PC' if mark == P2_MARK else 'Human'
+                        print(
+                            f'{winner} won "{self.pc_pref.get()} mode", Game {game}:Turn {turn}.')
+                else:
+                    self.highlight_result('win', combo)
+                    self.display_status(f'{mark} WINS!')
+                break
 
         if self.turn_number() == 9 and not self.winner_found:  # Is a tie.
             self.winner_found = True
@@ -1284,9 +1247,9 @@ class TicTacToeGUI(tk.Tk):
         """
 
         if self.autospeed_selection.get() == 'fast':
-            after_time = const.AUTO_FAST
+            after_time = AUTO_FAST
         else:  # Is 'game' or 'flash' (or a misspelled argument call).
-            after_time = const.AUTO_SLOW
+            after_time = AUTO_SLOW
 
         # Note: *after_type* 'flash' is called from auto_flash_game()
         #   where the flash time needs to be less than the after_time
