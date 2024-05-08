@@ -158,7 +158,15 @@ def program_name() -> str:
 
     :return: Name of the main script file.
     """
-    return Path(sys.modules['__main__'].__file__).name
+    """
+    Returns the script name or, if called from a PyInstaller stand-alone,
+    the executable name. Use for setting file paths and naming windows.
+
+    :return: Context-specific name of the main program, as string.
+    """
+    if getattr(sys, 'frozen', False):  # hasattr(sys, '_MEIPASS'):
+        return Path(sys.executable).stem
+    return  Path(sys.modules['__main__'].__file__).stem
 
 
 def quit_game(mainloop, keybind=None) -> None:

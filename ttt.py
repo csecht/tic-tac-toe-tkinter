@@ -813,6 +813,7 @@ class TicTacToeGUI(tk.Tk):
             winning_mark != P1_MARK will be True and 1 will be added to
             p2_points. Otherwise, it will be False and 0 will be added.
             (Thank you Copilot for the explanation.)
+
             :param winning_mark: Current player's mark
             :return: None
             """
