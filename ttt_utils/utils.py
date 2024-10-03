@@ -14,7 +14,6 @@ import platform
 import sys
 # Local program imports:
 from pathlib import Path
-from __main__ import __doc__
 from ttt_utils import (__author__,
                        __copyright__,
                        __dev_status__,
@@ -138,7 +137,7 @@ def manage_args() -> None:
     args = parser.parse_args()
     if args.about:
         print('====================== ABOUT START ====================')
-        print(__doc__)
+        print(sys.modules["__main__"].__doc__)
         print(f'{"Author:".ljust(13)}', __author__)
         print(f'{"Version:".ljust(13)}', __version__)
         print(f'{"Status:".ljust(13)}', __dev_status__)
