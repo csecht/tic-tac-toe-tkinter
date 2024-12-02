@@ -22,6 +22,8 @@ https://gist.github.com/riya1620/72c2b668ef29da061c44d97a82318572
 
 # Standard library imports:
 import random
+
+from signal import signal, SIGINT
 from typing import Callable  # Used only in auto_repeat()
 
 try:
@@ -956,18 +958,10 @@ class TicTacToeGUI(tk.Tk):
                                     relief='raised')
         status_window.title('Game Status')
 
-        if MY_OS == 'win':  # Windows
-            size = '500x150'
-            min_w = 300
-            min_h = 150
-        elif MY_OS == 'dar':  # macOS
-            size = '200x90'
-            min_w = 150
-            min_h = 90
-        else:  # Linux
-            size = '230x100'
-            min_w = 180
-            min_h = 100
+        size, min_w, min_h = {
+            'win': ('520x150', 300, 150),
+            'dar': ('220x90', 150, 90)
+        }.get(MY_OS, ('260x100', 180, 100))  # Defaults to Linux.
 
         status_window.geometry(size)
         status_window.minsize(min_w, min_h)
@@ -1452,6 +1446,8 @@ def run_checks() -> None:
     utils.manage_args()
 
 def main():
+    run_checks() # Comment out to run PyInstaller on this script.
+
     app = TicTacToeGUI()
     app.title('TIC TAC TOE')
     app.resizable(False, False)
@@ -1472,12 +1468,22 @@ def main():
 
     print(f'{utils.program_name()} now running...')
 
-    try:
-        app.mainloop()
-    except KeyboardInterrupt:
-        print("\n*** User quit the program from Terminal/Console ***\n")
+    # Allow user to quit from the Terminal command line using Ctrl-C
+    #  without the delay of waiting for tk event actions.
+    # Source: https://stackoverflow.com/questions/39840815/
+    #   exiting-a-tkinter-app-with-ctrl-c-and-catching-sigint
+    # Keep polling the mainloop to check for the SIGINT signal, Ctrl-C.
+    # Comment out the following statements before mainloop() when using PyInstaller.
+    signal(signalnum=SIGINT,
+           handler=lambda x, y: utils.quit_game(mainloop=app))
+
+    def tk_check(msec):
+        app.after(msec, tk_check, msec)
+
+    poll_ms = 500
+    app.after(poll_ms, tk_check, poll_ms)
+
+    app.mainloop()
 
 if __name__ == '__main__':
-
-    run_checks() # Comment out to run PyInstaller on this script.
     main()
