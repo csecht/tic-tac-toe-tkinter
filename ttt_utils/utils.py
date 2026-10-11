@@ -149,6 +149,7 @@ def manage_args() -> None:
         sys.exit(0)
 
 
+# The use of sys.modules['__main__'] may not work in all Python environments.
 def program_name() -> str:
     """
     Extract the main program's file name from the full path.

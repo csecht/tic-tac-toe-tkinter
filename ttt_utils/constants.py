@@ -15,6 +15,7 @@ TIES, WINS: (unused) tuples of board end-game configurations, in index order.
 from sys import platform
 
 MY_OS = platform[:3]
+PROGRAM_NAME = 'ttt'
 
 # Used only for display of player ID.
 PLAYER1 = 'Player 1'

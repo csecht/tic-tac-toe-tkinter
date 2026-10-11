@@ -55,6 +55,7 @@ from ttt_utils.constants import (
     PLAY_AFTER,
     PLAYER1,
     PLAYER2,
+    PROGRAM_NAME,
     SIDES,
     WINNING_COMBOS,
 )
@@ -1466,7 +1467,7 @@ def main():
         print('Cannot display program icon, so it will be left blank or tk default.')
         print(f'tk error message: {msg}')
 
-    print(f'{utils.program_name()} now running...')
+    print(f'{PROGRAM_NAME} now running...')
 
     # Allow user to quit from the Terminal command line using Ctrl-C
     #  without the delay of waiting for tk event actions.
